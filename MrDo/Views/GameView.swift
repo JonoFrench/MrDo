@@ -1,0 +1,46 @@
+//
+//  GameView.swift
+//  MrDo
+//
+//  Created by Jonathan French on 17.09.24.
+//
+
+import SwiftUI
+
+struct GameView: View {
+    @EnvironmentObject var manager: GameManager
+    @ObservedObject var mrDo:MrDo
+    var body: some View {
+        VStack(alignment:.center, spacing: .zero) {
+            TopView()
+                .frame(height: manager.gameScreen.assetDimension * 1 , alignment: .center)
+                .background(.black)
+                .zIndex(3.0)
+            ZStack(alignment: .center) {
+                ScreenView(gameScreen: manager.gameScreen)
+                //.frame(height: manager.gameScreen.assetDimension * 13, alignment: .center)
+                    .zIndex(0.5)
+                MrDoView(mrDo: mrDo)
+                    .position(mrDo.position)
+                    .zIndex(2.0)
+                
+                ForEach(manager.appleArray, id: \.id) { apple in
+                    AppleView(apple: apple)
+                        .position(apple.position)
+                        .zIndex(0.6)
+                }
+                CenterView(center: manager.center)
+                    .position(manager.center.position)
+                    .zIndex(0.7)
+            }
+            BottomView()
+                .frame(height: manager.gameScreen.assetDimension * 1, alignment: .center)
+                .zIndex(3.0)
+                .background(.black)
+        }
+    }
+}
+
+//#Preview {
+//    GameView()
+//}

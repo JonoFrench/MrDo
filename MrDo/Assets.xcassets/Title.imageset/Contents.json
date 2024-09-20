@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "MrDoTitle.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
