@@ -53,11 +53,13 @@ public class MrDoHighScores:ObservableObject {
         }
     }
     
-    public func addScores(score:Int,initials:String){
+    public func addScores(score:Int,initials:String,level: Int,time:Int){
         
         let newHighScore:HighScores = HighScores.init(entity: NSEntityDescription.entity(forEntityName: "HighScores", in:managedObjectContext)!, insertInto: managedObjectContext)
         newHighScore.initials = initials
         newHighScore.score = Int32(score)
+        newHighScore.level = Int32(level)
+        newHighScore.time = Int32(time)
         self.managedObjectContext.insert(newHighScore)
         do {
             try self.managedObjectContext.save()
@@ -106,7 +108,7 @@ public class MrDoHighScores:ObservableObject {
         self.selectedLetter = 0
         /// Final letter and store it
         if self.letterIndex == 3 {
-            addScores(score: newScore, initials: String(self.letterArray))
+            addScores(score: newScore, initials: String(self.letterArray),level: 0,time: 0)
             getScores()
             NotificationCenter.default.post(name: .notificationNewGame, object: nil)
         }

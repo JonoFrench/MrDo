@@ -141,6 +141,13 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         case 1: level1Data()
         case 2: level2Data()
         case 3: level3Data()
+        case 4: level4Data()
+        case 5: level5Data()
+        case 6: level6Data()
+        case 7: level7Data()
+        case 8: level8Data()
+        case 9: level9Data()
+        case 10: level10Data()
 
         default:
             level1Data()
@@ -178,8 +185,73 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         appleArray.append(Apple(xPos: 3, yPos: 7))
         appleArray.append(Apple(xPos: 7, yPos: 8))
     }
-
     
+    func level4Data(){
+        mrDo.setup(xPos: 5, yPos: 12)
+        appleArray.append(Apple(xPos: 8, yPos: 1))
+        appleArray.append(Apple(xPos: 5, yPos: 2))
+        appleArray.append(Apple(xPos: 2, yPos: 3))
+        appleArray.append(Apple(xPos: 6, yPos: 4))
+        appleArray.append(Apple(xPos: 6, yPos: 5))
+        appleArray.append(Apple(xPos: 10, yPos: 7))
+    }
+
+    func level5Data(){
+        mrDo.setup(xPos: 5, yPos: 12)
+        appleArray.append(Apple(xPos: 5, yPos: 1))
+        appleArray.append(Apple(xPos: 1, yPos: 2))
+        appleArray.append(Apple(xPos: 7, yPos: 2))
+        appleArray.append(Apple(xPos: 3, yPos: 6))
+        appleArray.append(Apple(xPos: 8, yPos: 6))
+        appleArray.append(Apple(xPos: 7, yPos: 7))
+    }
+
+    func level6Data(){
+        mrDo.setup(xPos: 5, yPos: 12)
+        appleArray.append(Apple(xPos: 5, yPos: 1))
+        appleArray.append(Apple(xPos: 8, yPos: 2))
+        appleArray.append(Apple(xPos: 1, yPos: 3))
+        appleArray.append(Apple(xPos: 9, yPos: 3))
+        appleArray.append(Apple(xPos: 3, yPos: 8))
+        appleArray.append(Apple(xPos: 9, yPos: 9))
+    }
+    func level7Data(){
+        mrDo.setup(xPos: 5, yPos: 12)
+        appleArray.append(Apple(xPos: 1, yPos: 1))
+        appleArray.append(Apple(xPos: 8, yPos: 1))
+        appleArray.append(Apple(xPos: 6, yPos: 2))
+        appleArray.append(Apple(xPos: 3, yPos: 3))
+        appleArray.append(Apple(xPos: 2, yPos: 7))
+        appleArray.append(Apple(xPos: 9, yPos: 8))
+    }
+    func level8Data(){
+        mrDo.setup(xPos: 5, yPos: 12)
+        appleArray.append(Apple(xPos: 4, yPos: 1))
+        appleArray.append(Apple(xPos: 5, yPos: 1))
+        appleArray.append(Apple(xPos: 1, yPos: 3))
+        appleArray.append(Apple(xPos: 7, yPos: 3))
+        appleArray.append(Apple(xPos: 4, yPos: 8))
+        appleArray.append(Apple(xPos: 7, yPos: 9))
+    }
+    func level9Data(){
+        mrDo.setup(xPos: 5, yPos: 12)
+        appleArray.append(Apple(xPos: 4, yPos: 1))
+        appleArray.append(Apple(xPos: 2, yPos: 2))
+        appleArray.append(Apple(xPos: 4, yPos: 2))
+        appleArray.append(Apple(xPos: 9, yPos: 2))
+        appleArray.append(Apple(xPos: 8, yPos: 4))
+        appleArray.append(Apple(xPos: 4, yPos: 8))
+    }
+    func level10Data(){
+        mrDo.setup(xPos: 5, yPos: 12)
+        appleArray.append(Apple(xPos: 4, yPos: 1))
+        appleArray.append(Apple(xPos: 6, yPos: 2))
+        appleArray.append(Apple(xPos: 8, yPos: 2))
+        appleArray.append(Apple(xPos: 2, yPos: 4))
+        appleArray.append(Apple(xPos: 10, yPos: 5))
+        appleArray.append(Apple(xPos: 6, yPos: 9))
+    }
+
     func circlesIntersect(center1: CGPoint, diameter1: CGFloat, center2: CGPoint, diameter2: CGFloat) -> Bool {
         let radius1 = diameter1 / 2
         let radius2 = diameter2 / 2

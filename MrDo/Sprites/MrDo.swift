@@ -131,11 +131,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if gridAsset == .rb {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .vt
             }
-
             if gridAsset == .lb {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .bk
             }
-
     
             if previousAsset == .rt {
                 resolvedInstance.levelData.tileArray[yPos+1][xPos] = .vt
@@ -152,7 +150,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if previousAsset == .lt {
                 resolvedInstance.levelData.tileArray[yPos+1][xPos] = .bk
             }
-
             if previousAsset == .rl {
                 resolvedInstance.levelData.tileArray[yPos+1][xPos] = .bl
             }
@@ -195,8 +192,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .vt
             }
 
-            
-    
             if previousAsset == .rb {
                 resolvedInstance.levelData.tileArray[yPos-1][xPos] = .vt
             }
@@ -212,7 +207,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if previousAsset == .lb {
                 resolvedInstance.levelData.tileArray[yPos-1][xPos] = .bk
             }
-            
             if previousAsset == .rl {
                 resolvedInstance.levelData.tileArray[yPos-1][xPos] = .tl
             }
@@ -253,12 +247,10 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if gridAsset == .rr {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .hz
             }
-
             if gridAsset == .br {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
             }
 
-    
             if previousAsset == .rl {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .hz
             }
@@ -274,7 +266,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if previousAsset == .ll {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .bk
             }
-
             if previousAsset == .rt {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .tr
             }
@@ -282,7 +273,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .br
             }
 
-            
             resolvedInstance.objectWillChange.send()
         }
     }
@@ -313,12 +303,10 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if gridAsset == .vt {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .lr
             }
-
             if gridAsset == .rl {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .hz
             }
 
-    
             if previousAsset == .rr {
                 resolvedInstance.levelData.tileArray[yPos][xPos-1] = .hz
             }
@@ -334,14 +322,12 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if previousAsset == .lr {
                 resolvedInstance.levelData.tileArray[yPos][xPos-1] = .bk
             }
-            
             if previousAsset == .rt {
                 resolvedInstance.levelData.tileArray[yPos][xPos-1] = .tl
             }
             if previousAsset == .rb {
                 resolvedInstance.levelData.tileArray[yPos][xPos-1] = .bl
             }
-
 
             resolvedInstance.objectWillChange.send()
 

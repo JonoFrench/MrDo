@@ -563,7 +563,7 @@
 			);
 			currentVersion = 34099A0A2C99C50E00F4FE3A /* HighScores.xcdatamodel */;
 			name = HighScores.xcdatamodeld;
-			path = /Users/jonathanfrench/Projects/MrDo/MrDo/HiScores/HighScores.xcdatamodeld;
+			path = HighScores.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

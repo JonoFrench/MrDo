@@ -18,5 +18,7 @@ extension HighScores {
 
     @NSManaged public var initials: String?
     @NSManaged public var score: Int32
+    @NSManaged public var level: Int32
+    @NSManaged public var time: Int32
 
 }

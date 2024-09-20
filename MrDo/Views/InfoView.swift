@@ -16,9 +16,9 @@ struct InfoView: View {
     var body: some View {
         VStack {
 //            Spacer()
-            Image("Instructions")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
+//            Image("Instructions")
+//                .resizable()
+//                .aspectRatio(contentMode: .fit)
 //                .frame(width: 50, height: 50)
 //                .rotationEffect(.degrees(90))
             Spacer()
