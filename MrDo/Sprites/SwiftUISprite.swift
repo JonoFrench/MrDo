@@ -24,7 +24,6 @@ protocol Moveable {
 
 class SwiftUISprite {
     var id = UUID()
-    var screenData = ScreenData()
     var xPos = 0
     var yPos = 0
     var currentAnimationFrame = 0

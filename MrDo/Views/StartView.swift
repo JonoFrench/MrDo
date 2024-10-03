@@ -19,7 +19,7 @@ struct StartView: View {
     var body: some View {
         GeometryReader { proxy in
             VStack {
-                Spacer()
+//                Spacer()
                 Image("Title")
                     .resizable()
                     .aspectRatio(contentMode: .fit)

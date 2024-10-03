@@ -15,7 +15,11 @@ struct InfoView: View {
 #endif
     var body: some View {
         VStack {
-//            Spacer()
+            Image("Title")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+
+            //            Spacer()
 //            Image("Instructions")
 //                .resizable()
 //                .aspectRatio(contentMode: .fit)

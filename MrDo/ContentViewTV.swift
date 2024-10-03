@@ -23,7 +23,7 @@ struct ContentViewTV: View {
                         Spacer()
                     }
                     else if manager.gameState == .playing {
-                        GameView(mrDo: manager.mrDo)
+                        GameView(mrDo: manager.mrDo,ball: manager.ball,appleArray:manager.appleArray)
                             .zIndex(1.0)
                     }
                     else if manager.gameState == .highscore {

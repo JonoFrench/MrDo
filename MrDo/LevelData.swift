@@ -11,7 +11,25 @@ import SwiftUI
 import UIKit
 
 enum TileType:Int {
-    case ro,rt,rb,rl,rr,vt,hz,tl,tr,br,bl,lt,ll,lb,lr,fu,ch,bk
+    case ro,rt,rb,rl,rr,vt,hz,tl,tr,br,bl,lt,ll,lb,lr,fu,ch,bk,tb
+}
+
+enum TileDirection {
+    case vertical,horizontal,both
+}
+
+struct TileWall {
+    var left = false
+    var right = false
+    var top = false
+    var bottom = false
+    
+    init(left: Bool = false, right: Bool = false, top: Bool = false, bottom: Bool = false) {
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom = bottom
+    }
 }
 
 class LevelData:ObservableObject {
@@ -22,12 +40,274 @@ class LevelData:ObservableObject {
     var tileImages:[UIImage] = []
     let tileBackground:[Int] = [0,1,2,3,4,2,5,6,7,8]
     
-    //    func tileImage(tileType:TileType) -> UIImage {
-    //        let tile = tileType.rawValue
-    //        return getTile(pos: tile)!
-    //    }
-    
     init() {
+    }
+    
+    
+    let fullWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+    
+    let blankWalls:[[Int]] = [
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0]
+    ]
+
+    let rtWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1]
+    ]
+
+    let rbWalls:[[Int]] = [
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,1,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+    let rlWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,1,0,0,0,0,0],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+
+    let rrWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [0,0,0,0,0,1,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+    
+    let tlWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0]
+    ]
+    let trWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [0,0,0,0,0,1,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1]
+    ]
+
+    let brWalls:[[Int]] = [
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+    let blWalls:[[Int]] = [
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,1,0,0,0,0,0],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+
+    let hzWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+    let vtWalls:[[Int]] = [
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,1,0,0,0,0,1,1]
+    ]
+    let ltWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0]
+    ]
+    let lbWalls:[[Int]] = [
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ]
+    let llWalls:[[Int]] = [
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0]
+    ]
+    let lrWalls:[[Int]] = [
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1,1]
+    ]
+    
+    let tbWalls:[[Int]] = [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0]
+    ]
+
+    func getTileDirection(type:TileType) -> TileDirection {
+        switch type {
+        case .ro:
+            return .both
+        case .rt:
+            return .vertical
+        case .rb:
+            return .vertical
+        case .rl:
+            return .horizontal
+        case .rr:
+            return .horizontal
+        case .vt:
+            return .vertical
+        case .hz:
+            return .horizontal
+        case .tl:
+            return .both
+        case .tr:
+            return .both
+        case .br:
+            return .both
+        case .bl:
+            return .both
+        case .lt:
+            return .horizontal
+        case .ll:
+            return .vertical
+        case .lb:
+            return .horizontal
+        case .lr:
+            return .vertical
+        case .fu:
+            return .both
+        case .ch:
+            return .both
+        case .bk:
+            return .both
+        case .tb:
+            return .horizontal
+        }
+    }
+    
+    func getWall(type:TileType, xOffset:Int, yOffset:Int) -> Bool {
+        switch type {
+        case .ro:
+            return fullWalls[yOffset][xOffset] == 1 ? true : false
+        case .rt:
+            return rtWalls[yOffset][xOffset] == 1 ? true : false
+        case .rb:
+            return rbWalls[yOffset][xOffset] == 1 ? true : false
+        case .rl:
+            return rlWalls[yOffset][xOffset] == 1 ? true : false
+        case .rr:
+            return rrWalls[yOffset][xOffset] == 1 ? true : false
+        case .vt:
+            return vtWalls[yOffset][xOffset] == 1 ? true : false
+        case .hz:
+            return hzWalls[yOffset][xOffset] == 1 ? true : false
+        case .tl:
+            return tlWalls[yOffset][xOffset] == 1 ? true : false
+        case .tr:
+            return trWalls[yOffset][xOffset] == 1 ? true : false
+        case .br:
+            return brWalls[yOffset][xOffset] == 1 ? true : false
+        case .bl:
+            return blWalls[yOffset][xOffset] == 1 ? true : false
+        case .lt:
+            return ltWalls[yOffset][xOffset] == 1 ? true : false
+        case .ll:
+            return llWalls[yOffset][xOffset] == 1 ? true : false
+        case .lb:
+            return lbWalls[yOffset][xOffset] == 1 ? true : false
+        case .lr:
+            return lrWalls[yOffset][xOffset] == 1 ? true : false
+        case .fu:
+            return fullWalls[yOffset][xOffset] == 1 ? true : false
+        case .ch:
+            return fullWalls[yOffset][xOffset] == 1 ? true : false
+        case .bk:
+            return blankWalls[yOffset][xOffset] == 1 ? true : false
+        case .tb:
+            return tbWalls[yOffset][xOffset] == 1 ? true : false
+
+        }
     }
     
     func setLevelData(level:Int) {
@@ -40,6 +320,9 @@ class LevelData:ObservableObject {
         for i in 0...17 {
             tiles.append(getTile(level: tileBackground[level - 1], pos: i)!)
         }
+        //last one is blank for under the EXTRA
+        tiles.append(getTile(level: tileBackground[level - 1], pos: 17)!)
+
         return tiles
     }
     
@@ -101,7 +384,7 @@ struct Levels {
     }
     
     let level1:[[TileType]] = [
-        [.fu,.fu,.fu,.fu,.bl,.bk,.lb,.lb,.hz,.tr,.fu,.fu],
+        [.fu,.fu,.fu,.fu,.rl,.lt,.hz,.hz,.hz,.tr,.fu,.fu],
         [.ch,.ch,.fu,.fu,.fu,.vt,.fu,.fu,.fu,.bl,.tr,.fu],
         [.ch,.ch,.fu,.fu,.fu,.vt,.ch,.ch,.ch,.ch,.bl,.tr],
         [.ch,.ch,.fu,.ch,.ch,.vt,.ch,.ch,.ch,.ch,.fu,.vt],

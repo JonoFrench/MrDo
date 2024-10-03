@@ -24,7 +24,7 @@ extension GameManager {
                         if gameState == .intro {
                             startGame()
                         } else if gameState == .playing {
-
+                            throwBall()
                         } else if gameState == .highscore {
                             hiScores.nextLetter()
                         }

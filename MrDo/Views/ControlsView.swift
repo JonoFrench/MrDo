@@ -28,7 +28,7 @@ struct ControlsView: View {
                         if manager.gameState == .intro {
                             manager.startGame()
                         } else if manager.gameState == .playing {
-
+                            manager.throwBall()
                         } else if manager.gameState == .highscore {
                             manager.hiScores.nextLetter()
                         }

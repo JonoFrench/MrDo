@@ -22,12 +22,35 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
     var walkLeftFrames: [UIImage] = []
     var walkUpFrames: [UIImage] = []
     var walkDownFrames: [UIImage] = []
+    var walkRightBallFrames: [UIImage] = []
+    var walkLeftBallFrames: [UIImage] = []
+    var walkUpBallFrames: [UIImage] = []
+    var walkDownBallFrames: [UIImage] = []
     var direction:DoDirection = .stop
+    var facing:DoDirection = .right
     var willStop = false
+    @Published
+    var hasBall = false
     
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
         super.init(xPos: xPos, yPos: yPos, frameSize: frameSize)
-        
+        setImages()
+        currentImage = walkRightBallFrames[0]
+        gridOffsetX = 2
+        gridOffsetY = 3
+    }
+
+    func setup(xPos: Int, yPos: Int) {
+        setPosition(xPos: xPos, yPos: yPos)
+        direction = .stop
+        facing = .right
+        hasBall = true
+        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            moveDistance = resolvedInstance.assetDimensionStep * Double(GameConstants.doSpeed)
+        }
+    }
+    
+    func setImages() {
         for i in 0..<3 {
             walkRightFrames.append(getTile(name: "DoWalking", pos: i)!)
         }
@@ -40,17 +63,17 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
         for i in 9..<12 {
             walkUpFrames.append(getTile(name: "DoWalking", pos: i)!)
         }
-
-        currentImage = walkRightFrames[0]
-        gridOffsetX = 2
-        gridOffsetY = 3
-    }
-
-    func setup(xPos: Int, yPos: Int) {
-        setPosition(xPos: xPos, yPos: yPos)
-        direction = .stop
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            moveDistance = resolvedInstance.assetDimensionStep * Double(GameConstants.doSpeed)
+        for i in 0..<3 {
+            walkRightBallFrames.append(getTile(name: "DoWalkingBall", pos: i)!)
+        }
+        for i in 3..<6 {
+            walkDownBallFrames.append(getTile(name: "DoWalkingBall", pos: i)!)
+        }
+        for i in 6..<9 {
+            walkLeftBallFrames.append(getTile(name: "DoWalkingBall", pos: i)!)
+        }
+        for i in 9..<12 {
+            walkUpBallFrames.append(getTile(name: "DoWalkingBall", pos: i)!)
         }
     }
     
@@ -80,6 +103,10 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
     func moveNothing(){
     }
     
+    func stateFrames() {
+        
+    }
+    
     func animate() {
         currentAnimationFrame += 1
         if currentAnimationFrame == 3 {
@@ -88,13 +115,32 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
 
         switch direction {
         case .left:
-            currentImage = walkLeftFrames[currentAnimationFrame]
+            if hasBall {
+                currentImage = walkLeftBallFrames[currentAnimationFrame]
+            } else {
+                currentImage = walkLeftFrames[currentAnimationFrame]
+            }
         case .right:
-            currentImage = walkRightFrames[currentAnimationFrame]
+            if hasBall {
+                currentImage = walkRightBallFrames[currentAnimationFrame]
+            }
+            else {
+                currentImage = walkRightFrames[currentAnimationFrame]
+            }
         case .up:
-            currentImage = walkUpFrames[currentAnimationFrame]
+            if hasBall {
+                currentImage = walkUpBallFrames[currentAnimationFrame]
+            }
+            else {
+                currentImage = walkUpFrames[currentAnimationFrame]
+            }
         case .down:
-            currentImage = walkDownFrames[currentAnimationFrame]
+            if hasBall {
+                currentImage = walkDownBallFrames[currentAnimationFrame]
+            }
+            else {
+                currentImage = walkDownFrames[currentAnimationFrame]
+            }
         case .stop:
             print("nothing")
         }
@@ -337,6 +383,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
     
     func moveRight() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            facing = .right
             if (xPos == resolvedInstance.screenDimensionX - 1 && gridOffsetX == 2) {return}
             print("Do Right offset \(gridOffsetX) xPos \(xPos)")
             position.x += moveDistance
@@ -354,6 +401,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
 
     func moveLeft() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            facing = .left
             if (xPos == 0 && gridOffsetX == 2) {return}
             print("Do Left offset \(gridOffsetX) xPos \(xPos)")
             position.x -= moveDistance
@@ -371,6 +419,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
     
     func moveUp() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            facing = .up
             print("Do up offset \(gridOffsetY) yPos \(yPos)")
             if (yPos == 0 && gridOffsetY == 3) {return}
             position.y -= moveDistance
@@ -387,6 +436,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
     }
     func moveDown() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            facing = .down
             print("Do down offset \(gridOffsetY) yPos \(yPos)")
             if (yPos == resolvedInstance.screenDimensionY - 1 && gridOffsetY == 3) {return}
             position.y += moveDistance
@@ -406,28 +456,44 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
         case .left:
             if gridOffsetX == 2 {
                 currentAnimationFrame = 0
-                currentImage = walkLeftFrames[currentAnimationFrame]
+                if hasBall {
+                    currentImage = walkLeftBallFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkLeftFrames[currentAnimationFrame]
+                }
                 direction = .stop
                 willStop = false
             }
         case .right:
             if gridOffsetX == 2 {
                 currentAnimationFrame = 0
-                currentImage = walkRightFrames[currentAnimationFrame]
+                if hasBall {
+                    currentImage = walkRightBallFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkRightFrames[currentAnimationFrame]
+                }
                 direction = .stop
                 willStop = false
             }
         case .up:
             if gridOffsetY == 3 {
                 currentAnimationFrame = 0
-                currentImage = walkUpFrames[currentAnimationFrame]
+                if hasBall {
+                    currentImage = walkUpBallFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkUpFrames[currentAnimationFrame]
+                }
                 direction = .stop
                 willStop = false
             }
         case .down:
             if gridOffsetY == 3 {
                 currentAnimationFrame = 0
-                currentImage = walkDownFrames[currentAnimationFrame]
+                if hasBall {
+                    currentImage = walkDownBallFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkDownFrames[currentAnimationFrame]
+                }
                 direction = .stop
                 willStop = false
             }

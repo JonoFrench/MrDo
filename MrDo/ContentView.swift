@@ -20,7 +20,7 @@ struct ContentView: View {
                         .background(.clear)
                 }
                 else if manager.gameState == .playing {
-                    GameView(mrDo: manager.mrDo)
+                    GameView(mrDo: manager.mrDo,ball: manager.ball,appleArray:manager.appleArray)
                         .frame(width: UIScreen.main.bounds.width, height: manager.gameScreen.assetDimension * 15, alignment: .center)
                             .zIndex(1.0)
                 }

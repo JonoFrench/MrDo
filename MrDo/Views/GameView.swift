@@ -10,6 +10,8 @@ import SwiftUI
 struct GameView: View {
     @EnvironmentObject var manager: GameManager
     @ObservedObject var mrDo:MrDo
+    @ObservedObject var ball:Ball
+    @ObservedObject var appleArray:AppleArray
     var body: some View {
         VStack(alignment:.center, spacing: .zero) {
             TopView()
@@ -23,8 +25,12 @@ struct GameView: View {
                 MrDoView(mrDo: mrDo)
                     .position(mrDo.position)
                     .zIndex(2.0)
-                
-                ForEach(manager.appleArray, id: \.id) { apple in
+                if ball.thrown {
+                    BallView(ball: ball)
+                        .position(ball.position)
+                        .zIndex(1.9)
+                }
+                ForEach(appleArray.apples, id: \.id) { apple in
                     AppleView(apple: apple)
                         .position(apple.position)
                         .zIndex(0.6)

@@ -17,6 +17,11 @@ struct TopView: View {
     static var topTextSize:CGFloat = 28
     static var extraTextSize:CGFloat = 40
     static var liveSize = CGSize(width: 48, height: 48)
+//#elseif os(iPadOS)
+//    static var topTextSize:CGFloat = 28
+//    static var extraTextSize:CGFloat = 40
+//    static var liveSize = CGSize(width: 48, height: 48)
+//
 #endif
     
     var body: some View {

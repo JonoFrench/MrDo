@@ -16,15 +16,17 @@ struct HiScoreView: View {
     static var scoreTextSize:CGFloat = 16
     static var starttextSize:CGFloat = 14
 #elseif os(tvOS)
-    static var titleTextSize:CGFloat = 24
-    static var subTitleTextSize:CGFloat = 24
-    static var scoreTextSize:CGFloat = 32
+    static var titleTextSize:CGFloat = 28
+    static var subTitleTextSize:CGFloat = 18
+    static var scoreTextSize:CGFloat = 24
     static var starttextSize:CGFloat = 28
 #endif
     var body: some View {
         let scores = manager.hiScores
         VStack {
-            Spacer()
+            Image("Title")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
             Text("High Scores")
                 .foregroundStyle(.red)
                 .font(.custom("MrDo-Arcade", size: HiScoreView.titleTextSize))
@@ -53,7 +55,7 @@ struct HiScoreView: View {
                         .padding([.trailing])
                     Spacer()
                 }
-//                Spacer()
+                Spacer()
                 ForEach(scores.hiScores, id: \.self) {score in
                     HStack{
                         Spacer()
@@ -78,6 +80,7 @@ struct HiScoreView: View {
                             .padding([.trailing])
                         Spacer()
                     }
+                    Spacer()
                 }
             })
             Spacer()
