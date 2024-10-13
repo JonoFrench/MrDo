@@ -12,6 +12,7 @@ struct GameView: View {
     @ObservedObject var mrDo:MrDo
     @ObservedObject var ball:Ball
     @ObservedObject var appleArray:AppleArray
+    
     var body: some View {
         VStack(alignment:.center, spacing: .zero) {
             TopView()
@@ -31,13 +32,13 @@ struct GameView: View {
                         .zIndex(1.9)
                 }
                 ForEach(appleArray.apples, id: \.id) { apple in
-                    AppleView(apple: apple)
-                        .position(apple.position)
-                        .zIndex(0.6)
+                        AppleView(apple: apple)
+                            //.position(apple.position)
+                            .zIndex(1.6)
                 }
                 CenterView(center: manager.center)
                     .position(manager.center.position)
-                    .zIndex(0.7)
+                    .zIndex(1.5)
             }
             BottomView()
                 .frame(height: manager.gameScreen.assetDimension * 1, alignment: .center)

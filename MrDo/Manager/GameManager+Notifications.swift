@@ -12,14 +12,17 @@ import GameController
 #endif
 extension Notification.Name {
     static let notificationNewGame = Notification.Name("NotificationNewGame")
-    
+    static let notificationRemoveApple = Notification.Name("NotificationRemoveApple")
+
 }
 
 extension GameManager {
     
     func notificationObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(self.nextGame(notification:)), name: .notificationNewGame, object: nil)
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.removeApple(notification:)), name: .notificationRemoveApple, object: nil)
+
+ 
         
         
 #if os(tvOS)
@@ -44,6 +47,13 @@ extension GameManager {
     @objc func nextGame(notification: Notification) {
         gameState = .intro
     }
+    
+    @objc func removeApple(notification: Notification) {
+        if let id = notification.userInfo?["id"] as? UUID {
+            appleArray.remove(id: id)
+        }
+    }
+
     
 #if os(tvOS)
     @objc func controllerDidConnect(notification: Notification) {

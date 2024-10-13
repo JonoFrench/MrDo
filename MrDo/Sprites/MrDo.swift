@@ -15,7 +15,7 @@ enum DoDirection {
     case left,right,up,down,stop
 }
 
-final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
+final class MrDo:SwiftUISprite,Moveable,Animatable {
     static var animateFrames: Int = 0
     static var speed: Int = GameConstants.doSpeed
     var walkRightFrames: [UIImage] = []
@@ -26,12 +26,39 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
     var walkLeftBallFrames: [UIImage] = []
     var walkUpBallFrames: [UIImage] = []
     var walkDownBallFrames: [UIImage] = []
+    
+    var pushRightFrames: [UIImage] = []
+    var pushLeftFrames: [UIImage] = []
+    var pushUpFrames: [UIImage] = []
+    var pushDownFrames: [UIImage] = []
+    var pushRightBallFrames: [UIImage] = []
+    var pushLeftBallFrames: [UIImage] = []
+    var pushUpBallFrames: [UIImage] = []
+    var pushDownBallFrames: [UIImage] = []
+
     var direction:DoDirection = .stop
-    var facing:DoDirection = .right
+    var previousDirection:DoDirection = .stop
+    var facing:DoDirection = .right {
+        didSet {
+            if oldValue != facing {
+                animate()
+            }
+        }
+    }
     var willStop = false
     @Published
     var hasBall = false
+    @Published
+    var isPushing = false {
+        didSet {
+            if oldValue != isPushing {
+//                animate()
+            }
+        }
+    }
     
+    var pushedApple: Apple?
+
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
         super.init(xPos: xPos, yPos: yPos, frameSize: frameSize)
         setImages()
@@ -75,9 +102,36 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
         for i in 9..<12 {
             walkUpBallFrames.append(getTile(name: "DoWalkingBall", pos: i)!)
         }
+        
+        for i in 0..<3 {
+            pushRightFrames.append(getTile(name: "DoPushing", pos: i)!)
+        }
+        for i in 3..<6 {
+            pushDownFrames.append(getTile(name: "DoPushing", pos: i)!)
+        }
+        for i in 6..<9 {
+            pushLeftFrames.append(getTile(name: "DoPushing", pos: i)!)
+        }
+        for i in 9..<12 {
+            pushUpFrames.append(getTile(name: "DoPushing", pos: i)!)
+        }
+
+        for i in 0..<3 {
+            pushRightBallFrames.append(getTile(name: "DoPushingBall", pos: i)!)
+        }
+        for i in 3..<6 {
+            pushDownBallFrames.append(getTile(name: "DoPushingBall", pos: i)!)
+        }
+        for i in 6..<9 {
+            pushLeftBallFrames.append(getTile(name: "DoPushingBall", pos: i)!)
+        }
+        for i in 9..<12 {
+            pushUpBallFrames.append(getTile(name: "DoPushingBall", pos: i)!)
+        }
+
+        
     }
-    
-    
+        
     func move() {
         speedCounter += 1
         if speedCounter == GameConstants.doSpeed + 1 {
@@ -113,19 +167,35 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             currentAnimationFrame = 0
         }
 
-        switch direction {
+        switch facing {
         case .left:
             if hasBall {
-                currentImage = walkLeftBallFrames[currentAnimationFrame]
+                if isPushing {
+                    currentImage = pushLeftBallFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkLeftBallFrames[currentAnimationFrame]
+                }
             } else {
-                currentImage = walkLeftFrames[currentAnimationFrame]
+                if isPushing {
+                    currentImage = pushLeftFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkLeftFrames[currentAnimationFrame]
+                }
             }
         case .right:
             if hasBall {
-                currentImage = walkRightBallFrames[currentAnimationFrame]
+                if isPushing {
+                    currentImage = pushRightBallFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkRightBallFrames[currentAnimationFrame]
+                }
             }
             else {
-                currentImage = walkRightFrames[currentAnimationFrame]
+                if isPushing {
+                    currentImage = pushRightFrames[currentAnimationFrame]
+                } else {
+                    currentImage = walkRightFrames[currentAnimationFrame]
+                }
             }
         case .up:
             if hasBall {
@@ -206,7 +276,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             resolvedInstance.objectWillChange.send()
         }
     }
-
     func checkGridDown() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
@@ -380,19 +449,30 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
         }
     }
 
-    
     func moveRight() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             facing = .right
             if (xPos == resolvedInstance.screenDimensionX - 1 && gridOffsetX == 2) {return}
+            if appleRight() && gridOffsetX == 2 && !canPushRight() { return }
             print("Do Right offset \(gridOffsetX) xPos \(xPos)")
             position.x += moveDistance
+            if isPushing {
+                pushedApple?.position.x += moveDistance
+                print("pushing apple")
+            }
+
             gridOffsetX += 1
             if gridOffsetX >= Int(GameConstants.tileSteps) / GameConstants.doSpeed {
                 gridOffsetX = 0
                 if xPos < resolvedInstance.screenDimensionX {
                     xPos += 1
                     checkGridRight()
+                    if isPushing {
+                        pushedApple?.position.x += moveDistance
+                        pushedApple?.isPushed = true
+                        pushedApple?.xPos += 1
+                        isPushing = false
+                    }
                 }
             }
             animate()
@@ -403,14 +483,25 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             facing = .left
             if (xPos == 0 && gridOffsetX == 2) {return}
+            if appleLeft() && gridOffsetX == 2 && !canPushLeft() { return }
             print("Do Left offset \(gridOffsetX) xPos \(xPos)")
             position.x -= moveDistance
+            if isPushing {
+                pushedApple?.position.x -= moveDistance
+                print("pushing apple")
+            }
             gridOffsetX -= 1
             if gridOffsetX < 0 {
                 gridOffsetX = Int(GameConstants.tileSteps) / GameConstants.doSpeed - 1
                 if xPos > 0 {
                     xPos -= 1
                     checkGridLeft()
+                    if isPushing {
+//                        pushedApple?.position.x -= moveDistance
+                        pushedApple?.isPushed = true
+                        pushedApple?.xPos -= 1
+                        isPushing = false
+                    }
                 }
             }
             animate()
@@ -422,6 +513,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             facing = .up
             print("Do up offset \(gridOffsetY) yPos \(yPos)")
             if (yPos == 0 && gridOffsetY == 3) {return}
+            if appleAbove() { return }
             position.y -= moveDistance
             gridOffsetY -= 1
             if gridOffsetY < 0 {
@@ -439,6 +531,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             facing = .down
             print("Do down offset \(gridOffsetY) yPos \(yPos)")
             if (yPos == resolvedInstance.screenDimensionY - 1 && gridOffsetY == 3) {return}
+            if appleBelow() { return }
             position.y += moveDistance
             gridOffsetY += 1
             if gridOffsetY >= Int(GameConstants.tileSteps) / GameConstants.doSpeed {
@@ -457,9 +550,18 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if gridOffsetX == 2 {
                 currentAnimationFrame = 0
                 if hasBall {
-                    currentImage = walkLeftBallFrames[currentAnimationFrame]
+                    if isPushing {
+                        currentImage = pushLeftBallFrames[currentAnimationFrame]
+                    } else {
+                        currentImage = walkLeftBallFrames[currentAnimationFrame]
+
+                    }
                 } else {
-                    currentImage = walkLeftFrames[currentAnimationFrame]
+                    if isPushing {
+                        currentImage = pushLeftFrames[currentAnimationFrame]
+                    } else {
+                        currentImage = walkLeftFrames[currentAnimationFrame]
+                    }
                 }
                 direction = .stop
                 willStop = false
@@ -468,9 +570,17 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             if gridOffsetX == 2 {
                 currentAnimationFrame = 0
                 if hasBall {
-                    currentImage = walkRightBallFrames[currentAnimationFrame]
+                    if isPushing {
+                        currentImage = pushRightBallFrames[currentAnimationFrame]
+                    } else {
+                        currentImage = walkRightBallFrames[currentAnimationFrame]
+                    }
                 } else {
-                    currentImage = walkRightFrames[currentAnimationFrame]
+                    if isPushing {
+                        currentImage = pushRightFrames[currentAnimationFrame]
+                    } else {
+                        currentImage = walkRightFrames[currentAnimationFrame]
+                    }
                 }
                 direction = .stop
                 willStop = false
@@ -499,7 +609,95 @@ final class MrDo:SwiftUISprite,Moveable,Animatable, ObservableObject {
             }
         case .stop:
             print("stop")
+            willStop = false
         }
+    }
+    
+    func appleAbove() -> Bool {
+        ///Is there an apple above?
+        if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
+            for apple in appleArray.apples {
+                if apple.yPos+1 == yPos && apple.xPos == xPos {
+                    print("Apple Above")
+                    pushedApple = apple
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    func appleBelow() -> Bool {
+        ///Is there an apple below?
+        if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
+            for apple in appleArray.apples {
+                if apple.yPos-1 == yPos && apple.xPos == xPos {
+                    pushedApple = apple
+                    return true
+                }
+            }
+        }
+        return false
+    }
+ 
+    func appleLeft() -> Bool {
+        ///Is there an apple to the left?
+        if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
+            for apple in appleArray.apples {
+                if apple.xPos+1 == xPos && apple.yPos == yPos {
+                    pushedApple = apple
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    func appleRight() -> Bool {
+        ///Is there an apple to the right?
+        if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
+            for apple in appleArray.apples {
+                if apple.xPos-1 == xPos && apple.yPos == yPos {
+                    pushedApple = apple
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    func canPushLeft() -> Bool {
+        guard isPushing == false else { return false }
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            ///Can we push the apple?
+            if let pushedApple {
+                if pushedApple.xPos == 0 {return false}
+                let screenAsset = screenData.levelData.tileArray[pushedApple.yPos][pushedApple.xPos-1]
+                if screenAsset != .ch && screenAsset != .fu {
+                    pushedApple.position.x -= moveDistance
+                    isPushing = true
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    func canPushRight() -> Bool {
+        guard isPushing == false else { return false }
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            ///Can we push the apple?
+            if let pushedApple {
+                if pushedApple.xPos == screenData.screenDimensionX - 1 {return false}
+                let screenAsset = screenData.levelData.tileArray[pushedApple.yPos][pushedApple.xPos+1]
+                if screenAsset != .ch && screenAsset != .fu {
+                    pushedApple.position.x += moveDistance
+                    isPushing = true
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     

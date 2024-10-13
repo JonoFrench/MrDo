@@ -10,15 +10,18 @@ import SwiftUI
 import UIKit
 
 
+enum AppleState {
+    case sitting,dislodged,falling,breaking
+}
+
 final class AppleArray: ObservableObject {
     @Published var apples: [Apple] = []
 
     func move(){
         for apple in apples where apple.appleState == .falling {
             apple.move()
-            self.objectWillChange.send()
+//            self.objectWillChange.send()
         }
-
     }
     
     func remove(id:UUID) {
@@ -32,28 +35,37 @@ final class AppleArray: ObservableObject {
         apples.append(apple)
     }
     
-    func checkDrop(){
+    func checkDrop(doXpos:Int,doYpos:Int){
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             for apple in apples where apple.appleState == .sitting {
-                if screenData.levelData.tileArray[apple.yPos+1][apple.xPos] == .hz {
-                    apple.dislodge()
+                let checkAsset = screenData.levelData.tileArray[apple.yPos+1][apple.xPos]
+//                if checkAsset == .hz || checkAsset == .vt || checkAsset == .tl || checkAsset == .tr || checkAsset == .ll || checkAsset == .lr {
+                if !(checkAsset == .fu || checkAsset == .ch) && (apple.yPos+1 != doYpos || apple.xPos != doXpos) {
+                    print("Apple dislodge checkAsset \(checkAsset)")
+                    if !apple.isPushed {
+                        apple.dislodge()
+                    } else {
+                        apple.appleState = .falling
+                    }
                 }
             }
         }
     }
-
-}
-enum AppleState {
-    case sitting,dislodged,falling,breaking
 }
 
-final class Apple:SwiftUISprite,Moveable, ObservableObject {
+final class Apple:SwiftUISprite,Moveable {
     static var speed: Int = 1
     
     @Published
     var appleState:AppleState = .sitting
     var dropLevel = 0
     var moveCounter = 0
+    @Published
+    var leftImage:UIImage = UIImage()
+    @Published
+    var rightImage:UIImage = UIImage()
+    var appleFrames: [UIImage] = []
+    var isPushed = false
     init(xPos: Int, yPos:Int) {
         
 #if os(iOS)
@@ -61,7 +73,15 @@ final class Apple:SwiftUISprite,Moveable, ObservableObject {
 #elseif os(tvOS)
         super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 64, height:  64))
 #endif
-        currentImage = getTile(name: "Apple", pos: 1)!
+        setImages()
+        currentImage = appleFrames[1]
+        isShowing = true
+    }
+    
+    func setImages() {
+        for i in 0..<3 {
+            appleFrames.append(getTile(name: "Apple", pos: i)!)
+        }
     }
 
     func move() {
@@ -71,9 +91,21 @@ final class Apple:SwiftUISprite,Moveable, ObservableObject {
                 speedCounter = 0
                 moveCounter += 1
                 position.y += screenData.assetDimensionStep
+                print("Apple falling moveCounter \(moveCounter) pos \(position.y)")
                 if moveCounter == 8 {
                     moveCounter = 0
-                    appleState = .sitting
+                    dropLevel += 1
+                    let checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
+                    print("Apple YPos checkAsset \(checkAsset)")
+                    if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
+                        print("Apple fall checkAsset \(checkAsset) dropLevel \(dropLevel)")
+                        if dropLevel > 1 {
+                            breakApple()
+                        } else {
+                            dropLevel = 0
+                            appleState = .sitting
+                        }
+                    }
                     yPos += 1
                 }
             }
@@ -83,16 +115,33 @@ final class Apple:SwiftUISprite,Moveable, ObservableObject {
     func dislodge() {
         appleState = .dislodged
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-            currentImage = getTile(name: "Apple", pos: 2)!
+            currentImage = appleFrames[2]
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-                currentImage = getTile(name: "Apple", pos: 0)!
+                currentImage = appleFrames[0]
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-                    currentImage = getTile(name: "Apple", pos: 1)!
+                    currentImage = appleFrames[1]
                     appleState = .falling
                 }
             }
         }
     }
     
+    func breakApple() {
+        appleState = .breaking
+        leftImage = getTile(name: "AppleEnd", pos: 0)!
+        rightImage = getTile(name: "AppleEnd", pos: 1)!
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [self] in
+            leftImage = getTile(name: "AppleEnd", pos: 2)!
+            rightImage = getTile(name: "AppleEnd", pos: 3)!
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [self] in
+                leftImage = getTile(name: "AppleEnd", pos: 4)!
+                rightImage = getTile(name: "AppleEnd", pos: 5)!
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+                    let appleID:[String: UUID] = ["id": self.id]
+                    NotificationCenter.default.post(name: .notificationRemoveApple, object: nil, userInfo: appleID)
+                }
+            }
+        }
+    }
     
 }

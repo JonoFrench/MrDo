@@ -22,7 +22,7 @@ protocol Moveable {
     func move()
 }
 
-class SwiftUISprite {
+class SwiftUISprite:ObservableObject {
     var id = UUID()
     var xPos = 0
     var yPos = 0

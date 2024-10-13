@@ -13,7 +13,7 @@ enum BallDirection {
 }
 
 
-final class Ball:SwiftUISprite, Moveable, ObservableObject {
+final class Ball:SwiftUISprite, Moveable {
     static var speed: Int = GameConstants.ballSpeed
     var thrown = false
     var direction:BallDirection = .downright
@@ -22,6 +22,7 @@ final class Ball:SwiftUISprite, Moveable, ObservableObject {
     var adjustedPosition = CGPoint()
     var tileDirection:TileDirection = .horizontal
     var previousDirection:TileDirection = .horizontal
+    ///Can't catch until first change of direction. Otherwise the ball will be caught as soon as thrown.
     var catchable = false
     init() {
 #if os(iOS)

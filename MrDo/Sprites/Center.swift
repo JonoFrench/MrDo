@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import UIKit
 
-final class Center:SwiftUISprite, ObservableObject {
+final class Center:SwiftUISprite {
     @Published
     var collected = false
     

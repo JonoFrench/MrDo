@@ -42,6 +42,7 @@
 		34099A342C9AC60A00F4FE3A /* AppleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A332C9AC60A00F4FE3A /* AppleView.swift */; };
 		34099A382C9B025F00F4FE3A /* CenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A372C9B025F00F4FE3A /* CenterView.swift */; };
 		34099A3A2C9B027500F4FE3A /* Center.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A392C9B027500F4FE3A /* Center.swift */; };
+		340A7B302CBBE14100433318 /* GameManager+Levels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B2F2CBBE14100433318 /* GameManager+Levels.swift */; };
 		34B951642C9C392D00FE770B /* MrDoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951632C9C392D00FE770B /* MrDoView.swift */; };
 		34B951662C9C394200FE770B /* MrDo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951652C9C394200FE770B /* MrDo.swift */; };
 		34B951682C9E0A5700FE770B /* BallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951672C9E0A5700FE770B /* BallView.swift */; };
@@ -86,6 +87,7 @@
 		34099A332C9AC60A00F4FE3A /* AppleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleView.swift; sourceTree = "<group>"; };
 		34099A372C9B025F00F4FE3A /* CenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterView.swift; sourceTree = "<group>"; };
 		34099A392C9B027500F4FE3A /* Center.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Center.swift; sourceTree = "<group>"; };
+		340A7B2F2CBBE14100433318 /* GameManager+Levels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameManager+Levels.swift"; sourceTree = "<group>"; };
 		34B951632C9C392D00FE770B /* MrDoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDoView.swift; sourceTree = "<group>"; };
 		34B951652C9C394200FE770B /* MrDo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDo.swift; sourceTree = "<group>"; };
 		34B951672C9E0A5700FE770B /* BallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallView.swift; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 				340999FD2C99C25900F4FE3A /* GameManager.swift */,
 				340999FF2C99C3D100F4FE3A /* GameManager+Notifications.swift */,
 				34099A012C99C45C00F4FE3A /* GameManager+TV.swift */,
+				340A7B2F2CBBE14100433318 /* GameManager+Levels.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -336,6 +339,7 @@
 				34099A342C9AC60A00F4FE3A /* AppleView.swift in Sources */,
 				34099A252C99CB4800F4FE3A /* NewHighScoreView.swift in Sources */,
 				34099A2C2C99E68A00F4FE3A /* InfoView.swift in Sources */,
+				340A7B302CBBE14100433318 /* GameManager+Levels.swift in Sources */,
 				34099A0B2C99C50E00F4FE3A /* CoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
