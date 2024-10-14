@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 final class ScreenData:ObservableObject {
+    let soundFX:SoundFX = SoundFX()
     @Published
     var levelData = LevelData()
     let screenDimensionX:Int = 12

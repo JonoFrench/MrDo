@@ -13,6 +13,7 @@ import GameController
 extension Notification.Name {
     static let notificationNewGame = Notification.Name("NotificationNewGame")
     static let notificationRemoveApple = Notification.Name("NotificationRemoveApple")
+    static let notificationAddScore = Notification.Name("NotificationAddScore")
 
 }
 
@@ -22,7 +23,8 @@ extension GameManager {
         NotificationCenter.default.addObserver(self, selector: #selector(self.nextGame(notification:)), name: .notificationNewGame, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeApple(notification:)), name: .notificationRemoveApple, object: nil)
 
- 
+        NotificationCenter.default.addObserver(self, selector: #selector(self.addScore(notification:)), name: .notificationAddScore, object: nil)
+
         
         
 #if os(tvOS)
@@ -51,6 +53,22 @@ extension GameManager {
     @objc func removeApple(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             appleArray.remove(id: id)
+        }
+    }
+
+    @objc func addScore(notification: Notification) {
+        if let value = notification.userInfo?["score"] as? Int,let count = notification.userInfo?["count"] as? Int {
+            score += value
+            if value == 50 {
+                gameScreen.soundFX.cherrySound(count: count)
+                if count == 8 {
+                    score += 500
+                }
+                cherryCount += 1
+                if cherryCount == 40 {
+                    nextLevel()
+                }
+            }
         }
     }
 

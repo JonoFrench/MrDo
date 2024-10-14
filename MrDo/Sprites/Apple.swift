@@ -20,7 +20,6 @@ final class AppleArray: ObservableObject {
     func move(){
         for apple in apples where apple.appleState == .falling {
             apple.move()
-//            self.objectWillChange.send()
         }
     }
     
@@ -39,7 +38,6 @@ final class AppleArray: ObservableObject {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             for apple in apples where apple.appleState == .sitting {
                 let checkAsset = screenData.levelData.tileArray[apple.yPos+1][apple.xPos]
-//                if checkAsset == .hz || checkAsset == .vt || checkAsset == .tl || checkAsset == .tr || checkAsset == .ll || checkAsset == .lr {
                 if !(checkAsset == .fu || checkAsset == .ch) && (apple.yPos+1 != doYpos || apple.xPos != doXpos) {
                     print("Apple dislodge checkAsset \(checkAsset)")
                     if !apple.isPushed {
@@ -104,6 +102,7 @@ final class Apple:SwiftUISprite,Moveable {
                         } else {
                             dropLevel = 0
                             appleState = .sitting
+                            screenData.soundFX.appleDropSoundStop()
                         }
                     }
                     yPos += 1
@@ -121,6 +120,9 @@ final class Apple:SwiftUISprite,Moveable {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
                     currentImage = appleFrames[1]
                     appleState = .falling
+                    if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+                        screenData.soundFX.appleDropSound()
+                    }
                 }
             }
         }
@@ -131,6 +133,10 @@ final class Apple:SwiftUISprite,Moveable {
         leftImage = getTile(name: "AppleEnd", pos: 0)!
         rightImage = getTile(name: "AppleEnd", pos: 1)!
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [self] in
+            if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+                screenData.soundFX.appleDropSoundStop()
+                screenData.soundFX.appleBreakSound()
+            }
             leftImage = getTile(name: "AppleEnd", pos: 2)!
             rightImage = getTile(name: "AppleEnd", pos: 3)!
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [self] in

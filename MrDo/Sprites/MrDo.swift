@@ -56,7 +56,8 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             }
         }
     }
-    
+    var wasCherry = false
+    var cherryCount = 0
     var pushedApple: Apple?
 
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
@@ -75,6 +76,15 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             moveDistance = resolvedInstance.assetDimensionStep * Double(GameConstants.doSpeed)
         }
+    }
+    
+    func reset() {
+        currentImage = walkRightBallFrames[0]
+        gridOffsetX = 2
+        gridOffsetY = 3
+        direction = .stop
+        facing = .right
+        hasBall = true
     }
     
     func setImages() {
@@ -217,12 +227,26 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         
     }
     
+    func addCherry() {
+        if wasCherry {
+            cherryCount += 1
+        } else {
+            cherryCount = 1
+        }
+        let value:[String: Int] = ["score": 50,"count":cherryCount]
+        NotificationCenter.default.post(name: .notificationAddScore, object: nil, userInfo: value)
+        wasCherry = true
+    }
+    
     func checkGridUp() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
             let previousAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
             if gridAsset == .ch {
                 // add cherry to score
+                addCherry()
+            } else {
+                wasCherry = false
             }
             if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .tl || gridAsset == .tr || gridAsset == .rt { return }
             
@@ -282,6 +306,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             let previousAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
             if gridAsset == .ch {
                 // add cherry to score
+                addCherry()
+            } else {
+                wasCherry = false
             }
             if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .bl || gridAsset == .br || gridAsset == .rb { return }
             
@@ -338,6 +365,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
             if gridAsset == .ch {
                 // add cherry to score
+                addCherry()
+            } else {
+                wasCherry = false
             }
             if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tl || gridAsset == .bl { return }
             
@@ -397,6 +427,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
             if gridAsset == .ch {
                 // add cherry to score
+                addCherry()
+            } else {
+                wasCherry = false
             }
             if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tr || gridAsset == .br || gridAsset == .rr { return }
             

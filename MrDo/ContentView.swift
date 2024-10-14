@@ -19,7 +19,7 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity)
                         .background(.clear)
                 }
-                else if manager.gameState == .playing {
+                else if manager.gameState == .playing || manager.gameState == .levelend {
                     GameView(mrDo: manager.mrDo,ball: manager.ball,appleArray:manager.appleArray)
                         .frame(width: UIScreen.main.bounds.width, height: manager.gameScreen.assetDimension * 15, alignment: .center)
                             .zIndex(1.0)

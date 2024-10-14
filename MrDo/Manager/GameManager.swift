@@ -18,6 +18,10 @@ enum JoyPad {
     case left,right,up,down,stop
 }
 
+enum LevelEndType {
+    case cherry,monsters
+}
+
 struct GameConstants {
     static let tileSteps = 8.0
     static let doSpeed = 2
@@ -33,8 +37,15 @@ struct GameConstants {
 #endif
 }
 
+struct LevelScores {
+    let id = UUID()
+    var level = 0
+    var time = 0
+    var levelScore = 0
+    var endType:LevelEndType
+}
+
 class GameManager: ObservableObject {
-    let soundFX:SoundFX = SoundFX()
     let hiScores:MrDoHighScores = MrDoHighScores()
     @Published
     var gameScreen:ScreenData = ScreenData()
@@ -42,7 +53,9 @@ class GameManager: ObservableObject {
     var gameState:GameState = .intro
     @Published
     var lives = 3
+    @Published
     var score = 0
+    var cherryCount = 0
     var moveDirection: JoyPad {
         didSet {
             if moveDirection != oldValue {
@@ -67,6 +80,11 @@ class GameManager: ObservableObject {
         }
     }
     
+    var levelScores:[LevelScores] = []
+    var startTime: Date = Date()
+    var endTime: Date = Date()
+
+    
     init() {
         moveDirection = .stop
         /// Share these instances so they are available from the Sprites
@@ -90,6 +108,7 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
 
         lives = 3
         score = 0
+        cherryCount = 0
 //        turnOffCollisions = true
         startPlaying()
     }
@@ -137,7 +156,31 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         gameScreen.gameOver = false
 //        gameScreen.level = 1
         setDataForLevel()
+        startTime = Date()
         gameState = .playing
+        gameScreen.soundFX.startSound()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) { [self] in
+            gameScreen.soundFX.backgroundSound()
+        }
+    }
+    
+    func nextLevel() {
+        gameScreen.soundFX.backgroundSoundStop()
+        gameScreen.soundFX.roundClear()
+        endTime = Date()
+        let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
+        print("Level Time \(difference)")
+        levelScores.append(LevelScores(level: gameScreen.level, time: Int(difference),levelScore: 0,endType: .cherry))
+        cherryCount = 0
+        gameState = .levelend
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
+            mrDo.reset()
+            if gameScreen.level % 3 == 0 {
+                ///Every 3 levels display the how we doing screen.
+            }
+            gameScreen.level += 1
+            startPlaying()
+        }
     }
     
     func catchBall(){
