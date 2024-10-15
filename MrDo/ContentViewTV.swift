@@ -22,7 +22,7 @@ struct ContentViewTV: View {
                         Spacer()
                         Spacer()
                     }
-                    else if manager.gameState == .playing || manager.gameState == .levelend {
+                    else if manager.gameState == .playing || manager.gameState == .levelend || manager.gameState == .progress {
                         GameView(mrDo: manager.mrDo,ball: manager.ball,appleArray:manager.appleArray)
                             .zIndex(1.0)
                     }
@@ -31,6 +31,7 @@ struct ContentViewTV: View {
                 }.background(.black)
                 Spacer()
             }.frame(width:864, height: UIScreen.main.bounds.height,alignment: .center)
+                .clipped()
             Spacer()
         }.frame(width: UIScreen.main.bounds.width , height: UIScreen.main.bounds.height,alignment: .center)
             .background(.black)

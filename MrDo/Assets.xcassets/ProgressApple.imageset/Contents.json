@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ProgressApple.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

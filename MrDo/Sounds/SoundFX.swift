@@ -23,7 +23,7 @@ final class SoundFX {
     private var cherry8AudioPlayer: AVAudioPlayer?
     private var appleDropAudioPlayer: AVAudioPlayer?
     private var appleBreakAudioPlayer: AVAudioPlayer?
-    private var jumpAudioPlayer: AVAudioPlayer?
+    private var progressAudioPlayer: AVAudioPlayer?
     private var getAudioPlayer: AVAudioPlayer?
     private var barrelJumpAudioPlayer: AVAudioPlayer?
     private var walkingAudioPlayer: AVAudioPlayer?
@@ -45,7 +45,7 @@ final class SoundFX {
     private lazy var cherry8url = Bundle.main.url(forResource: "Cherry8", withExtension: "m4a")
     private lazy var appleBreakurl = Bundle.main.url(forResource: "AppleBreak", withExtension: "m4a")
     private lazy var appleDropurl = Bundle.main.url(forResource: "AppleDrop", withExtension: "m4a")
-    private lazy var jumpurl = Bundle.main.url(forResource: "jump", withExtension: "wav")
+    private lazy var progressurl = Bundle.main.url(forResource: "Progress", withExtension: "m4a")
     private lazy var geturl = Bundle.main.url(forResource: "itemget", withExtension: "wav")
     private lazy var barrelJumpurl = Bundle.main.url(forResource: "jumpbar", withExtension: "wav")
     private lazy var walkingurl = Bundle.main.url(forResource: "walking", withExtension: "wav")
@@ -71,6 +71,7 @@ final class SoundFX {
             cherry8AudioPlayer = try AVAudioPlayer(contentsOf: cherry8url!, fileTypeHint: AVFileType.m4a.rawValue)
             appleDropAudioPlayer = try AVAudioPlayer(contentsOf: appleDropurl!, fileTypeHint: AVFileType.m4a.rawValue)
             appleBreakAudioPlayer = try AVAudioPlayer(contentsOf: appleBreakurl!, fileTypeHint: AVFileType.m4a.rawValue)
+            progressAudioPlayer = try AVAudioPlayer(contentsOf: progressurl!, fileTypeHint: AVFileType.m4a.rawValue)
 
 
 
@@ -103,6 +104,11 @@ final class SoundFX {
     func startSound(){
         guard let startAudioPlayer = startAudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: startAudioPlayer)
+    }
+
+    func progressSound(){
+        guard let progressAudioPlayer = progressAudioPlayer else { return }
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: progressAudioPlayer)
     }
     
     func backgroundSound(){

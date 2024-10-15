@@ -16,7 +16,12 @@ enum BallDirection {
 final class Ball:SwiftUISprite, Moveable {
     static var speed: Int = GameConstants.ballSpeed
     var thrown = false
-    var direction:BallDirection = .downright
+    var noCheck = false
+    var direction:BallDirection = .downright {
+        didSet {
+            noCheck = true
+        }
+    }
     var xAdjust = 0.0
     var yAdjust = 0.0
     var adjustedPosition = CGPoint()
@@ -92,7 +97,11 @@ final class Ball:SwiftUISprite, Moveable {
             position.y += resolvedInstance.assetDimensionStep
             gridOffsetX -= 1
             gridOffsetY += 1
-            
+//            if noCheck {
+//                noCheck = !noCheck
+//                return
+//            }
+//            
             if gridOffsetX <= -1 {
                 catchable = true
                 xPos -= 1
@@ -119,12 +128,24 @@ final class Ball:SwiftUISprite, Moveable {
             var checkX = gridOffsetX-1
             var checkY = gridOffsetY+1
             if checkX < 0 {
-                checkX = 7
-                checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                if xPos > 0 {
+                    checkX = 7
+                    checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                } else {
+                    checkX = 0
+                    direction = .downright
+                    return
+                }
             }
             if checkY > 7 {
-                checkY = 0
-                checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                if yPos < resolvedInstance.screenDimensionY - 1 {
+                    checkY = 0
+                    checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                } else {
+                    direction = .upright
+                    return
+
+                }
             }
             checkDirection(checkAsset: checkAsset)
             //1
@@ -156,7 +177,7 @@ final class Ball:SwiftUISprite, Moveable {
                         return
                     }
                     
-                    if checkAsset == .rl && checkX < 3 {
+                    if (checkAsset == .rl || checkAsset == .bl) && checkX < 3 {
                         print("downleft to upright asset \(checkAsset)")
                         direction = .upright
                         return
@@ -185,7 +206,11 @@ final class Ball:SwiftUISprite, Moveable {
             position.y += resolvedInstance.assetDimensionStep
             gridOffsetX += 1
             gridOffsetY += 1
-            
+//            if noCheck {
+//                noCheck = !noCheck
+//                return
+//            }
+
             if gridOffsetX >= 8 {
                 catchable = true
                 xPos += 1
@@ -216,8 +241,14 @@ final class Ball:SwiftUISprite, Moveable {
                 checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
             }
             if checkY > 7 {
-                checkY = 0
-                checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                if yPos < resolvedInstance.screenDimensionY - 1 {
+                    checkY = 0
+                    checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                } else {
+                    direction = .upleft
+                    return
+
+                }
             }
             checkDirection(checkAsset: checkAsset)
             //1 As you where
@@ -275,7 +306,11 @@ final class Ball:SwiftUISprite, Moveable {
             position.y -= resolvedInstance.assetDimensionStep
             gridOffsetX -= 1
             gridOffsetY -= 1
-            
+//            if noCheck {
+//                noCheck = !noCheck
+//                return
+//            }
+
             if gridOffsetX <= -1 {
                 catchable = true
                 xPos -= 1
@@ -302,8 +337,13 @@ final class Ball:SwiftUISprite, Moveable {
             var checkX = gridOffsetX-1
             var checkY = gridOffsetY-1
             if checkX < 0 {
-                checkX = 7
-                checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                if xPos > 0 {
+                    checkX = 7
+                    checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                } else {
+                    direction = .upleft
+                    return
+                }
             }
             if checkY < 0 {
                 checkY = 7
@@ -365,6 +405,11 @@ final class Ball:SwiftUISprite, Moveable {
             position.y -= resolvedInstance.assetDimensionStep
             gridOffsetX += 1
             gridOffsetY -= 1
+//            if noCheck {
+//                noCheck = !noCheck
+//                return
+//            }
+
             if gridOffsetX >= 8 {
                 catchable = true
                 xPos += 1
@@ -454,6 +499,9 @@ final class Ball:SwiftUISprite, Moveable {
     func checkDirection(checkAsset: TileType) {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             tileDirection = resolvedInstance.levelData.getTileDirection(type: checkAsset)
+//            if checkAsset == .bk {
+//                return
+//            }
             if tileDirection == .both {
                 if previousDirection == .vertical {
                     tileDirection = .horizontal

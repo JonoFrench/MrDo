@@ -59,10 +59,12 @@ extension GameManager {
     @objc func addScore(notification: Notification) {
         if let value = notification.userInfo?["score"] as? Int,let count = notification.userInfo?["count"] as? Int {
             score += value
+            levelScore += value
             if value == 50 {
                 gameScreen.soundFX.cherrySound(count: count)
                 if count == 8 {
                     score += 500
+                    levelScore += 500
                 }
                 cherryCount += 1
                 if cherryCount == 40 {

@@ -37,13 +37,15 @@ final class AppleArray: ObservableObject {
     func checkDrop(doXpos:Int,doYpos:Int){
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             for apple in apples where apple.appleState == .sitting {
-                let checkAsset = screenData.levelData.tileArray[apple.yPos+1][apple.xPos]
-                if !(checkAsset == .fu || checkAsset == .ch) && (apple.yPos+1 != doYpos || apple.xPos != doXpos) {
-                    print("Apple dislodge checkAsset \(checkAsset)")
-                    if !apple.isPushed {
-                        apple.dislodge()
-                    } else {
-                        apple.appleState = .falling
+                if apple.yPos < screenData.screenDimensionY - 1 {
+                    let checkAsset = screenData.levelData.tileArray[apple.yPos+1][apple.xPos]
+                    if !(checkAsset == .fu || checkAsset == .ch) && (apple.yPos+1 != doYpos || apple.xPos != doXpos) {
+                        print("Apple dislodge checkAsset \(checkAsset)")
+                        if !apple.isPushed {
+                            apple.dislodge()
+                        } else {
+                            apple.appleState = .falling
+                        }
                     }
                 }
             }

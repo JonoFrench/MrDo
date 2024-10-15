@@ -11,7 +11,7 @@ import Combine
 
 
 enum GameState {
-    case intro,kongintro,howhigh,playing,ended,highscore,levelend
+    case intro,kongintro,howhigh,playing,ended,highscore,levelend, progress
 }
 
 enum JoyPad {
@@ -55,6 +55,7 @@ class GameManager: ObservableObject {
     var lives = 3
     @Published
     var score = 0
+    var levelScore = 0
     var cherryCount = 0
     var moveDirection: JoyPad {
         didSet {
@@ -84,6 +85,8 @@ class GameManager: ObservableObject {
     var startTime: Date = Date()
     var endTime: Date = Date()
 
+    @ObservedObject
+    var progress:Progress = Progress()
     
     init() {
         moveDirection = .stop
@@ -110,6 +113,13 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         score = 0
         cherryCount = 0
 //        turnOffCollisions = true
+        
+//        progress = Progress()
+//        levelScores.append(LevelScores(level: 1, time: Int(45),levelScore: 1000,endType: .cherry))
+//        levelScores.append(LevelScores(level: 2, time: Int(83),levelScore: 2500,endType: .cherry))
+//        levelScores.append(LevelScores(level: 3, time: Int(96),levelScore: 4600,endType: .cherry))
+//        gameState = .progress
+//        gameScreen.soundFX.progressSound()
         startPlaying()
     }
     
@@ -147,6 +157,8 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
             }
             appleArray.checkDrop(doXpos: mrDo.xPos,doYpos: mrDo.yPos)
             appleArray.move()
+        } else if gameState == .progress {
+                progress.move()
         }
     }
     
@@ -155,6 +167,7 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         gameScreen.levelEnd = false
         gameScreen.gameOver = false
 //        gameScreen.level = 1
+        levelScore = 0
         setDataForLevel()
         startTime = Date()
         gameState = .playing
@@ -169,17 +182,24 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         gameScreen.soundFX.roundClear()
         endTime = Date()
         let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
-        print("Level Time \(difference)")
-        levelScores.append(LevelScores(level: gameScreen.level, time: Int(difference),levelScore: 0,endType: .cherry))
+        levelScores.append(LevelScores(level: gameScreen.level, time: Int(difference),levelScore: levelScore,endType: .cherry))
         cherryCount = 0
         gameState = .levelend
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
             mrDo.reset()
             if gameScreen.level % 3 == 0 {
                 ///Every 3 levels display the how we doing screen.
+                progress = Progress()
+                gameState = .progress
+                gameScreen.soundFX.progressSound()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [self] in
+                    gameScreen.level += 1
+                    startPlaying()
+                }
+            } else {
+                gameScreen.level += 1
+                startPlaying()
             }
-            gameScreen.level += 1
-            startPlaying()
         }
     }
     
