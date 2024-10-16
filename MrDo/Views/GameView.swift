@@ -41,6 +41,11 @@ struct GameView: View {
                     CenterView(center: manager.center)
                         .position(manager.center.position)
                         .zIndex(1.5)
+                    if manager.gameScreen.gameOver {
+                        GameOverView(manager: _manager)
+                            .position(x:manager.gameScreen.gameSize.width / 2,y: manager.gameScreen.gameSize.height / 2).offset(y: -40)
+                            .zIndex(5)
+                    }
                 }
             }
             BottomView()

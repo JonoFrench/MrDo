@@ -27,6 +27,9 @@ struct ContentViewTV: View {
                             .zIndex(1.0)
                     }
                     else if manager.gameState == .highscore {
+                        NewHighScoreView(hiScores: manager.hiScores)
+                            .background(.clear)
+                            .zIndex(1.0)
                     }
                 }.background(.black)
                 Spacer()

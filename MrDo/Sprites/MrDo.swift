@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 enum DoState {
-    case still,walking,dead
+    case still,walking,falling,dead
 }
 enum DoDirection {
     case left,right,up,down,stop
@@ -18,24 +18,26 @@ enum DoDirection {
 final class MrDo:SwiftUISprite,Moveable,Animatable {
     static var animateFrames: Int = 0
     static var speed: Int = GameConstants.doSpeed
-    var walkRightFrames: [UIImage] = []
-    var walkLeftFrames: [UIImage] = []
-    var walkUpFrames: [UIImage] = []
-    var walkDownFrames: [UIImage] = []
-    var walkRightBallFrames: [UIImage] = []
-    var walkLeftBallFrames: [UIImage] = []
-    var walkUpBallFrames: [UIImage] = []
-    var walkDownBallFrames: [UIImage] = []
+    private var walkRightFrames: [UIImage] = []
+    private var walkLeftFrames: [UIImage] = []
+    private var walkUpFrames: [UIImage] = []
+    private var walkDownFrames: [UIImage] = []
+    private var walkRightBallFrames: [UIImage] = []
+    private var walkLeftBallFrames: [UIImage] = []
+    private var walkUpBallFrames: [UIImage] = []
+    private var walkDownBallFrames: [UIImage] = []
     
-    var pushRightFrames: [UIImage] = []
-    var pushLeftFrames: [UIImage] = []
-    var pushUpFrames: [UIImage] = []
-    var pushDownFrames: [UIImage] = []
-    var pushRightBallFrames: [UIImage] = []
-    var pushLeftBallFrames: [UIImage] = []
-    var pushUpBallFrames: [UIImage] = []
-    var pushDownBallFrames: [UIImage] = []
+    private var pushRightFrames: [UIImage] = []
+    private var pushLeftFrames: [UIImage] = []
+    private var pushUpFrames: [UIImage] = []
+    private var pushDownFrames: [UIImage] = []
+    private var pushRightBallFrames: [UIImage] = []
+    private var pushLeftBallFrames: [UIImage] = []
+    private var pushUpBallFrames: [UIImage] = []
+    private var pushDownBallFrames: [UIImage] = []
+    private var dieFrames: [UIImage] = []
 
+    
     var direction:DoDirection = .stop
     var previousDirection:DoDirection = .stop
     var facing:DoDirection = .right {
@@ -59,7 +61,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     var wasCherry = false
     var cherryCount = 0
     var pushedApple: Apple?
-
+    var doState:DoState = .still
+    private var moveCounter = 0
+    
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
         super.init(xPos: xPos, yPos: yPos, frameSize: frameSize)
         setImages()
@@ -79,12 +83,18 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     }
     
     func reset() {
+        currentAnimationFrame = 0
         currentImage = walkRightBallFrames[0]
+        willStop = false
+        xPos = 5
+        yPos = 12
         gridOffsetX = 2
         gridOffsetY = 3
         direction = .stop
         facing = .right
         hasBall = true
+        doState = .still
+        setPosition(xPos: 5, yPos: 12)
     }
     
     func setImages() {
@@ -138,13 +148,23 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         for i in 9..<12 {
             pushUpBallFrames.append(getTile(name: "DoPushingBall", pos: i)!)
         }
-
-        
+        for i in 0..<5 {
+            dieFrames.append(getTile(name: "DoDie", pos: i)!)
+        }
     }
         
     func move() {
         speedCounter += 1
         if speedCounter == GameConstants.doSpeed + 1 {
+            speedCounter = 0
+            if doState == .falling {
+                fall()
+                return
+            }
+            if doState == .dead {
+                die()
+                return
+            }
             if willStop {
                 moveStop()
             }
@@ -160,7 +180,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             case .stop:
                 moveNothing()
             }
-            speedCounter = 0
         }
     }
     
@@ -171,7 +190,40 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         
     }
     
+    func fall(){
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            //speedCounter += 1
+            //if speedCounter == 1 {
+            //    speedCounter = 0
+                moveCounter += 1
+                position.y += screenData.assetDimensionStep * 2
+                print("Do falling moveCounter \(moveCounter) pos \(position.y)")
+                if moveCounter == 4 {
+                    moveCounter = 0
+                    let checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
+                    print("Do YPos checkAsset \(checkAsset)")
+                    if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
+                        doState = .dead
+                        currentAnimationFrame = 0
+                        screenData.soundFX.loseLifeSound()
+                        die()
+                    }
+                    yPos += 1
+                }
+            }
+        //}
+    }
+    
+    func die() {
+        guard currentAnimationFrame < dieFrames.count else { return }
+        currentImage = dieFrames[currentAnimationFrame]
+        currentAnimationFrame += 1
+        if currentAnimationFrame == 5 {
+            NotificationCenter.default.post(name: .notificationLoseLife, object: nil, userInfo: nil)
+        }
+    }
     func animate() {
+        guard doState != .dead else {return}
         currentAnimationFrame += 1
         if currentAnimationFrame == 3 {
             currentAnimationFrame = 0
@@ -238,7 +290,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         wasCherry = true
     }
     
-    func checkGridUp() {
+    private func checkGridUp() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
             let previousAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
@@ -300,7 +352,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             resolvedInstance.objectWillChange.send()
         }
     }
-    func checkGridDown() {
+    private func checkGridDown() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
             let previousAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
@@ -359,7 +411,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             resolvedInstance.objectWillChange.send()
         }
     }
-    func checkGridLeft() {
+    private func checkGridLeft() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
             let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
@@ -421,7 +473,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             resolvedInstance.objectWillChange.send()
         }
     }
-    func checkGridRight() {
+    private func checkGridRight() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
             let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
@@ -646,7 +698,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
     }
     
-    func appleAbove() -> Bool {
+    private func appleAbove() -> Bool {
         ///Is there an apple above?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {
@@ -660,7 +712,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         return false
     }
 
-    func appleBelow() -> Bool {
+    private func appleBelow() -> Bool {
         ///Is there an apple below?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {
@@ -673,7 +725,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         return false
     }
  
-    func appleLeft() -> Bool {
+    private func appleLeft() -> Bool {
         ///Is there an apple to the left?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {
@@ -686,7 +738,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         return false
     }
 
-    func appleRight() -> Bool {
+    private func appleRight() -> Bool {
         ///Is there an apple to the right?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {
@@ -699,7 +751,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         return false
     }
 
-    func canPushLeft() -> Bool {
+    private func canPushLeft() -> Bool {
         guard isPushing == false else { return false }
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             ///Can we push the apple?
@@ -716,7 +768,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         return false
     }
 
-    func canPushRight() -> Bool {
+    private func canPushRight() -> Bool {
         guard isPushing == false else { return false }
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             ///Can we push the apple?

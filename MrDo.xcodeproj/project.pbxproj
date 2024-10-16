@@ -59,6 +59,10 @@
 		340A7B4C2CBD5C8700433318 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B4B2CBD5C8700433318 /* ProgressView.swift */; };
 		340A7B4E2CBE5EEA00433318 /* Progress.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 340A7B4D2CBE5EEA00433318 /* Progress.m4a */; };
 		340A7B502CBE765200433318 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B4F2CBE765200433318 /* Progress.swift */; };
+		340A7B522CBFDB4F00433318 /* LoseLife.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 340A7B512CBFDB4F00433318 /* LoseLife.m4a */; };
+		340A7B542CBFE27D00433318 /* GameOver.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 340A7B532CBFE27D00433318 /* GameOver.m4a */; };
+		340A7B562CBFED6D00433318 /* GameOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B552CBFED6200433318 /* GameOverView.swift */; };
+		340A7B582CC0070F00433318 /* NameEntry.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 340A7B572CC0070F00433318 /* NameEntry.m4a */; };
 		34B951642C9C392D00FE770B /* MrDoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951632C9C392D00FE770B /* MrDoView.swift */; };
 		34B951662C9C394200FE770B /* MrDo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951652C9C394200FE770B /* MrDo.swift */; };
 		34B951682C9E0A5700FE770B /* BallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951672C9E0A5700FE770B /* BallView.swift */; };
@@ -120,6 +124,10 @@
 		340A7B4B2CBD5C8700433318 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		340A7B4D2CBE5EEA00433318 /* Progress.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Progress.m4a; sourceTree = "<group>"; };
 		340A7B4F2CBE765200433318 /* Progress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
+		340A7B512CBFDB4F00433318 /* LoseLife.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = LoseLife.m4a; sourceTree = "<group>"; };
+		340A7B532CBFE27D00433318 /* GameOver.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = GameOver.m4a; sourceTree = "<group>"; };
+		340A7B552CBFED6200433318 /* GameOverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverView.swift; sourceTree = "<group>"; };
+		340A7B572CC0070F00433318 /* NameEntry.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = NameEntry.m4a; sourceTree = "<group>"; };
 		34B951632C9C392D00FE770B /* MrDoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDoView.swift; sourceTree = "<group>"; };
 		34B951652C9C394200FE770B /* MrDo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDo.swift; sourceTree = "<group>"; };
 		34B951672C9E0A5700FE770B /* BallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallView.swift; sourceTree = "<group>"; };
@@ -242,6 +250,9 @@
 				340A7B3D2CBD4A8A00433318 /* Cherry6.m4a */,
 				340A7B3E2CBD4A8A00433318 /* Cherry7.m4a */,
 				340A7B3F2CBD4A8A00433318 /* Cherry8.m4a */,
+				340A7B532CBFE27D00433318 /* GameOver.m4a */,
+				340A7B512CBFDB4F00433318 /* LoseLife.m4a */,
+				340A7B572CC0070F00433318 /* NameEntry.m4a */,
 				340A7B4D2CBE5EEA00433318 /* Progress.m4a */,
 				340A7B332CBD3C4500433318 /* Start.m4a */,
 				340A7B312CBD25EF00433318 /* RoundClear.m4a */,
@@ -265,6 +276,7 @@
 		340999FC2C99C21E00F4FE3A /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				340A7B552CBFED6200433318 /* GameOverView.swift */,
 				34099A142C99CA3600F4FE3A /* ImageView.swift */,
 				34099A162C99CA7100F4FE3A /* TopView.swift */,
 				34099A182C99CA8300F4FE3A /* BottomView.swift */,
@@ -340,7 +352,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				340A7B582CC0070F00433318 /* NameEntry.m4a in Resources */,
 				34099A112C99C58800F4FE3A /* mr-do-arcade.ttf in Resources */,
+				340A7B522CBFDB4F00433318 /* LoseLife.m4a in Resources */,
 				340A7B322CBD25EF00433318 /* RoundClear.m4a in Resources */,
 				340A7B342CBD3C4500433318 /* Start.m4a in Resources */,
 				340A7B402CBD4A8A00433318 /* Cherry3.m4a in Resources */,
@@ -357,6 +371,7 @@
 				340999EC2C99C15900F4FE3A /* Preview Assets.xcassets in Resources */,
 				340A7B382CBD445100433318 /* Cherry1.m4a in Resources */,
 				340999E92C99C15900F4FE3A /* Assets.xcassets in Resources */,
+				340A7B542CBFE27D00433318 /* GameOver.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +418,7 @@
 				34099A342C9AC60A00F4FE3A /* AppleView.swift in Sources */,
 				34099A252C99CB4800F4FE3A /* NewHighScoreView.swift in Sources */,
 				34099A2C2C99E68A00F4FE3A /* InfoView.swift in Sources */,
+				340A7B562CBFED6D00433318 /* GameOverView.swift in Sources */,
 				340A7B302CBBE14100433318 /* GameManager+Levels.swift in Sources */,
 				34099A0B2C99C50E00F4FE3A /* CoreDataStack.swift in Sources */,
 			);

@@ -14,7 +14,7 @@ extension Notification.Name {
     static let notificationNewGame = Notification.Name("NotificationNewGame")
     static let notificationRemoveApple = Notification.Name("NotificationRemoveApple")
     static let notificationAddScore = Notification.Name("NotificationAddScore")
-
+    static let notificationLoseLife = Notification.Name("NotificationLoseLife")
 }
 
 extension GameManager {
@@ -22,8 +22,8 @@ extension GameManager {
     func notificationObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(self.nextGame(notification:)), name: .notificationNewGame, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeApple(notification:)), name: .notificationRemoveApple, object: nil)
-
         NotificationCenter.default.addObserver(self, selector: #selector(self.addScore(notification:)), name: .notificationAddScore, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.loseLife(notification:)), name: .notificationLoseLife, object: nil)
 
         
         
@@ -50,6 +50,35 @@ extension GameManager {
         gameState = .intro
     }
     
+    @objc func loseLife(notification: Notification) {
+        lives -= 1
+        gameScreen.soundFX.backgroundSoundStop()
+        if lives == 2 {
+            endTime = Date()
+            let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
+            gameTime += Int(difference)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+                gameScreen.soundFX.gameOverSound()
+                gameScreen.gameOver = true
+                self.objectWillChange.send()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [self] in
+                    if hiScores.isNewHiScore(score: score,level: gameScreen.level, time: gameTime) {
+                        hiScores.resetInput()
+                        gameState = .highscore
+                        gameScreen.soundFX.nameEntrySound()
+                    } else {
+                        gameState = .intro
+                    }
+                }
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
+                restartPlaying()
+            }
+
+        }
+    }
+
     @objc func removeApple(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             appleArray.remove(id: id)

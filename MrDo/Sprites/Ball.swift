@@ -109,7 +109,8 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos == -1 {
                     xPos = 0
                     gridOffsetY = 0
-                    direction = .downleft
+                    direction = .downright
+                    print("moveDownLeft to downright X edge")
                     return
                 }            }
             if gridOffsetY >= 8 {
@@ -119,7 +120,8 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos == resolvedInstance.screenDimensionY {
                     yPos = resolvedInstance.screenDimensionY-1
                     gridOffsetY = 7
-                    direction = .upleft
+                    direction = .upright
+                    print("moveDownLeft to upright Y edge")
                     return
                 }
             }
@@ -131,9 +133,16 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos > 0 {
                     checkX = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                    if checkAsset == .fu || checkAsset == .ch {
+                        direction = .downright
+                        print("moveDownLeft to downright X full")
+                        return
+                    }
+
                 } else {
                     checkX = 0
                     direction = .downright
+                    print("moveDownLeft to downright X else")
                     return
                 }
             }
@@ -141,8 +150,15 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos < resolvedInstance.screenDimensionY - 1 {
                     checkY = 0
                     checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                    if checkAsset == .fu || checkAsset == .ch {
+                        direction = .upright
+                        print("moveDownLeft to upright Y full")
+                        return
+                    }
+
                 } else {
                     direction = .upright
+                    print("moveDownLeft to upright Y else")
                     return
 
                 }
@@ -218,7 +234,8 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos == resolvedInstance.screenDimensionX {
                     xPos = resolvedInstance.screenDimensionX-1
                     gridOffsetY = 7
-                    direction = .upleft
+                    direction = .downleft
+                    print("moveDownRight to downleft X edge")
                     return
                 }            }
             if gridOffsetY >= 8 {
@@ -229,6 +246,7 @@ final class Ball:SwiftUISprite, Moveable {
                     yPos = resolvedInstance.screenDimensionY-1
                     gridOffsetY = 7
                     direction = .upleft
+                    print("moveDownRight to upleft Y edge")
                     return
                 }
                 
@@ -239,13 +257,26 @@ final class Ball:SwiftUISprite, Moveable {
             if checkX > 7 {
                 checkX = 0
                 checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+                
+                if checkAsset == .fu || checkAsset == .ch {
+                    direction = .downleft
+                    print("moveDownRight to downleft X full")
+                    return
+                }
+                
             }
             if checkY > 7 {
                 if yPos < resolvedInstance.screenDimensionY - 1 {
                     checkY = 0
                     checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                    if checkAsset == .fu || checkAsset == .ch {
+                        direction = .upright
+                        print("moveDownRight to upright Y full")
+                        return
+                    }
                 } else {
                     direction = .upleft
+                    print("moveDownRight to upleft Y else")
                     return
 
                 }
@@ -318,7 +349,8 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos == -1 {
                     xPos = 0
                     gridOffsetY = 0
-                    direction = .downleft
+                    direction = .upright
+                    print("moveUpLeft to upright X edge")
                     return
                 }
             }
@@ -330,6 +362,7 @@ final class Ball:SwiftUISprite, Moveable {
                     yPos = 0
                     gridOffsetY = 0
                     direction = .downleft
+                    print("moveUpLeft to downleft Y edge")
                     return
                 }
             }
@@ -417,7 +450,8 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos == resolvedInstance.screenDimensionX {
                     xPos = resolvedInstance.screenDimensionX - 1
                     gridOffsetY = 7
-                    direction = .downright
+                    direction = .upleft
+                    print("moveUpRight to upleft X edge")
                     return
                 }
             }
@@ -428,7 +462,8 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos == -1 {
                     yPos = 0
                     gridOffsetY = 0
-                    direction = .downright
+                    direction = .downleft
+                    print("moveUpRight to downleft Y edge")
                     return
                 }
             }
@@ -499,9 +534,6 @@ final class Ball:SwiftUISprite, Moveable {
     func checkDirection(checkAsset: TileType) {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             tileDirection = resolvedInstance.levelData.getTileDirection(type: checkAsset)
-//            if checkAsset == .bk {
-//                return
-//            }
             if tileDirection == .both {
                 if previousDirection == .vertical {
                     tileDirection = .horizontal

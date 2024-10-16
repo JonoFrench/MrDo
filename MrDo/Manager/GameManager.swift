@@ -11,7 +11,7 @@ import Combine
 
 
 enum GameState {
-    case intro,kongintro,howhigh,playing,ended,highscore,levelend, progress
+    case intro,playing,ended,highscore,levelend,progress
 }
 
 enum JoyPad {
@@ -57,6 +57,7 @@ class GameManager: ObservableObject {
     var score = 0
     var levelScore = 0
     var cherryCount = 0
+    var gameTime = 0
     var moveDirection: JoyPad {
         didSet {
             if moveDirection != oldValue {
@@ -111,6 +112,8 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
 
         lives = 3
         score = 0
+        gameTime = 0
+        gameScreen.gameOver = false
         cherryCount = 0
 //        turnOffCollisions = true
         
@@ -124,7 +127,7 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
     }
     
     func handleJoyPad() {
-        guard !mrDo.willStop else {return}
+//        guard !mrDo.willStop else {return}
         switch moveDirection {
         case .down:
             if gameState == .playing {
@@ -156,9 +159,13 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
                 ball.move()
             }
             appleArray.checkDrop(doXpos: mrDo.xPos,doYpos: mrDo.yPos)
-            appleArray.move()
+            if appleArray.move(doXpos: mrDo.xPos,doYpos: mrDo.yPos) {
+                mrDo.doState = .falling
+            }
         } else if gameState == .progress {
                 progress.move()
+        } else if gameState == .ended {
+            
         }
     }
     
@@ -177,11 +184,24 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         }
     }
     
+    func restartPlaying(){
+        
+        mrDo.reset()
+        moveDirection = .stop
+        gameState = .playing
+        gameScreen.soundFX.startSound()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) { [self] in
+            gameScreen.soundFX.backgroundSound()
+        }
+
+    }
+    
     func nextLevel() {
         gameScreen.soundFX.backgroundSoundStop()
         gameScreen.soundFX.roundClear()
         endTime = Date()
         let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
+        gameTime += Int(difference)
         levelScores.append(LevelScores(level: gameScreen.level, time: Int(difference),levelScore: levelScore,endType: .cherry))
         cherryCount = 0
         gameState = .levelend

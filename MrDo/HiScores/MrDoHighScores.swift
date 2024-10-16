@@ -20,7 +20,9 @@ public class MrDoHighScores:ObservableObject {
     var hiScores:[HighScores] = []
     var highScore = 9999
     var newScore = 0
-    
+    var newLevel = 0
+    var newTime = 0
+
     ///New High Score Handling
     @Published
     public var letterIndex = 0
@@ -73,8 +75,10 @@ public class MrDoHighScores:ObservableObject {
         
     }
     
-    public func isNewHiScore(score:Int) -> Bool {
+    public func isNewHiScore(score:Int,level:Int,time:Int) -> Bool {
         self.newScore = score
+        self.newTime = time
+        self.newLevel = level
         for s in hiScores {
             if s.score < Int16(score) {
                 return true
@@ -108,7 +112,7 @@ public class MrDoHighScores:ObservableObject {
         self.selectedLetter = 0
         /// Final letter and store it
         if self.letterIndex == 3 {
-            addScores(score: newScore, initials: String(self.letterArray),level: 0,time: 0)
+            addScores(score: newScore, initials: String(self.letterArray),level: newLevel,time: newTime)
             getScores()
             NotificationCenter.default.post(name: .notificationNewGame, object: nil)
         }

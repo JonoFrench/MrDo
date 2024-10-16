@@ -17,10 +17,14 @@ enum AppleState {
 final class AppleArray: ObservableObject {
     @Published var apples: [Apple] = []
 
-    func move(){
+    func move(doXpos:Int,doYpos:Int) -> Bool {
+        var doDead = false
         for apple in apples where apple.appleState == .falling {
-            apple.move()
+            if apple.move(doXpos: doXpos,doYpos: doYpos) {
+                doDead = true
+            }
         }
+        return doDead
     }
     
     func remove(id:UUID) {
@@ -83,8 +87,11 @@ final class Apple:SwiftUISprite,Moveable {
             appleFrames.append(getTile(name: "Apple", pos: i)!)
         }
     }
+    
+    func move(){
+    }
 
-    func move() {
+    func move(doXpos:Int,doYpos:Int) -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             speedCounter += 1
             if speedCounter == Apple.speed {
@@ -108,9 +115,14 @@ final class Apple:SwiftUISprite,Moveable {
                         }
                     }
                     yPos += 1
+                    /// Has the apple fallen on MrDo?
+                    if xPos == doXpos && yPos == doYpos {
+                        return true
+                    }
                 }
             }
         }
+        return false
     }
     
     func dislodge() {

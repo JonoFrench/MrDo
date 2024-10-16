@@ -24,13 +24,14 @@ final class SoundFX {
     private var appleDropAudioPlayer: AVAudioPlayer?
     private var appleBreakAudioPlayer: AVAudioPlayer?
     private var progressAudioPlayer: AVAudioPlayer?
-    private var getAudioPlayer: AVAudioPlayer?
-    private var barrelJumpAudioPlayer: AVAudioPlayer?
+    private var gameOverAudioPlayer: AVAudioPlayer?
+    private var loseLifeAudioPlayer: AVAudioPlayer?
+    private var nameEntryAudioPlayer: AVAudioPlayer?
+    
     private var walkingAudioPlayer: AVAudioPlayer?
     private var win1AudioPlayer: AVAudioPlayer?
     private var win2AudioPlayer: AVAudioPlayer?
     private var endLevelAudioPlayer: AVAudioPlayer?
-    private var gameOverAudioPlayer: AVAudioPlayer?
     
     private lazy var roundClearurl = Bundle.main.url(forResource: "RoundClear", withExtension: "m4a")
     private lazy var starturl = Bundle.main.url(forResource: "Start", withExtension: "m4a")
@@ -46,14 +47,10 @@ final class SoundFX {
     private lazy var appleBreakurl = Bundle.main.url(forResource: "AppleBreak", withExtension: "m4a")
     private lazy var appleDropurl = Bundle.main.url(forResource: "AppleDrop", withExtension: "m4a")
     private lazy var progressurl = Bundle.main.url(forResource: "Progress", withExtension: "m4a")
-    private lazy var geturl = Bundle.main.url(forResource: "itemget", withExtension: "wav")
-    private lazy var barrelJumpurl = Bundle.main.url(forResource: "jumpbar", withExtension: "wav")
-    private lazy var walkingurl = Bundle.main.url(forResource: "walking", withExtension: "wav")
-    private lazy var win1url = Bundle.main.url(forResource: "win1", withExtension: "wav")
-    private lazy var win2url = Bundle.main.url(forResource: "win2", withExtension: "wav")
-    private lazy var endLevelurl = Bundle.main.url(forResource: "DKEndLevel", withExtension: "m4a")
-    private lazy var gameOverurl = Bundle.main.url(forResource: "DKGameOver", withExtension: "m4a")
-    
+    private lazy var gameOverurl = Bundle.main.url(forResource: "GameOver", withExtension: "m4a")
+    private lazy var loseLifeurl = Bundle.main.url(forResource: "LoseLife", withExtension: "m4a")
+    private lazy var nameEntryurl = Bundle.main.url(forResource: "NameEntry", withExtension: "m4a")
+
     init() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
@@ -72,20 +69,10 @@ final class SoundFX {
             appleDropAudioPlayer = try AVAudioPlayer(contentsOf: appleDropurl!, fileTypeHint: AVFileType.m4a.rawValue)
             appleBreakAudioPlayer = try AVAudioPlayer(contentsOf: appleBreakurl!, fileTypeHint: AVFileType.m4a.rawValue)
             progressAudioPlayer = try AVAudioPlayer(contentsOf: progressurl!, fileTypeHint: AVFileType.m4a.rawValue)
+            loseLifeAudioPlayer = try AVAudioPlayer(contentsOf: loseLifeurl!, fileTypeHint: AVFileType.m4a.rawValue)
+            gameOverAudioPlayer = try AVAudioPlayer(contentsOf: gameOverurl!, fileTypeHint: AVFileType.m4a.rawValue)
+            nameEntryAudioPlayer = try AVAudioPlayer(contentsOf: nameEntryurl!, fileTypeHint: AVFileType.m4a.rawValue)
 
-
-
-            //            introLongAudioPlayer = try AVAudioPlayer(contentsOf: introLongurl!, fileTypeHint: AVFileType.wav.rawValue)
-            //            introAudioPlayer = try AVAudioPlayer(contentsOf: introurl!, fileTypeHint: AVFileType.wav.rawValue)
-            //            jumpAudioPlayer = try AVAudioPlayer(contentsOf: jumpurl!, fileTypeHint: AVFileType.wav.rawValue)
-            //            getAudioPlayer = try AVAudioPlayer(contentsOf: geturl!, fileTypeHint: AVFileType.wav.rawValue)
-            //            barrelJumpAudioPlayer = try AVAudioPlayer(contentsOf: barrelJumpurl!, fileTypeHint: AVFileType.wav.rawValue)
-            //            walkingAudioPlayer = try AVAudioPlayer(contentsOf: walkingurl!, fileTypeHint: AVFileType.wav.rawValue)
-            //            win1AudioPlayer = try AVAudioPlayer(contentsOf: win1url!, fileTypeHint: AVFileType.wav.rawValue)
-            //            win2AudioPlayer = try AVAudioPlayer(contentsOf: win2url!, fileTypeHint: AVFileType.wav.rawValue)
-            //            endLevelAudioPlayer = try AVAudioPlayer(contentsOf: endLevelurl!, fileTypeHint: AVFileType.m4a.rawValue)
-            //            gameOverAudioPlayer = try AVAudioPlayer(contentsOf: endLevelurl!, fileTypeHint: AVFileType.m4a.rawValue)
-            
         } catch let error {
             print(error.localizedDescription)
         }
@@ -105,7 +92,18 @@ final class SoundFX {
         guard let startAudioPlayer = startAudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: startAudioPlayer)
     }
+    
+    func nameEntrySound(){
+        guard let nameEntryAudioPlayer = nameEntryAudioPlayer else { return }
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: nameEntryAudioPlayer)
+    }
 
+    func loseLifeSound(){
+        guard let loseLifeAudioPlayer = loseLifeAudioPlayer else { return }
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: loseLifeAudioPlayer)
+    }
+    
+    
     func progressSound(){
         guard let progressAudioPlayer = progressAudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: progressAudioPlayer)
@@ -150,17 +148,17 @@ final class SoundFX {
         guard let appleDropAudioPlayer = appleDropAudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: appleDropAudioPlayer)
     }
-
+    
     func appleBreakSound(){
         guard let appleBreakAudioPlayer = appleBreakAudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: appleBreakAudioPlayer)
     }
-
+    
     func appleDropSoundStop(){
         guard let appleDropAudioPlayer = appleDropAudioPlayer else { return }
         appleDropAudioPlayer.stop()
     }
-
+    
     func cherrySound1(){
         guard let cherry1AudioPlayer = cherry1AudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: cherry1AudioPlayer)
@@ -193,67 +191,9 @@ final class SoundFX {
         guard let cherry8AudioPlayer = cherry8AudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: cherry8AudioPlayer)
     }
+    func gameOverSound(){
+        guard let gameOverAudioPlayer = gameOverAudioPlayer else { return }
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: gameOverAudioPlayer)
+    }
 
-    
-    
-    //
-    //
-    //
-    //    func gameOverSound(){
-    //        guard let gameOverAudioPlayer = gameOverAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: gameOverAudioPlayer)
-    //    }
-    //
-    //    func endLevelSound(){
-    //        guard let endLevelAudioPlayer = endLevelAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: endLevelAudioPlayer)
-    //    }
-    //
-    //
-    //    func howHighSound() {
-    //        guard let howHighAudioPlayer = howHighAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: howHighAudioPlayer)
-    //    }
-    //    func introLongSound() {
-    //        guard let introLongAudioPlayer = introLongAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: introLongAudioPlayer)
-    //    }
-    //    func introSound() {
-    //        guard let introAudioPlayer = introAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: introAudioPlayer)
-    //    }
-    //
-    //    func jumpSound() {
-    //        guard let jumpAudioPlayer = jumpAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: jumpAudioPlayer)
-    //    }
-    //
-    //    func getItemSound()
-    //    {
-    //        guard let getAudioPlayer = getAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: getAudioPlayer)
-    //    }
-    //    func barrelJumpSound()
-    //    {
-    //        guard let barrelJumpAudioPlayer = barrelJumpAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: barrelJumpAudioPlayer)
-    //    }
-    //
-    //    func walkingSound()
-    //    {
-    //        guard let walkingAudioPlayer = walkingAudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: walkingAudioPlayer)
-    //    }
-    //
-    //    func win1Sound()
-    //    {
-    //        guard let win1AudioPlayer = win1AudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: win1AudioPlayer)
-    //    }
-    //
-    //    func win2Sound()
-    //    {
-    //        guard let win2AudioPlayer = win2AudioPlayer else { return }
-    //        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: win2AudioPlayer)
-    //    }
 }
