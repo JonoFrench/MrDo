@@ -30,7 +30,7 @@ struct BottomView: View {
 
             Spacer()
             VStack(alignment: .leading, content: {
-                Text("SCENE.....\(String(format: "%01d", manager.gameScreen.level))")
+                Text("SCENE....\(String(format: "%02d", manager.gameScreen.gameLevel))")
                     .foregroundStyle(.green)
                     .font(.custom("MrDo-Arcade", size: BottomView.topTextSize))
                     .padding([.trailing])

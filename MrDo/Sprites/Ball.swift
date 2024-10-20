@@ -29,6 +29,7 @@ final class Ball:SwiftUISprite, Moveable {
     var previousDirection:TileDirection = .horizontal
     ///Can't catch until first change of direction. Otherwise the ball will be caught as soon as thrown.
     var catchable = false
+    var ballSwitch = false
     init() {
 #if os(iOS)
         super.init(xPos: 0, yPos: 0, frameSize: CGSize(width: 18, height:  18))
@@ -39,6 +40,7 @@ final class Ball:SwiftUISprite, Moveable {
     
     func setPosition(xPos: Int, yPos: Int, ballDirection: BallDirection) {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            currentFrame = ImageResource(name: "Ball", bundle: .main)
             self.setPosition(xPos: xPos, yPos: yPos)
             direction = ballDirection
             catchable = false
@@ -71,6 +73,8 @@ final class Ball:SwiftUISprite, Moveable {
     func move() {
         speedCounter += 1
         if speedCounter == GameConstants.ballSpeed {
+//            currentFrame = ballSwitch ? ImageResource(name: "Ball1", bundle: .main) : ImageResource(name: "Ball2", bundle: .main)
+//            ballSwitch = !ballSwitch
             switch direction {
             case .downleft:
                 print("downleft")
@@ -379,8 +383,13 @@ final class Ball:SwiftUISprite, Moveable {
                 }
             }
             if checkY < 0 {
-                checkY = 7
-                checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                if yPos > 0 {
+                    checkY = 7
+                    checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                } else {
+                    direction = .downleft
+                    return
+                }
             }
             checkDirection(checkAsset: checkAsset)
             //1
@@ -475,8 +484,13 @@ final class Ball:SwiftUISprite, Moveable {
                 checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
             }
             if checkY < 0 {
-                checkY = 7
-                checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                if yPos > 0 {
+                    checkY = 7
+                    checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                } else {
+                    direction = .downright
+                    return
+                }
             }
             checkDirection(checkAsset: checkAsset)
             //1 As you where

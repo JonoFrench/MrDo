@@ -9,11 +9,11 @@ import Foundation
 
 extension GameManager {
    
-    func setDataForLevel() {
+    func setDataForLevel(level:Int) {
         appleArray.apples.removeAll()
         center = Center(xPos: 5, yPos: 6)
-        gameScreen.levelData.setLevelData(level: gameScreen.level)
-        switch gameScreen.level {
+        gameScreen.levelData.setLevelData(level: level)
+        switch level {
         case 1: level1Data()
         case 2: level2Data()
         case 3: level3Data()

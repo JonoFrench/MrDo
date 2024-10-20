@@ -36,7 +36,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     private var pushUpBallFrames: [UIImage] = []
     private var pushDownBallFrames: [UIImage] = []
     private var dieFrames: [UIImage] = []
-
+    
     
     var direction:DoDirection = .stop
     var previousDirection:DoDirection = .stop
@@ -54,7 +54,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     var isPushing = false {
         didSet {
             if oldValue != isPushing {
-//                animate()
+                //                animate()
             }
         }
     }
@@ -62,7 +62,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     var cherryCount = 0
     var pushedApple: Apple?
     var doState:DoState = .still
-    private var moveCounter = 0
+    var moveCounter = 0
     
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
         super.init(xPos: xPos, yPos: yPos, frameSize: frameSize)
@@ -71,7 +71,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         gridOffsetX = 2
         gridOffsetY = 3
     }
-
+    
     func setup(xPos: Int, yPos: Int) {
         setPosition(xPos: xPos, yPos: yPos)
         direction = .stop
@@ -135,7 +135,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         for i in 9..<12 {
             pushUpFrames.append(getTile(name: "DoPushing", pos: i)!)
         }
-
+        
         for i in 0..<3 {
             pushRightBallFrames.append(getTile(name: "DoPushingBall", pos: i)!)
         }
@@ -152,15 +152,15 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             dieFrames.append(getTile(name: "DoDie", pos: i)!)
         }
     }
-        
+    
     func move() {
+        if doState == .falling {
+            fall()
+            return
+        }
         speedCounter += 1
         if speedCounter == GameConstants.doSpeed + 1 {
             speedCounter = 0
-            if doState == .falling {
-                fall()
-                return
-            }
             if doState == .dead {
                 die()
                 return
@@ -192,26 +192,22 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     
     func fall(){
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            //speedCounter += 1
-            //if speedCounter == 1 {
-            //    speedCounter = 0
-                moveCounter += 1
-                position.y += screenData.assetDimensionStep * 2
-                print("Do falling moveCounter \(moveCounter) pos \(position.y)")
-                if moveCounter == 4 {
-                    moveCounter = 0
-                    let checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
-                    print("Do YPos checkAsset \(checkAsset)")
-                    if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
-                        doState = .dead
-                        currentAnimationFrame = 0
-                        screenData.soundFX.loseLifeSound()
-                        die()
-                    }
-                    yPos += 1
+            moveCounter += 1
+            position.y += screenData.assetDimensionStep
+            print("Do falling moveCounter \(moveCounter) pos \(position.y)")
+            if moveCounter == 8 {
+                moveCounter = 0
+                let checkAsset = screenData.levelData.tileArray[yPos][xPos]
+                print("Do YPos checkAsset \(checkAsset)")
+                if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
+                    doState = .dead
+                    currentAnimationFrame = 0
+                    screenData.soundFX.loseLifeSound()
+                    die()
                 }
+                yPos += 1
             }
-        //}
+        }
     }
     
     func die() {
@@ -228,7 +224,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         if currentAnimationFrame == 3 {
             currentAnimationFrame = 0
         }
-
+        
         switch facing {
         case .left:
             if hasBall {
@@ -276,7 +272,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         case .stop:
             print("nothing")
         }
-        
     }
     
     func addCherry() {
@@ -326,7 +321,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .lb {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .bk
             }
-    
+            
             if previousAsset == .rt {
                 resolvedInstance.levelData.tileArray[yPos+1][xPos] = .vt
             }
@@ -348,7 +343,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if previousAsset == .rr {
                 resolvedInstance.levelData.tileArray[yPos+1][xPos] = .br
             }
-
+            
             resolvedInstance.objectWillChange.send()
         }
     }
@@ -385,7 +380,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .rt {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .vt
             }
-
+            
             if previousAsset == .rb {
                 resolvedInstance.levelData.tileArray[yPos-1][xPos] = .vt
             }
@@ -407,7 +402,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if previousAsset == .rr {
                 resolvedInstance.levelData.tileArray[yPos-1][xPos] = .tr
             }
-
+            
             resolvedInstance.objectWillChange.send()
         }
     }
@@ -447,7 +442,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .br {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
             }
-
+            
             if previousAsset == .rl {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .hz
             }
@@ -469,7 +464,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if previousAsset == .rb {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .br
             }
-
+            
             resolvedInstance.objectWillChange.send()
         }
     }
@@ -506,7 +501,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .rl {
                 resolvedInstance.levelData.tileArray[yPos][xPos] = .hz
             }
-
+            
             if previousAsset == .rr {
                 resolvedInstance.levelData.tileArray[yPos][xPos-1] = .hz
             }
@@ -528,12 +523,12 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if previousAsset == .rb {
                 resolvedInstance.levelData.tileArray[yPos][xPos-1] = .bl
             }
-
+            
             resolvedInstance.objectWillChange.send()
-
+            
         }
     }
-
+    
     func moveRight() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             facing = .right
@@ -545,7 +540,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
                 pushedApple?.position.x += moveDistance
                 print("pushing apple")
             }
-
+            
             gridOffsetX += 1
             if gridOffsetX >= Int(GameConstants.tileSteps) / GameConstants.doSpeed {
                 gridOffsetX = 0
@@ -563,7 +558,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             animate()
         }
     }
-
+    
     func moveLeft() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             facing = .left
@@ -582,7 +577,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
                     xPos -= 1
                     checkGridLeft()
                     if isPushing {
-//                        pushedApple?.position.x -= moveDistance
+                        //                        pushedApple?.position.x -= moveDistance
                         pushedApple?.isPushed = true
                         pushedApple?.xPos -= 1
                         isPushing = false
@@ -639,7 +634,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
                         currentImage = pushLeftBallFrames[currentAnimationFrame]
                     } else {
                         currentImage = walkLeftBallFrames[currentAnimationFrame]
-
+                        
                     }
                 } else {
                     if isPushing {
@@ -711,7 +706,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
         return false
     }
-
+    
     private func appleBelow() -> Bool {
         ///Is there an apple below?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
@@ -724,7 +719,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
         return false
     }
- 
+    
     private func appleLeft() -> Bool {
         ///Is there an apple to the left?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
@@ -737,7 +732,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
         return false
     }
-
+    
     private func appleRight() -> Bool {
         ///Is there an apple to the right?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
@@ -750,7 +745,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
         return false
     }
-
+    
     private func canPushLeft() -> Bool {
         guard isPushing == false else { return false }
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
@@ -767,7 +762,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
         return false
     }
-
+    
     private func canPushRight() -> Bool {
         guard isPushing == false else { return false }
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
@@ -784,6 +779,4 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
         return false
     }
-
-    
 }

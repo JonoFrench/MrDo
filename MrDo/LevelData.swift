@@ -315,6 +315,12 @@ class LevelData:ObservableObject {
         tileImages = setTilesFor(level: level)
     }
     
+    func setProgress10Data() {
+        tileArray = levels.progress10
+        tileImages = setTilesFor(level: 10)
+    }
+
+    
     func setTilesFor(level:Int) -> [UIImage] {
         var tiles:[UIImage] = []
         for i in 0...17 {
@@ -542,6 +548,21 @@ struct Levels {
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
+        [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
+        [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
+        [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu]]
+    
+    let progress10:[[TileType]] = [
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
+        [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
+        [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
+        [.fu,.fu,.fu,.bk,.bk,.bk,.bk,.bk,.bk,.fu,.fu,.fu],
+        [.fu,.fu,.fu,.bk,.bk,.bk,.bk,.bk,.bk,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu]]

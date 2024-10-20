@@ -11,7 +11,7 @@ struct BallView: View {
     @ObservedObject var ball:Ball
     var body: some View {
         ZStack {
-            Image("Ball")
+            Image(ball.currentFrame)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: ball.frameSize.width, height: ball.frameSize.height)

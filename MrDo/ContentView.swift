@@ -19,8 +19,8 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity)
                         .background(.clear)
                 }
-                else if manager.gameState == .playing || manager.gameState == .levelend || manager.gameState == .progress {
-                    GameView(mrDo: manager.mrDo,ball: manager.ball,appleArray:manager.appleArray)
+                else if manager.gameState == .playing || manager.gameState == .levelend || manager.gameState == .progress || manager.gameState == .progress10 {
+                    GameView(mrDo: manager.mrDo,ball: manager.ball,appleArray:manager.appleArray,redMonsterArray:manager.redMonsterArray)
                         .frame(width: UIScreen.main.bounds.width, height: manager.gameScreen.assetDimension * 15, alignment: .center)
                             .zIndex(1.0)
                 }

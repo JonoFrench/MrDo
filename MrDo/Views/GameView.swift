@@ -12,7 +12,7 @@ struct GameView: View {
     @ObservedObject var mrDo:MrDo
     @ObservedObject var ball:Ball
     @ObservedObject var appleArray:AppleArray
-    
+    @ObservedObject var redMonsterArray:RedMonsterArray
     var body: some View {
         VStack(alignment:.center, spacing: .zero) {
             TopView()
@@ -21,6 +21,10 @@ struct GameView: View {
                 .zIndex(3.0)
             if manager.gameState == .progress {
                 ProgressView(progress: manager.progress)
+            } else if manager.gameState == .progress10 {
+                ZStack(alignment: .center) {
+                    Progress10View(manager: _manager)
+                }
             } else {
                 ZStack(alignment: .center) {
                     ScreenView(gameScreen: manager.gameScreen)
@@ -37,6 +41,10 @@ struct GameView: View {
                     ForEach(appleArray.apples, id: \.id) { apple in
                         AppleView(apple: apple)
                             .zIndex(1.6)
+                    }
+                    ForEach(redMonsterArray.monsters, id: \.id) { monster in
+                        RedMonsterView(redMonster: monster)
+                            .zIndex(1.7)
                     }
                     CenterView(center: manager.center)
                         .position(manager.center.position)
@@ -55,7 +63,3 @@ struct GameView: View {
         }
     }
 }
-
-//#Preview {
-//    GameView()
-//}

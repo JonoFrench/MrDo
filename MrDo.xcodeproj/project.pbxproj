@@ -63,6 +63,9 @@
 		340A7B542CBFE27D00433318 /* GameOver.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 340A7B532CBFE27D00433318 /* GameOver.m4a */; };
 		340A7B562CBFED6D00433318 /* GameOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B552CBFED6200433318 /* GameOverView.swift */; };
 		340A7B582CC0070F00433318 /* NameEntry.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 340A7B572CC0070F00433318 /* NameEntry.m4a */; };
+		340A7B5A2CC0FDE000433318 /* Progress10View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B592CC0FDE000433318 /* Progress10View.swift */; };
+		340A7B5C2CC140FA00433318 /* RedMonster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B5B2CC140FA00433318 /* RedMonster.swift */; };
+		340A7B5E2CC1410D00433318 /* RedMonsterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B5D2CC1410D00433318 /* RedMonsterView.swift */; };
 		34B951642C9C392D00FE770B /* MrDoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951632C9C392D00FE770B /* MrDoView.swift */; };
 		34B951662C9C394200FE770B /* MrDo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951652C9C394200FE770B /* MrDo.swift */; };
 		34B951682C9E0A5700FE770B /* BallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951672C9E0A5700FE770B /* BallView.swift */; };
@@ -128,6 +131,9 @@
 		340A7B532CBFE27D00433318 /* GameOver.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = GameOver.m4a; sourceTree = "<group>"; };
 		340A7B552CBFED6200433318 /* GameOverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverView.swift; sourceTree = "<group>"; };
 		340A7B572CC0070F00433318 /* NameEntry.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = NameEntry.m4a; sourceTree = "<group>"; };
+		340A7B592CC0FDE000433318 /* Progress10View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress10View.swift; sourceTree = "<group>"; };
+		340A7B5B2CC140FA00433318 /* RedMonster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedMonster.swift; sourceTree = "<group>"; };
+		340A7B5D2CC1410D00433318 /* RedMonsterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedMonsterView.swift; sourceTree = "<group>"; };
 		34B951632C9C392D00FE770B /* MrDoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDoView.swift; sourceTree = "<group>"; };
 		34B951652C9C394200FE770B /* MrDo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDo.swift; sourceTree = "<group>"; };
 		34B951672C9E0A5700FE770B /* BallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallView.swift; sourceTree = "<group>"; };
@@ -224,6 +230,8 @@
 				34B951672C9E0A5700FE770B /* BallView.swift */,
 				34B951692C9E0A6600FE770B /* Ball.swift */,
 				340A7B4F2CBE765200433318 /* Progress.swift */,
+				340A7B5B2CC140FA00433318 /* RedMonster.swift */,
+				340A7B5D2CC1410D00433318 /* RedMonsterView.swift */,
 			);
 			path = Sprites;
 			sourceTree = "<group>";
@@ -290,6 +298,7 @@
 				34099A292C99E67100F4FE3A /* StartView.swift */,
 				34099A2B2C99E68A00F4FE3A /* InfoView.swift */,
 				340A7B4B2CBD5C8700433318 /* ProgressView.swift */,
+				340A7B592CC0FDE000433318 /* Progress10View.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -390,6 +399,7 @@
 				34099A2A2C99E67100F4FE3A /* StartView.swift in Sources */,
 				34099A382C9B025F00F4FE3A /* CenterView.swift in Sources */,
 				34099A132C99C99200F4FE3A /* SwiftUISprite.swift in Sources */,
+				340A7B5A2CC0FDE000433318 /* Progress10View.swift in Sources */,
 				34099A002C99C3D100F4FE3A /* GameManager+Notifications.swift in Sources */,
 				34099A3A2C9B027500F4FE3A /* Center.swift in Sources */,
 				34B951662C9C394200FE770B /* MrDo.swift in Sources */,
@@ -404,6 +414,7 @@
 				34099A192C99CA8300F4FE3A /* BottomView.swift in Sources */,
 				34099A232C99CB2800F4FE3A /* GameView.swift in Sources */,
 				34099A322C9AC5F500F4FE3A /* Apple.swift in Sources */,
+				340A7B5C2CC140FA00433318 /* RedMonster.swift in Sources */,
 				34099A212C99CB0D00F4FE3A /* JoyPadView.swift in Sources */,
 				34B951682C9E0A5700FE770B /* BallView.swift in Sources */,
 				340A7B502CBE765200433318 /* Progress.swift in Sources */,
@@ -413,6 +424,7 @@
 				34099A042C99C4CF00F4FE3A /* SoundFX.swift in Sources */,
 				34099A152C99CA3600F4FE3A /* ImageView.swift in Sources */,
 				34099A282C99E52500F4FE3A /* IntroView.swift in Sources */,
+				340A7B5E2CC1410D00433318 /* RedMonsterView.swift in Sources */,
 				34099A2E2C99E6F100F4FE3A /* ScreenData.swift in Sources */,
 				34099A1D2C99CAD900F4FE3A /* HiScoreView.swift in Sources */,
 				34099A342C9AC60A00F4FE3A /* AppleView.swift in Sources */,

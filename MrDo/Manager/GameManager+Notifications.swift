@@ -53,7 +53,7 @@ extension GameManager {
     @objc func loseLife(notification: Notification) {
         lives -= 1
         gameScreen.soundFX.backgroundSoundStop()
-        if lives == 2 {
+        if lives == 0 {
             endTime = Date()
             let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
             gameTime += Int(difference)

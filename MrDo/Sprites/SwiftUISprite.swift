@@ -70,6 +70,13 @@ class SwiftUISprite:ObservableObject {
         guard let cgImage = image.cgImage?.cropping(to: rect) else { return nil }
         return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
     }
+    func getTile(name:String,pos:Int,y:Int) -> UIImage? {
+        guard let image = UIImage(named: name) else { return nil }
+        let rect = CGRect(x: pos * 16, y: y * 16, width: 16, height: 16)
+        guard let cgImage = image.cgImage?.cropping(to: rect) else { return nil }
+        return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
+    }
+
 
     
 //        .position(x:Double(x) * gameScreen.assetDimension + (gameScreen.assetDimension / 2),y: Double(y) * gameScreen.assetDimension + (gameScreen.assetDimension / 2))
