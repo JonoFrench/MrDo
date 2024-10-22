@@ -10,13 +10,14 @@ import SwiftUI
 struct BallView: View {
     @ObservedObject var ball:Ball
     var body: some View {
-        ZStack {
-            Image(ball.currentFrame)
+            ZStack {
+                Image(ball.currentFrame)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: ball.frameSize.width, height: ball.frameSize.height)
                     .background(.clear)
-        }.background(.clear)
-            .frame(width: 1,height: 1,alignment: .center)
+            }.background(.clear)
+//                .position(ball.position)
+                .frame(width: 1,height: 1,alignment: .center)
     }
 }

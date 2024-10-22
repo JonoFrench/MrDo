@@ -13,7 +13,7 @@ struct RedMonsterView: View {
         ZStack {
             Image(uiImage: redMonster.currentImage)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .aspectRatio(contentMode: .fill)
                 .frame(width: redMonster.frameSize.width, height: redMonster.frameSize.height)
                 .background(.clear)
                 .zIndex(2.1)

@@ -70,6 +70,8 @@
 		34B951662C9C394200FE770B /* MrDo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951652C9C394200FE770B /* MrDo.swift */; };
 		34B951682C9E0A5700FE770B /* BallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951672C9E0A5700FE770B /* BallView.swift */; };
 		34B9516A2C9E0A6600FE770B /* Ball.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951692C9E0A6600FE770B /* Ball.swift */; };
+		34B9D1962CC7C78F001BF478 /* BallHit.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D1952CC7C78F001BF478 /* BallHit.m4a */; };
+		34B9D1982CC7C799001BF478 /* BallReset.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D1972CC7C799001BF478 /* BallReset.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -138,6 +140,8 @@
 		34B951652C9C394200FE770B /* MrDo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDo.swift; sourceTree = "<group>"; };
 		34B951672C9E0A5700FE770B /* BallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallView.swift; sourceTree = "<group>"; };
 		34B951692C9E0A6600FE770B /* Ball.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ball.swift; sourceTree = "<group>"; };
+		34B9D1952CC7C78F001BF478 /* BallHit.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BallHit.m4a; sourceTree = "<group>"; };
+		34B9D1972CC7C799001BF478 /* BallReset.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BallReset.m4a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +254,8 @@
 				340A7B472CBD4E4E00433318 /* AppleBreak.m4a */,
 				340A7B482CBD4E4E00433318 /* AppleDrop.m4a */,
 				340A7B352CBD3E3000433318 /* BGM.m4a */,
+				34B9D1952CC7C78F001BF478 /* BallHit.m4a */,
+				34B9D1972CC7C799001BF478 /* BallReset.m4a */,
 				340A7B372CBD445100433318 /* Cherry1.m4a */,
 				340A7B392CBD4A8A00433318 /* Cherry2.m4a */,
 				340A7B3A2CBD4A8A00433318 /* Cherry3.m4a */,
@@ -368,6 +374,7 @@
 				340A7B342CBD3C4500433318 /* Start.m4a in Resources */,
 				340A7B402CBD4A8A00433318 /* Cherry3.m4a in Resources */,
 				340A7B412CBD4A8A00433318 /* Cherry5.m4a in Resources */,
+				34B9D1982CC7C799001BF478 /* BallReset.m4a in Resources */,
 				340A7B422CBD4A8A00433318 /* Cherry8.m4a in Resources */,
 				340A7B492CBD4E4E00433318 /* AppleBreak.m4a in Resources */,
 				340A7B4A2CBD4E4E00433318 /* AppleDrop.m4a in Resources */,
@@ -377,6 +384,7 @@
 				340A7B462CBD4A8A00433318 /* Cherry7.m4a in Resources */,
 				340A7B4E2CBE5EEA00433318 /* Progress.m4a in Resources */,
 				340A7B362CBD3E3000433318 /* BGM.m4a in Resources */,
+				34B9D1962CC7C78F001BF478 /* BallHit.m4a in Resources */,
 				340999EC2C99C15900F4FE3A /* Preview Assets.xcassets in Resources */,
 				340A7B382CBD445100433318 /* Cherry1.m4a in Resources */,
 				340999E92C99C15900F4FE3A /* Assets.xcassets in Resources */,

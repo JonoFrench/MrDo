@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CenterView: View {
-    var center:Center
+    @ObservedObject var center:Center
     var body: some View {
         if !center.collected {
             ZStack {
@@ -21,6 +21,3 @@ struct CenterView: View {
         }
     }
 }
-//#Preview {
-//    CenterView()
-//}

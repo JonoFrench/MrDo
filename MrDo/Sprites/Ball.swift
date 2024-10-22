@@ -12,16 +12,25 @@ enum BallDirection {
     case downleft,upleft,downright,upright
 }
 
+enum ExplodeDirection {
+    case downleft,upleft,downright,upright,up,down,left,right
+}
+
+struct explodeBall {
+    let id:UUID = UUID()
+    let direction:ExplodeDirection
+    var position:CGPoint
+}
+
 
 final class Ball:SwiftUISprite, Moveable {
     static var speed: Int = GameConstants.ballSpeed
     var thrown = false
-    var noCheck = false
-    var direction:BallDirection = .downright {
-        didSet {
-            noCheck = true
-        }
-    }
+    @Published
+    var exploding = false
+    @Published
+    var imploding = false
+    var direction:BallDirection = .downright
     var xAdjust = 0.0
     var yAdjust = 0.0
     var adjustedPosition = CGPoint()
@@ -30,9 +39,14 @@ final class Ball:SwiftUISprite, Moveable {
     ///Can't catch until first change of direction. Otherwise the ball will be caught as soon as thrown.
     var catchable = false
     var ballSwitch = false
+    @Published
+    var explodeArray:[explodeBall] = []
+    var explodeCount = 0
+    var implodePosition = CGPoint()
+    var explodePosition = CGPoint()
     init() {
 #if os(iOS)
-        super.init(xPos: 0, yPos: 0, frameSize: CGSize(width: 18, height:  18))
+        super.init(xPos: 0, yPos: 0, frameSize: CGSize(width: 12, height:  12))
 #elseif os(tvOS)
         super.init(xPos: 0, yPos: 0, frameSize: CGSize(width: 36, height:  36))
 #endif
@@ -70,6 +84,13 @@ final class Ball:SwiftUISprite, Moveable {
         }
     }
     
+    func reset() {
+        explodeArray.removeAll()
+        exploding = false
+        imploding = false
+        explodeCount = 0
+    }
+    
     func move() {
         speedCounter += 1
         if speedCounter == GameConstants.ballSpeed {
@@ -78,15 +99,19 @@ final class Ball:SwiftUISprite, Moveable {
             switch direction {
             case .downleft:
                 print("downleft")
+                currentFrame = ImageResource(name: "Ball2", bundle: .main)
                 moveDownLeft()
             case .upleft:
                 print("upleft")
+                currentFrame = ImageResource(name: "Ball2", bundle: .main)
                 moveUpLeft()
             case .downright:
                 print("downright")
+                currentFrame = ImageResource(name: "Ball1", bundle: .main)
                 moveDownRight()
             case .upright:
                 print("upright")
+                currentFrame = ImageResource(name: "Ball1", bundle: .main)
                 moveUpRight()
             }
             previousDirection = tileDirection
@@ -101,11 +126,6 @@ final class Ball:SwiftUISprite, Moveable {
             position.y += resolvedInstance.assetDimensionStep
             gridOffsetX -= 1
             gridOffsetY += 1
-//            if noCheck {
-//                noCheck = !noCheck
-//                return
-//            }
-//            
             if gridOffsetX <= -1 {
                 catchable = true
                 xPos -= 1
@@ -226,10 +246,6 @@ final class Ball:SwiftUISprite, Moveable {
             position.y += resolvedInstance.assetDimensionStep
             gridOffsetX += 1
             gridOffsetY += 1
-//            if noCheck {
-//                noCheck = !noCheck
-//                return
-//            }
 
             if gridOffsetX >= 8 {
                 catchable = true
@@ -341,10 +357,6 @@ final class Ball:SwiftUISprite, Moveable {
             position.y -= resolvedInstance.assetDimensionStep
             gridOffsetX -= 1
             gridOffsetY -= 1
-//            if noCheck {
-//                noCheck = !noCheck
-//                return
-//            }
 
             if gridOffsetX <= -1 {
                 catchable = true
@@ -377,6 +389,12 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos > 0 {
                     checkX = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                    if checkAsset == .fu || checkAsset == .ch {
+                        direction = .upright
+                        print("moveUpLeft to upright X full")
+                        return
+                    }
+
                 } else {
                     direction = .upleft
                     return
@@ -386,6 +404,12 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos > 0 {
                     checkY = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                    if checkAsset == .fu || checkAsset == .ch {
+                        direction = .downleft
+                        print("moveUpLeft to downright Y full")
+                        return
+                    }
+
                 } else {
                     direction = .downleft
                     return
@@ -447,10 +471,6 @@ final class Ball:SwiftUISprite, Moveable {
             position.y -= resolvedInstance.assetDimensionStep
             gridOffsetX += 1
             gridOffsetY -= 1
-//            if noCheck {
-//                noCheck = !noCheck
-//                return
-//            }
 
             if gridOffsetX >= 8 {
                 catchable = true
@@ -482,11 +502,24 @@ final class Ball:SwiftUISprite, Moveable {
             if checkX > 7 {
                 checkX = 0
                 checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+                
+                if checkAsset == .fu || checkAsset == .ch {
+                    direction = .upleft
+                    print("moveUpRight to upleft X full")
+                    return
+                }
+
             }
             if checkY < 0 {
                 if yPos > 0 {
                     checkY = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                    if checkAsset == .fu || checkAsset == .ch {
+                        direction = .downright
+                        print("moveUpRight to downright Y full")
+                        return
+                    }
+
                 } else {
                     direction = .downright
                     return
@@ -545,7 +578,7 @@ final class Ball:SwiftUISprite, Moveable {
         }
     }
     
-    func checkDirection(checkAsset: TileType) {
+    private func checkDirection(checkAsset: TileType) {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             tileDirection = resolvedInstance.levelData.getTileDirection(type: checkAsset)
             if tileDirection == .both {
@@ -561,143 +594,121 @@ final class Ball:SwiftUISprite, Moveable {
         }
     }
     
+    func setImplode(position:CGPoint) {
+        imploding = true
+        implodePosition = position
+        currentFrame = ImageResource(name: "Ball", bundle: .main)
+        let distance = 8.0 * 15
+        explodeArray.append(explodeBall(direction: .left, position: CGPoint(x: implodePosition.x - distance, y: implodePosition.y)))
+        explodeArray.append(explodeBall(direction: .up, position: CGPoint(x: implodePosition.x, y: implodePosition.y + distance)))
+        explodeArray.append(explodeBall(direction: .down, position: CGPoint(x: implodePosition.x, y: implodePosition.y - distance)))
+        explodeArray.append(explodeBall(direction: .right, position: CGPoint(x: implodePosition.x + distance, y: implodePosition.y)))
+        explodeArray.append(explodeBall(direction: .upleft, position: CGPoint(x: implodePosition.x - distance, y: implodePosition.y + distance)))
+        explodeArray.append(explodeBall(direction: .upright, position: CGPoint(x: implodePosition.x + distance, y: implodePosition.y + distance)))
+        explodeArray.append(explodeBall(direction: .downleft, position: CGPoint(x: implodePosition.x - distance, y: implodePosition.y - distance)))
+        explodeArray.append(explodeBall(direction: .downright, position: CGPoint(x: implodePosition.x + distance, y: implodePosition.y - distance)))
+    }
+
+    
+    func setExplode(position:CGPoint) {
+        exploding = true
+        thrown = false
+        explodePosition = position
+        currentFrame = ImageResource(name: "Ball", bundle: .main)
+        explodeArray.append(explodeBall(direction: .left, position: explodePosition))
+        explodeArray.append(explodeBall(direction: .up, position: explodePosition))
+        explodeArray.append(explodeBall(direction: .down, position: explodePosition))
+        explodeArray.append(explodeBall(direction: .right, position: explodePosition))
+        explodeArray.append(explodeBall(direction: .upleft, position: explodePosition))
+        explodeArray.append(explodeBall(direction: .upright, position: explodePosition))
+        explodeArray.append(explodeBall(direction: .downleft, position: explodePosition))
+        explodeArray.append(explodeBall(direction: .downright, position: explodePosition))
+    }
+    
+    func explode() {
+        explodeCount += 1
+        if explodeCount == 15 {
+            setExplode(position: explodePosition)
+        }
+        if explodeCount == 30 {
+            explodeArray.removeAll()
+            explodeCount = 0
+            exploding = false
+            return
+        }
+        let distance = 8.0
+        for index in 0..<explodeArray.count {
+            var ball = explodeArray[index]
+            switch ball.direction {
+            case .downleft:
+                ball.position.x -= distance
+                ball.position.y -= distance
+            case .upleft:
+                ball.position.x -= distance
+                ball.position.y += distance
+            case .downright:
+                ball.position.x += distance
+                ball.position.y -= distance
+            case .upright:
+                ball.position.x += distance
+                ball.position.y += distance
+            case .up:
+                ball.position.y += distance
+            case .down:
+                ball.position.y -= distance
+            case .left:
+                ball.position.x -= distance
+            case .right:
+                ball.position.x += distance
+            }
+            explodeArray[index] = ball
+        }
+    }
+    
+    func implode() {
+        explodeCount += 1
+        if explodeCount == 15 {
+            setImplode(position: implodePosition)
+        }
+        if explodeCount == 30 {
+            explodeArray.removeAll()
+            explodeCount = 0
+            imploding = false
+            catchable = false
+            if let doInstance: MrDo = ServiceLocator.shared.resolve() {
+                doInstance.hasBall = true
+                doInstance.animate()
+            }
+            return
+        }
+        let distance = 8.0
+        for index in 0..<explodeArray.count {
+            var ball = explodeArray[index]
+            switch ball.direction {
+            case .downleft:
+                ball.position.x += distance
+                ball.position.y += distance
+            case .upleft:
+                ball.position.x += distance
+                ball.position.y -= distance
+            case .downright:
+                ball.position.x -= distance
+                ball.position.y += distance
+            case .upright:
+                ball.position.x -= distance
+                ball.position.y -= distance
+            case .up:
+                ball.position.y -= distance
+            case .down:
+                ball.position.y += distance
+            case .left:
+                ball.position.x += distance
+            case .right:
+                ball.position.x -= distance
+            }
+            explodeArray[index] = ball
+        }
+        
+    }
 }
-//func moveDownLeft() {
-//    if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-//        position.y += resolvedInstance.assetDimensionStep
-//        position.x -= resolvedInstance.assetDimensionStep
-//        let checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-//        let checkBounce = resolvedInstance.levelData.getWall(type: checkAsset)
-//
-//        if gridOffsetX == 7 {
-//            gridOffsetX = 0
-//            print("downleft x asset \(checkAsset)")
-//
-//            if checkBounce.left || checkAsset == .bk {
-//                direction = .downright
-//            } else {
-//                xPos -= 1
-//            }
-//        } else {
-//            gridOffsetX += 1
-//        }
-//
-//        if gridOffsetY == 7 {
-//            gridOffsetY = 0
-//            print("downleft y asset \(checkAsset)")
-//            if checkBounce.bottom {
-//                direction = .upleft
-//            } else {
-//                yPos += 1
-//            }
-//        } else {
-//            gridOffsetY += 1
-//        }
-//    }
-//}
-//func moveDownRight() {
-//    if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-//        position.y += resolvedInstance.assetDimensionStep
-//        position.x += resolvedInstance.assetDimensionStep
-//        let checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-//        let checkBounce = resolvedInstance.levelData.getWall(type: checkAsset)
-//
-//        if gridOffsetX == 7 {
-//            gridOffsetX = 0
-//            print("downright x asset \(checkAsset)")
-//            if checkBounce.right || checkAsset == .bk {
-//                direction = .downleft
-//            } else {
-//                xPos += 1
-//            }
-//        } else {
-//            gridOffsetX += 1
-//        }
-//
-//        if gridOffsetY == 7 {
-//            gridOffsetY = 0
-//            print("downright y asset \(checkAsset)")
-//            if checkBounce.bottom {
-//                direction = .upright
-//            } else {
-//                yPos += 1
-//            }
-//        } else {
-//            gridOffsetY += 1
-//        }
-//    }
-//}
-//func moveUpLeft() {
-//    if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-//        position.y -= resolvedInstance.assetDimensionStep
-//        position.x -= resolvedInstance.assetDimensionStep
-//        let checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-//        let checkBounce = resolvedInstance.levelData.getWall(type: checkAsset)
-//
-//        if gridOffsetX == 7 {
-//            gridOffsetX = 0
-//            print("upleft x asset \(checkAsset)")
-//            if checkBounce.left || checkAsset == .bk {
-//                direction = .upright
-//            } else {
-//                xPos -= 1
-//            }
-//        } else {
-//            gridOffsetX += 1
-//        }
-//
-//        if gridOffsetY == 7 {
-//            gridOffsetY = 0
-//            print("upleft y asset \(checkAsset)")
-//            if checkBounce.top {
-//                direction = .downleft
-//            } else {
-//                yPos -= 1
-//                if yPos == -1 {
-//                    yPos = 0
-//                    direction = .downleft
-//                }
-//            }
-//
-//        } else {
-//            gridOffsetY += 1
-//        }
-//    }
-//}
-//
-//func moveUpRight() {
-//    if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-//        position.y -= resolvedInstance.assetDimensionStep
-//        position.x += resolvedInstance.assetDimensionStep
-//        let checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-//        let checkBounce = resolvedInstance.levelData.getWall(type: checkAsset)
-//
-//        if gridOffsetX == 7 {
-//            gridOffsetX = 0
-//            print("upright x asset \(checkAsset)")
-//            if checkBounce.right || checkAsset == .bk {
-//                direction = .upleft
-//            } else {
-//                xPos += 1
-//            }
-//        } else {
-//            gridOffsetX += 1
-//        }
-//
-//        if gridOffsetY == 7 {
-//            gridOffsetY = 0
-//            print("upright y asset \(checkAsset)")
-//            if checkBounce.top {
-//                direction = .downright
-//            } else {
-//                yPos -= 1
-//                if yPos == -1 {
-//                    yPos = 0
-//                    direction = .downright
-//                }
-//            }
-//        } else {
-//            gridOffsetY += 1
-//        }
-//    }
-//}
+

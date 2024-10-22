@@ -19,7 +19,7 @@ enum JoyPad {
 }
 
 enum LevelEndType {
-    case cherry,monsters
+    case cherry,redmonster
 }
 
 struct GameConstants {
@@ -97,6 +97,7 @@ class GameManager: ObservableObject {
         /// Share these instances so they are available from the Sprites
         ServiceLocator.shared.register(service: gameScreen)
         ServiceLocator.shared.register(service: appleArray)
+        ServiceLocator.shared.register(service: mrDo)
         ///Here we go, lets have a nice DisplayLink to update our model with the screen refresh.
         let displayLink:CADisplayLink = CADisplayLink(target: self, selector: #selector(refreshModel))
         displayLink.add(to: .main, forMode:.common)
@@ -124,8 +125,8 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         
 //        progress = Progress()
 //        levelScores.append(LevelScores(level: 1, time: Int(45),levelScore: 1000,endType: .cherry))
-//        levelScores.append(LevelScores(level: 2, time: Int(83),levelScore: 2500,endType: .cherry))
-//        levelScores.append(LevelScores(level: 10, time: Int(96),levelScore: 4600,endType: .cherry))
+//        levelScores.append(LevelScores(level: 2, time: Int(83),levelScore: 2500,endType: .redmonster))
+//        levelScores.append(LevelScores(level: 10, time: Int(96),levelScore: 4600,endType: .redmonster))
 //        gameState = .progress
 //        gameScreen.soundFX.progressSound()
 //        gameScreen.level = 10
@@ -167,7 +168,14 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
             mrDo.move()
             if ball.thrown {
                 catchBall()
+                checkBallHit()
                 ball.move()
+            }
+            if ball.exploding {
+                ball.explode()
+            }
+            if ball.imploding {
+                ball.implode()
             }
             appleArray.checkDrop(doXpos: mrDo.xPos,doYpos: mrDo.yPos)
             if appleArray.move(doXpos: mrDo.xPos,doYpos: mrDo.yPos) {
@@ -208,17 +216,21 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         }
     }
     
-    func nextLevel() {
+    func nextLevel(endType:LevelEndType) {
         gameScreen.soundFX.backgroundSoundStop()
         gameScreen.soundFX.roundClear()
         endTime = Date()
         let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
         gameTime += Int(difference)
-        levelScores.append(LevelScores(level: gameScreen.level, time: Int(difference),levelScore: levelScore,endType: .cherry))
+        levelScores.append(LevelScores(level: gameScreen.level, time: Int(difference),levelScore: levelScore,endType: endType))
         cherryCount = 0
+        redMonsterArray.monsterCount = 0
+        redMonsterArray.killCount = 0
+        redMonsterArray.monsters.removeAll()
         gameState = .levelend
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
             mrDo.reset()
+            ball.reset()
             if gameScreen.level % 3 == 0 {
                 ///Every 3 levels display the how we doing screen.
                 progress = Progress()
@@ -242,10 +254,32 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
     }
     
     func addRedMonsters(){
-        guard redMonsterArray.monsters.count < 1 else {return}
+        guard redMonsterArray.monsterCount < 6 else {
+            center.setBonusFood()
+            return
+        }
         redMonsterArray.add(xPos: 5, yPos: 6)
         DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in:0...5) + 2.0) { [self] in
             addRedMonsters()
+        }
+    }
+    
+    func checkBallHit() {
+        for monster in redMonsterArray.monsters where monster.monsterState == .moving {
+            if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
+                ball.setExplode(position: monster.position)
+                returnBall()
+                score += 500
+                monster.kill()
+                gameScreen.soundFX.ballHitSound()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
+                    redMonsterArray.remove(id: monster.id)
+                    if redMonsterArray.killCount == 5 {
+                        nextLevel(endType: .redmonster)
+                    }
+                }
+                return
+            }
         }
     }
     
@@ -278,6 +312,13 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         mrDo.animate()
     }
     
+    func returnBall(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
+            ball.setImplode(position: mrDo.position)
+            gameScreen.soundFX.ballResetSound()
+        }
+    }
+    
     func progress10(){
         gameState = .progress10
         gameScreen.levelData.setProgress10Data()
@@ -287,6 +328,15 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
             gameScreen.level += 1
             gameScreen.gameLevel += 1
             startPlaying()
+        }
+    }
+    
+    func levelEndImage(type:LevelEndType) -> ImageResource {
+        switch type {
+        case .cherry:
+            ImageResource(name: "Cherry", bundle: .main)
+        case .redmonster:
+            ImageResource(name: "RedMonster", bundle: .main)
         }
     }
     

@@ -45,7 +45,7 @@ struct ProgressView: View {
                         .font(.custom("MrDo-Arcade", size: ProgressView.subTitleTextSize))
                         .padding([.leading])
                     Spacer()
-                    Image("Cherry")
+                    Image(manager.levelEndImage(type: score.endType))
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: ProgressView.typeSize, height: ProgressView.typeSize)

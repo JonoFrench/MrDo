@@ -97,7 +97,7 @@ extension GameManager {
                 }
                 cherryCount += 1
                 if cherryCount == 40 {
-                    nextLevel()
+                    nextLevel(endType: .cherry)
                 }
             }
         }

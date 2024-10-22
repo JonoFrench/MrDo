@@ -27,7 +27,9 @@ final class SoundFX {
     private var gameOverAudioPlayer: AVAudioPlayer?
     private var loseLifeAudioPlayer: AVAudioPlayer?
     private var nameEntryAudioPlayer: AVAudioPlayer?
-    
+    private var ballHitAudioPlayer: AVAudioPlayer?
+    private var ballResetAudioPlayer: AVAudioPlayer?
+
     private var walkingAudioPlayer: AVAudioPlayer?
     private var win1AudioPlayer: AVAudioPlayer?
     private var win2AudioPlayer: AVAudioPlayer?
@@ -50,6 +52,8 @@ final class SoundFX {
     private lazy var gameOverurl = Bundle.main.url(forResource: "GameOver", withExtension: "m4a")
     private lazy var loseLifeurl = Bundle.main.url(forResource: "LoseLife", withExtension: "m4a")
     private lazy var nameEntryurl = Bundle.main.url(forResource: "NameEntry", withExtension: "m4a")
+    private lazy var ballHiturl = Bundle.main.url(forResource: "BallHit", withExtension: "m4a")
+    private lazy var ballReseturl = Bundle.main.url(forResource: "BallReset", withExtension: "m4a")
 
     init() {
         do {
@@ -72,6 +76,8 @@ final class SoundFX {
             loseLifeAudioPlayer = try AVAudioPlayer(contentsOf: loseLifeurl!, fileTypeHint: AVFileType.m4a.rawValue)
             gameOverAudioPlayer = try AVAudioPlayer(contentsOf: gameOverurl!, fileTypeHint: AVFileType.m4a.rawValue)
             nameEntryAudioPlayer = try AVAudioPlayer(contentsOf: nameEntryurl!, fileTypeHint: AVFileType.m4a.rawValue)
+            ballHitAudioPlayer = try AVAudioPlayer(contentsOf: ballHiturl!, fileTypeHint: AVFileType.m4a.rawValue)
+            ballResetAudioPlayer = try AVAudioPlayer(contentsOf: ballReseturl!, fileTypeHint: AVFileType.m4a.rawValue)
 
         } catch let error {
             print(error.localizedDescription)
@@ -195,5 +201,12 @@ final class SoundFX {
         guard let gameOverAudioPlayer = gameOverAudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: gameOverAudioPlayer)
     }
-
+    func ballHitSound(){
+        guard let ballHitAudioPlayer = ballHitAudioPlayer else { return }
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: ballHitAudioPlayer)
+    }
+    func ballResetSound(){
+        guard let ballResetAudioPlayer = ballResetAudioPlayer else { return }
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: ballResetAudioPlayer)
+    }
 }

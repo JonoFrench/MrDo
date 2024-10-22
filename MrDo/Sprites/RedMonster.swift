@@ -19,6 +19,8 @@ enum MonsterDirection {
 
 final class RedMonsterArray: ObservableObject {
     @Published var monsters: [RedMonster] = []
+    var monsterCount = 0
+    var killCount = 0
     
     func move() {
         for monster in monsters {
@@ -30,12 +32,14 @@ final class RedMonsterArray: ObservableObject {
     func remove(id:UUID) {
         if let index = monsters.firstIndex(where: {$0.id == id}) {
             monsters.remove(at: index)
+            killCount += 1
         }
     }
     
     func add(xPos:Int,yPos:Int) {
         let monster = RedMonster(xPos: xPos, yPos:yPos)
         monsters.append(monster)
+        monsterCount += 1
     }
     
 }
@@ -57,7 +61,7 @@ final class RedMonster:SwiftUISprite,Moveable,Animatable {
     private var deadFrame: UIImage = UIImage()
     private var blankFrame: UIImage = UIImage()
     
-    private var monsterState:RedMonsterState = .appearing
+    var monsterState:RedMonsterState = .appearing
     private var monsterDirection:MonsterDirection = .down
     private var appearCount = 0
     
@@ -85,8 +89,13 @@ final class RedMonster:SwiftUISprite,Moveable,Animatable {
         gridOffsetY = 0
     }
     
+    func kill(){
+        currentImage = UIImage(resource: ImageResource(name: "Points500", bundle: .main))
+        monsterState = .dead
+    }
+    
     func move() {
-        guard monsterState != .appearing else { return }
+        guard monsterState != .appearing && monsterState != .dead else { return }
         speedCounter += 1
         if speedCounter == currentSpeed {
             speedCounter = 0
@@ -103,15 +112,22 @@ final class RedMonster:SwiftUISprite,Moveable,Animatable {
                 if gridOffsetX == 0 {
                     if !canMoveLeft() {
                         monsterDirection = nextDirection()
+                        print("Can't move Left. moving \(monsterDirection)")
                         return
                     }
+                    xPos -= 1
                     let rndDirection = nextDirection()
-                    if Int.random(in: 0...4) == 1 && rndDirection != .left {
+                    if Int.random(in: 0...6) == 1 && rndDirection != .left {
                         monsterDirection = rndDirection
+                        if monsterDirection == .right {
+//                            gridOffsetX = 7
+                        }
+
+                        xPos += 1
                         return
                     } else {
                         gridOffsetX = 7
-                        xPos -= 1
+//                        xPos -= 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -120,21 +136,28 @@ final class RedMonster:SwiftUISprite,Moveable,Animatable {
                 position.x -= moveDistance
                 
             case .right:
+                print("Move Right \(gridOffsetX)")
                 if gridOffsetX == 0 {
                     if !canMoveRight() {
                         monsterDirection = nextDirection()
+                        print("Can't move right. moving \(monsterDirection)")
+                        if monsterDirection == .left {
+//                            gridOffsetX = 7
+                        }
                         return
                     }
                 }
-                print("Move Right \(gridOffsetX)")
                 if gridOffsetX == 7 {
-                    let rndDirection = nextDirection()
-                    if Int.random(in: 0...4) == 1 && rndDirection != .right {
+                    xPos += 1
+                   let rndDirection = nextDirection()
+                    if Int.random(in: 0...6) == 1 && rndDirection != .right {
+//                        gridOffsetX = 0
+                        xPos -= 1
                         monsterDirection = rndDirection
                         return
                     } else {
                         gridOffsetX = 0
-                        xPos += 1
+//                        xPos += 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -147,15 +170,21 @@ final class RedMonster:SwiftUISprite,Moveable,Animatable {
                 if gridOffsetY == 0 {
                     if !canMoveUp() {
                         monsterDirection = nextDirection()
+                        print("Can't move Up. moving \(monsterDirection)")
                         return
                     }
+                    yPos -= 1
                     let rndDirection = nextDirection()
-                    if Int.random(in: 0...4) == 1 && rndDirection != .up {
+                    if Int.random(in: 0...6) == 1 && rndDirection != .up {
                         monsterDirection = rndDirection
+                        if monsterDirection == .down {
+//                            gridOffsetY = 7
+                        }
+                        yPos += 1
                         return
                     } else {
                         gridOffsetY = 7
-                        yPos -= 1
+//                        yPos -= 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -168,17 +197,24 @@ final class RedMonster:SwiftUISprite,Moveable,Animatable {
                 if gridOffsetY == 0 {
                     if !canMoveDown() {
                         monsterDirection = nextDirection()
+//                        gridOffsetY = 7
+                        print("Can't move Down. moving \(monsterDirection)")
                         return
                     }
                 }
                 if gridOffsetY == 7 {
+                    yPos += 1
                     let rndDirection = nextDirection()
-                    if Int.random(in: 0...4) == 1 && rndDirection != .down {
+                    if Int.random(in: 0...6) == 1 && rndDirection != .down {
                         monsterDirection = rndDirection
+                        if monsterDirection == .up {
+//                            gridOffsetY = 0
+                        }
+                        yPos -= 1
                         return
                     } else {
                         gridOffsetY = 0
-                        yPos += 1
+//                        yPos += 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -190,6 +226,7 @@ final class RedMonster:SwiftUISprite,Moveable,Animatable {
     }
     
     func animate() {
+        guard monsterState != .dead else { return }
         currentAnimationFrame += 1
         if currentAnimationFrame == 8 {
             currentAnimationFrame = 0

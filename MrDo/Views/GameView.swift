@@ -38,6 +38,13 @@ struct GameView: View {
                             .position(ball.position)
                             .zIndex(1.9)
                     }
+                    if ball.exploding || ball.imploding {
+                        ForEach(ball.explodeArray,id: \.id) { ballExplode in
+                            BallView(ball: ball)
+                                .position(ballExplode.position)
+                                .zIndex(1.9)
+                        }
+                    }
                     ForEach(appleArray.apples, id: \.id) { apple in
                         AppleView(apple: apple)
                             .zIndex(1.6)

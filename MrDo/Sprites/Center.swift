@@ -12,6 +12,8 @@ import UIKit
 final class Center:SwiftUISprite {
     @Published
     var collected = false
+    @Published
+    var collectible = false
     
     init(xPos: Int, yPos:Int) {
         
@@ -26,5 +28,10 @@ final class Center:SwiftUISprite {
         currentFrame = ImageResource(name: "CenterMonster", bundle: .main)
     }
     
+    func setBonusFood() {
+        currentFrame = ImageResource(name: "BonusFood1", bundle: .main)
+        collectible = true
+//        self.objectWillChange.send()
+    }
     
 }
