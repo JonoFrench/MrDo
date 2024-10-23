@@ -1,24 +1,24 @@
 //
-//  RedMonster.swift
+//  ExtraMonster.swift
 //  MrDo
 //
-//  Created by Jonathan French on 17.10.24.
+//  Created by Jonathan French on 23.10.24.
 //
 
 import Foundation
 import SwiftUI
 
-enum MonsterState {
-    case appearing,moving,chasing,dead,digging,still,falling
-}
+//enum RedMonsterState {
+//    case appearing,moving,chasing,dead,digging,still,falling
+//}
+//
+//enum MonsterDirection {
+//    case left,right,up,down
+//}
 
-enum MonsterDirection {
-    case left,right,up,down
-}
 
-
-final class RedMonsterArray: ObservableObject {
-    @Published var monsters: [RedMonster] = []
+final class ExtraMonsterArray: ObservableObject {
+    @Published var monsters: [ExtraMonster] = []
     var monsterCount = 0
     var killCount = 0
     
@@ -43,14 +43,14 @@ final class RedMonsterArray: ObservableObject {
     }
     
     func add(xPos:Int,yPos:Int) {
-        let monster = RedMonster(xPos: xPos, yPos:yPos)
+        let monster = ExtraMonster(xPos: xPos, yPos:yPos)
         monsters.append(monster)
         monsterCount += 1
     }
     
 }
 
-final class RedMonster:SwiftUISprite,Moveable,Animatable {
+final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
     static var animateFrames: Int = 0
     static var speed: Int = GameConstants.monsterSpeed
     

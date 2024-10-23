@@ -51,18 +51,11 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     @Published
     var hasBall = false
     @Published
-    var isPushing = false {
-        didSet {
-            if oldValue != isPushing {
-                //                animate()
-            }
-        }
-    }
+    var isPushing = false
     var wasCherry = false
     var cherryCount = 0
     var pushedApple: Apple?
     var doState:DoState = .still
-    var moveCounter = 0
     
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
         super.init(xPos: xPos, yPos: yPos, frameSize: frameSize)
@@ -197,9 +190,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             print("Do falling moveCounter \(moveCounter) pos \(position.y)")
             if moveCounter == 8 {
                 moveCounter = 0
-                let checkAsset = screenData.levelData.tileArray[yPos][xPos]
-                print("Do YPos checkAsset \(checkAsset)")
-                if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
+                if screenData.levelData.checkFalling(xPos: xPos, yPos: yPos) || yPos == screenData.screenDimensionY {
                     doState = .dead
                     currentAnimationFrame = 0
                     screenData.soundFX.loseLifeSound()
@@ -218,13 +209,13 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             NotificationCenter.default.post(name: .notificationLoseLife, object: nil, userInfo: nil)
         }
     }
+    
     func animate() {
         guard doState != .dead else {return}
         currentAnimationFrame += 1
         if currentAnimationFrame == 3 {
             currentAnimationFrame = 0
         }
-        
         switch facing {
         case .left:
             if hasBall {

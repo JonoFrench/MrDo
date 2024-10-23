@@ -42,6 +42,7 @@ class SwiftUISprite:ObservableObject {
     var moveDistance = 0.0
     var speedCounter: Int = 0
     var animateCounter: Int = 0
+    var moveCounter = 0
 
     init(xPos: Int, yPos: Int, frameSize: CGSize) {
         self.xPos = xPos

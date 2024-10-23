@@ -13,6 +13,7 @@ struct GameView: View {
     @ObservedObject var ball:Ball
     @ObservedObject var appleArray:AppleArray
     @ObservedObject var redMonsterArray:RedMonsterArray
+    @ObservedObject var extraMonsterArray:ExtraMonsterArray
     var body: some View {
         VStack(alignment:.center, spacing: .zero) {
             TopView()
@@ -52,6 +53,10 @@ struct GameView: View {
                     ForEach(redMonsterArray.monsters, id: \.id) { monster in
                         RedMonsterView(redMonster: monster)
                             .zIndex(1.7)
+                    }
+                    ForEach(extraMonsterArray.monsters, id: \.id) { monster in
+                        ExtraMonsterView(extraMonster: monster)
+                            .zIndex(1.8)
                     }
                     CenterView(center: manager.center)
                         .position(manager.center.position)

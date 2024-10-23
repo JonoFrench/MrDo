@@ -72,6 +72,11 @@
 		34B9516A2C9E0A6600FE770B /* Ball.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951692C9E0A6600FE770B /* Ball.swift */; };
 		34B9D1962CC7C78F001BF478 /* BallHit.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D1952CC7C78F001BF478 /* BallHit.m4a */; };
 		34B9D1982CC7C799001BF478 /* BallReset.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D1972CC7C799001BF478 /* BallReset.m4a */; };
+		34B9D19C2CC90579001BF478 /* BGMMuncher.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D19B2CC90579001BF478 /* BGMMuncher.m4a */; };
+		34B9D19D2CC90579001BF478 /* BGMAlpha.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D1992CC90579001BF478 /* BGMAlpha.m4a */; };
+		34B9D19E2CC90579001BF478 /* BGMFaster.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D19A2CC90579001BF478 /* BGMFaster.m4a */; };
+		34B9D1A02CC91E08001BF478 /* ExtraMonsterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D19F2CC91E08001BF478 /* ExtraMonsterView.swift */; };
+		34B9D1A22CC91E3B001BF478 /* ExtraMonster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1A12CC91E3B001BF478 /* ExtraMonster.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -142,6 +147,11 @@
 		34B951692C9E0A6600FE770B /* Ball.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ball.swift; sourceTree = "<group>"; };
 		34B9D1952CC7C78F001BF478 /* BallHit.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BallHit.m4a; sourceTree = "<group>"; };
 		34B9D1972CC7C799001BF478 /* BallReset.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BallReset.m4a; sourceTree = "<group>"; };
+		34B9D1992CC90579001BF478 /* BGMAlpha.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BGMAlpha.m4a; sourceTree = "<group>"; };
+		34B9D19A2CC90579001BF478 /* BGMFaster.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BGMFaster.m4a; sourceTree = "<group>"; };
+		34B9D19B2CC90579001BF478 /* BGMMuncher.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BGMMuncher.m4a; sourceTree = "<group>"; };
+		34B9D19F2CC91E08001BF478 /* ExtraMonsterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraMonsterView.swift; sourceTree = "<group>"; };
+		34B9D1A12CC91E3B001BF478 /* ExtraMonster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraMonster.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,6 +246,8 @@
 				340A7B4F2CBE765200433318 /* Progress.swift */,
 				340A7B5B2CC140FA00433318 /* RedMonster.swift */,
 				340A7B5D2CC1410D00433318 /* RedMonsterView.swift */,
+				34B9D19F2CC91E08001BF478 /* ExtraMonsterView.swift */,
+				34B9D1A12CC91E3B001BF478 /* ExtraMonster.swift */,
 			);
 			path = Sprites;
 			sourceTree = "<group>";
@@ -254,6 +266,9 @@
 				340A7B472CBD4E4E00433318 /* AppleBreak.m4a */,
 				340A7B482CBD4E4E00433318 /* AppleDrop.m4a */,
 				340A7B352CBD3E3000433318 /* BGM.m4a */,
+				34B9D1992CC90579001BF478 /* BGMAlpha.m4a */,
+				34B9D19A2CC90579001BF478 /* BGMFaster.m4a */,
+				34B9D19B2CC90579001BF478 /* BGMMuncher.m4a */,
 				34B9D1952CC7C78F001BF478 /* BallHit.m4a */,
 				34B9D1972CC7C799001BF478 /* BallReset.m4a */,
 				340A7B372CBD445100433318 /* Cherry1.m4a */,
@@ -377,6 +392,9 @@
 				34B9D1982CC7C799001BF478 /* BallReset.m4a in Resources */,
 				340A7B422CBD4A8A00433318 /* Cherry8.m4a in Resources */,
 				340A7B492CBD4E4E00433318 /* AppleBreak.m4a in Resources */,
+				34B9D19C2CC90579001BF478 /* BGMMuncher.m4a in Resources */,
+				34B9D19D2CC90579001BF478 /* BGMAlpha.m4a in Resources */,
+				34B9D19E2CC90579001BF478 /* BGMFaster.m4a in Resources */,
 				340A7B4A2CBD4E4E00433318 /* AppleDrop.m4a in Resources */,
 				340A7B432CBD4A8A00433318 /* Cherry2.m4a in Resources */,
 				340A7B442CBD4A8A00433318 /* Cherry4.m4a in Resources */,
@@ -401,6 +419,7 @@
 			files = (
 				34099A1F2C99CAF900F4FE3A /* ControlsView.swift in Sources */,
 				34B951642C9C392D00FE770B /* MrDoView.swift in Sources */,
+				34B9D1A02CC91E08001BF478 /* ExtraMonsterView.swift in Sources */,
 				34099A0C2C99C50E00F4FE3A /* MrDoHighScores.swift in Sources */,
 				34099A172C99CA7100F4FE3A /* TopView.swift in Sources */,
 				34099A302C9A070600F4FE3A /* LevelData.swift in Sources */,
@@ -415,6 +434,7 @@
 				34099A0F2C99C50E00F4FE3A /* HighScores.xcdatamodeld in Sources */,
 				34099A0D2C99C50E00F4FE3A /* HighScores+CoreDataProperties.swift in Sources */,
 				340999E72C99C15700F4FE3A /* ContentView.swift in Sources */,
+				34B9D1A22CC91E3B001BF478 /* ExtraMonster.swift in Sources */,
 				340999FE2C99C25900F4FE3A /* GameManager.swift in Sources */,
 				340999FA2C99C1F000F4FE3A /* ContentViewTV.swift in Sources */,
 				340999E52C99C15700F4FE3A /* MrDoApp.swift in Sources */,

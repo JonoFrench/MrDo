@@ -32,15 +32,26 @@ struct TileWall {
     }
 }
 
+//if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
+
+
 class LevelData:ObservableObject {
     let levels = Levels()
     @Published
     var tileArray:[[TileType]] = [[]]
     let tileImage = "Tiles"
     var tileImages:[UIImage] = []
-    let tileBackground:[Int] = [0,1,2,3,4,2,5,6,7,8]
-    
+    let tileBackground:[Int] = [0,1,2,3,4,2,5,6,7,8,12]
+    private var fallSet:Set = [TileType.rb,.lb,.br,.bl,.ch,.fu,.hz,.rl,.rr]
+
     init() {
+    }
+    
+    func checkFalling(xPos:Int,yPos:Int) -> Bool {
+        if fallSet.contains(tileArray[yPos][xPos]) {
+            return true
+        }
+        return false
     }
     
     
@@ -315,6 +326,10 @@ class LevelData:ObservableObject {
         tileImages = setTilesFor(level: level)
     }
     
+    func setExtraLevelData() {
+        tileImages = setTilesFor(level: 11)
+    }
+    
     func setProgress10Data() {
         tileArray = levels.progress10
         tileImages = setTilesFor(level: 10)
@@ -331,6 +346,14 @@ class LevelData:ObservableObject {
 
         return tiles
     }
+
+    func getTile(name:String,pos:Int) -> UIImage? {
+        guard let image = UIImage(named: name) else { return nil }
+        let rect = CGRect(x: pos * 16, y: 0, width: 16, height: 16)
+        guard let cgImage = image.cgImage?.cropping(to: rect) else { return nil }
+        return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
+    }
+
     
     func getTile(level:Int,pos:Int) -> UIImage? {
         guard let image = UIImage(named: tileImage) else { return nil }

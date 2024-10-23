@@ -22,16 +22,19 @@ final class Center:SwiftUISprite {
 #elseif os(tvOS)
         super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 64, height:  64))
 #endif
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            //frameSize = CGSize(width: resolvedInstance.assetDimension, height: resolvedInstance.assetDimension)
-        }
         currentFrame = ImageResource(name: "CenterMonster", bundle: .main)
+        collectible = false
+        collected = false
     }
     
     func setBonusFood() {
         currentFrame = ImageResource(name: "BonusFood1", bundle: .main)
         collectible = true
-//        self.objectWillChange.send()
+    }
+    func collectBonusFood(){
+        collected = true
+        collectible = false
+        currentFrame = ImageResource(name: "Blank", bundle: .main)
     }
     
 }

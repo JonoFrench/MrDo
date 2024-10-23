@@ -29,12 +29,7 @@ final class ScreenData:ObservableObject {
     var gameLevel:Int = 1
     var levelEnd = false
     var gameOver = false
-    var pause:Bool = false {
-        didSet {
-            print("pause changed")
-        }
-    }
-
+    var pause:Bool = false
 }
 
 class ServiceLocator {

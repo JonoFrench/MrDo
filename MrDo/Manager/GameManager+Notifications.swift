@@ -15,6 +15,7 @@ extension Notification.Name {
     static let notificationRemoveApple = Notification.Name("NotificationRemoveApple")
     static let notificationAddScore = Notification.Name("NotificationAddScore")
     static let notificationLoseLife = Notification.Name("NotificationLoseLife")
+    static let notificationKillRedMonster = Notification.Name("NotificationKillRedMonster")
 }
 
 extension GameManager {
@@ -24,6 +25,7 @@ extension GameManager {
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeApple(notification:)), name: .notificationRemoveApple, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.addScore(notification:)), name: .notificationAddScore, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.loseLife(notification:)), name: .notificationLoseLife, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.removeRedMonster(notification:)), name: .notificationKillRedMonster, object: nil)
 
         
         
@@ -52,7 +54,7 @@ extension GameManager {
     
     @objc func loseLife(notification: Notification) {
         lives -= 1
-        gameScreen.soundFX.backgroundSoundStop()
+        gameScreen.soundFX.backgroundStopAll()
         if lives == 0 {
             endTime = Date()
             let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
@@ -84,7 +86,17 @@ extension GameManager {
             appleArray.remove(id: id)
         }
     }
+    @objc func removeRedMonster(notification: Notification) {
+        if let id = notification.userInfo?["id"] as? UUID {
+            redMonsterArray.remove(id: id)
+            if redMonsterArray.killCount == 6 {
+                nextLevel(endType: .redmonster)
+            }
+        }
+    }
 
+    
+    
     @objc func addScore(notification: Notification) {
         if let value = notification.userInfo?["score"] as? Int,let count = notification.userInfo?["count"] as? Int {
             score += value

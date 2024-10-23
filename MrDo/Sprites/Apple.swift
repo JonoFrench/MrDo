@@ -17,14 +17,26 @@ enum AppleState {
 final class AppleArray: ObservableObject {
     @Published var apples: [Apple] = []
 
-    func move(doXpos:Int,doYpos:Int) -> Bool {
-        var doDead = false
+    func move() {
         for apple in apples where apple.appleState == .falling {
-            if apple.move(doXpos: doXpos,doYpos: doYpos) {
-                doDead = true
+            apple.move()
+            if let doInstance: MrDo = ServiceLocator.shared.resolve() {
+                /// Has the apple fallen on MrDo?
+                if apple.xPos == doInstance.xPos && apple.yPos == doInstance.yPos {
+                    doInstance.moveCounter = 7
+                    doInstance.doState = .falling
+                }
+            }
+            /// Has the apple landed on any Red Monsters?
+            if let monsterInstance:RedMonsterArray = ServiceLocator.shared.resolve() {
+                for monster in monsterInstance.monsters {
+                    if apple.xPos == monster.xPos && apple.yPos == monster.yPos {
+                        monster.squash()
+                    }
+                }
+                
             }
         }
-        return doDead
     }
     
     func remove(id:UUID) {
@@ -63,7 +75,6 @@ final class Apple:SwiftUISprite,Moveable {
     @Published
     var appleState:AppleState = .sitting
     var dropLevel = 0
-    var moveCounter = 0
     @Published
     var leftImage:UIImage = UIImage()
     @Published
@@ -88,10 +99,7 @@ final class Apple:SwiftUISprite,Moveable {
         }
     }
     
-    func move(){
-    }
-
-    func move(doXpos:Int,doYpos:Int) -> Bool {
+    func move() {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             speedCounter += 1
             if speedCounter == Apple.speed {
@@ -115,14 +123,9 @@ final class Apple:SwiftUISprite,Moveable {
                         }
                     }
                     yPos += 1
-                    /// Has the apple fallen on MrDo?
-                    if xPos == doXpos && yPos == doYpos {
-                        return true
-                    }
                 }
             }
         }
-        return false
     }
     
     func dislodge() {

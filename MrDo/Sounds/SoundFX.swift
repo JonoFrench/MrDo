@@ -30,9 +30,9 @@ final class SoundFX {
     private var ballHitAudioPlayer: AVAudioPlayer?
     private var ballResetAudioPlayer: AVAudioPlayer?
 
-    private var walkingAudioPlayer: AVAudioPlayer?
-    private var win1AudioPlayer: AVAudioPlayer?
-    private var win2AudioPlayer: AVAudioPlayer?
+    private var backGroundFastAudioPlayer: AVAudioPlayer?
+    private var backGroundMuncherAudioPlayer: AVAudioPlayer?
+    private var backGroundAlphaAudioPlayer: AVAudioPlayer?
     private var endLevelAudioPlayer: AVAudioPlayer?
     
     private lazy var roundClearurl = Bundle.main.url(forResource: "RoundClear", withExtension: "m4a")
@@ -55,6 +55,11 @@ final class SoundFX {
     private lazy var ballHiturl = Bundle.main.url(forResource: "BallHit", withExtension: "m4a")
     private lazy var ballReseturl = Bundle.main.url(forResource: "BallReset", withExtension: "m4a")
 
+    private lazy var backgroundFasturl = Bundle.main.url(forResource: "BGMFaster", withExtension: "m4a")
+    private lazy var backgroundAlphaurl = Bundle.main.url(forResource: "BGMAlpha", withExtension: "m4a")
+    private lazy var backgroundMuncherurl = Bundle.main.url(forResource: "BGMMuncher", withExtension: "m4a")
+
+    
     init() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
@@ -78,6 +83,9 @@ final class SoundFX {
             nameEntryAudioPlayer = try AVAudioPlayer(contentsOf: nameEntryurl!, fileTypeHint: AVFileType.m4a.rawValue)
             ballHitAudioPlayer = try AVAudioPlayer(contentsOf: ballHiturl!, fileTypeHint: AVFileType.m4a.rawValue)
             ballResetAudioPlayer = try AVAudioPlayer(contentsOf: ballReseturl!, fileTypeHint: AVFileType.m4a.rawValue)
+            backGroundFastAudioPlayer = try AVAudioPlayer(contentsOf: backgroundFasturl!, fileTypeHint: AVFileType.m4a.rawValue)
+            backGroundAlphaAudioPlayer = try AVAudioPlayer(contentsOf: backgroundAlphaurl!, fileTypeHint: AVFileType.m4a.rawValue)
+            backGroundMuncherAudioPlayer = try AVAudioPlayer(contentsOf: backgroundMuncherurl!, fileTypeHint: AVFileType.m4a.rawValue)
 
         } catch let error {
             print(error.localizedDescription)
@@ -118,14 +126,53 @@ final class SoundFX {
     func backgroundSound(){
         guard let backgroundAudioPlayer = backgroundAudioPlayer else { return }
         backgroundAudioPlayer.numberOfLoops = -1
-        backgroundAudioPlayer.volume = 0.75
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: backgroundAudioPlayer)
     }
+    func backgroundFastSound(){
+        guard let backGroundFastAudioPlayer = backGroundFastAudioPlayer else { return }
+        if !backGroundFastAudioPlayer.isPlaying {
+            backGroundFastAudioPlayer.numberOfLoops = -1
+            Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: backGroundFastAudioPlayer)
+        }
+    }
+    func backgroundAlphaSound(){
+        guard let backGroundAlphaAudioPlayer = backGroundAlphaAudioPlayer else { return }
+        backGroundAlphaAudioPlayer.numberOfLoops = -1
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: backGroundAlphaAudioPlayer)
+    }
+    func backgroundMuncherSound(){
+        guard let backGroundMuncherAudioPlayer = backGroundMuncherAudioPlayer else { return }
+        backGroundMuncherAudioPlayer.numberOfLoops = -1
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: backGroundMuncherAudioPlayer)
+    }
+
     
     func backgroundSoundStop(){
         guard let backgroundAudioPlayer = backgroundAudioPlayer else { return }
         backgroundAudioPlayer.stop()
     }
+
+    func backgroundFastSoundStop(){
+        guard let backGroundFastAudioPlayer = backGroundFastAudioPlayer else { return }
+        backGroundFastAudioPlayer.stop()
+    }
+
+    func backgroundAlphaSoundStop(){
+        guard let backGroundAlphaAudioPlayer = backGroundAlphaAudioPlayer else { return }
+        backGroundAlphaAudioPlayer.stop()
+    }
+    
+    func backgroundMuncherSoundStop(){
+        guard let backGroundMuncherAudioPlayer = backGroundMuncherAudioPlayer else { return }
+        backGroundMuncherAudioPlayer.stop()
+    }
+    func backgroundStopAll() {
+        backgroundSoundStop()
+        backgroundFastSoundStop()
+        backgroundAlphaSoundStop()
+        backgroundMuncherSoundStop()
+    }
+    
     
     func cherrySound(count:Int){
         switch count {
