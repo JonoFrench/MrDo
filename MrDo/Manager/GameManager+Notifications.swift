@@ -16,6 +16,8 @@ extension Notification.Name {
     static let notificationAddScore = Notification.Name("NotificationAddScore")
     static let notificationLoseLife = Notification.Name("NotificationLoseLife")
     static let notificationKillRedMonster = Notification.Name("NotificationKillRedMonster")
+    static let notificationKillExtraMonster = Notification.Name("NotificationKillExtraMonster")
+    static let notificationExtraLife = Notification.Name("NotificationExtraLife")
 }
 
 extension GameManager {
@@ -26,6 +28,8 @@ extension GameManager {
         NotificationCenter.default.addObserver(self, selector: #selector(self.addScore(notification:)), name: .notificationAddScore, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.loseLife(notification:)), name: .notificationLoseLife, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeRedMonster(notification:)), name: .notificationKillRedMonster, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.removeExtraMonster(notification:)), name: .notificationKillExtraMonster, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.addExtraLife(notification:)), name: .notificationExtraLife, object: nil)
 
         
         
@@ -50,6 +54,13 @@ extension GameManager {
     
     @objc func nextGame(notification: Notification) {
         gameState = .intro
+    }
+    
+    @objc func addExtraLife(notification: Notification) {
+        lives += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
+            checkNextLevel()
+        }
     }
     
     @objc func loseLife(notification: Notification) {
@@ -95,7 +106,15 @@ extension GameManager {
         }
     }
 
-    
+    @objc func removeExtraMonster(notification: Notification) {
+        if let id = notification.userInfo?["id"] as? UUID {
+            extraMonsterArray.remove(id: id)
+//            if redMonsterArray.killCount == 6 {
+//                nextLevel(endType: .redmonster)
+//            }
+        }
+    }
+
     
     @objc func addScore(notification: Notification) {
         if let value = notification.userInfo?["score"] as? Int,let count = notification.userInfo?["count"] as? Int {

@@ -19,13 +19,18 @@ struct GameView: View {
             TopView()
                 .frame(height: manager.gameScreen.assetDimension * 1 , alignment: .center)
                 .background(.black)
-                .zIndex(3.0)
+                .zIndex(2.0)
             if manager.gameState == .progress {
                 ProgressView(progress: manager.progress)
             } else if manager.gameState == .progress10 {
                 ZStack(alignment: .center) {
                     Progress10View(manager: _manager)
                 }
+            }
+            else if manager.gameState == .extralife {
+//                ZStack(alignment: .center) {
+                ExtraLifeView(extraLife:manager.extraLife,ball: manager.extraLife.ball)
+//                }
             } else {
                 ZStack(alignment: .center) {
                     ScreenView(gameScreen: manager.gameScreen)
@@ -56,7 +61,7 @@ struct GameView: View {
                     }
                     ForEach(extraMonsterArray.monsters, id: \.id) { monster in
                         ExtraMonsterView(extraMonster: monster)
-                            .zIndex(1.8)
+                            .zIndex(3.8)
                     }
                     CenterView(center: manager.center)
                         .position(manager.center.position)
@@ -66,7 +71,7 @@ struct GameView: View {
                             .position(x:manager.gameScreen.gameSize.width / 2,y: manager.gameScreen.gameSize.height / 2).offset(y: -40)
                             .zIndex(5)
                     }
-                }
+                }.zIndex(2.9)
             }
             BottomView()
                 .frame(height: manager.gameScreen.assetDimension * 1, alignment: .center)

@@ -12,15 +12,16 @@ import SwiftUI
 //    case appearing,moving,chasing,dead,digging,still,falling
 //}
 //
-//enum MonsterDirection {
-//    case left,right,up,down
-//}
+enum ExtraType {
+    case letter,monster
+}
 
 
 final class ExtraMonsterArray: ObservableObject {
     @Published var monsters: [ExtraMonster] = []
     var monsterCount = 0
     var killCount = 0
+    var letterAdded = false
     
     func move() {
         for monster in monsters {
@@ -42,40 +43,40 @@ final class ExtraMonsterArray: ObservableObject {
         }
     }
     
-    func add(xPos:Int,yPos:Int) {
-        let monster = ExtraMonster(xPos: xPos, yPos:yPos)
+    func add(xPos:Int,yPos:Int,letterPos:Int) {
+        let monster = ExtraMonster(xPos: xPos, yPos:yPos,type: letterAdded ? .monster : .letter,letter: letterPos)
         monsters.append(monster)
         monsterCount += 1
+        letterAdded = true
+        if monsterCount == 6 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+                monsters[0].monsterState = .appearing
+            }
+        }
     }
-    
 }
 
-final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
+final class ExtraMonster:Monster,Moveable,Animatable {
     static var animateFrames: Int = 0
-    static var speed: Int = GameConstants.monsterSpeed
+    static var speed:Int = GameConstants.monsterSpeed
     
     private var walkRightFrames: [UIImage] = []
     private var walkLeftFrames: [UIImage] = []
     private var walkUpFrames: [UIImage] = []
     private var walkDownFrames: [UIImage] = []
     
-    private var chaseRightFrames: [UIImage] = []
-    private var chaseLeftFrames: [UIImage] = []
-    private var chaseUpFrames: [UIImage] = []
-    private var chaseDownFrames: [UIImage] = []
+    private var extraFrames: [UIImage] = []
+//    private var extraLeftFrames: [UIImage] = []
+//    private var extraUpFrames: [UIImage] = []
+//    private var extraDownFrames: [UIImage] = []
     
-    private var stripeRightFrames: [UIImage] = []
-    private var stripeLeftFrames: [UIImage] = []
-    private var stripeUpFrames: [UIImage] = []
-    private var stripeDownFrames: [UIImage] = []
-    
-    private var rightFrames: [UIImage] = []
-    private var leftFrames: [UIImage] = []
-    private var upFrames: [UIImage] = []
-    private var downFrames: [UIImage] = []
-
+//    private var stripeRightFrames: [UIImage] = []
+//    private var stripeLeftFrames: [UIImage] = []
+//    private var stripeUpFrames: [UIImage] = []
+//    private var stripeDownFrames: [UIImage] = []
     
     private var deadFrame: UIImage = UIImage()
+    private var deadExtraFrame: UIImage = UIImage()
     private var blankFrame: UIImage = UIImage()
     
     var monsterState:MonsterState = .appearing
@@ -90,20 +91,27 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
     private var currentSpeed = speed
     private var actualAnimationFrame = 0
     private var increaseSpeedCounter = 0
-    
-    init(xPos: Int, yPos: Int) {
+    var extraType: ExtraType = .letter
+    private var letter = 0
+    init(xPos: Int, yPos: Int, type:ExtraType, letter: Int) {
 #if os(iOS)
         super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 28, height:  28))
 #elseif os(tvOS)
         super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 52, height:  52))
 #endif
+        extraType = type
         setImages()
-        currentImage = walkRightFrames[0]
+        currentImage = extraType == .monster ? rightFrames[0] : extraFrames[0]
+        if extraType == .letter {
+            monsterState = .still
+        }
         actualAnimationFrame = 0
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             moveDistance = resolvedInstance.assetDimensionStep
+            position.y -= resolvedInstance.assetDimension
         }
         gridOffsetY = 0
+        self.letter = letter
     }
     
     func squash() {
@@ -117,7 +125,7 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
         currentAnimationFrame = 0
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
             let monsterID:[String: UUID] = ["id": self.id]
-            NotificationCenter.default.post(name: .notificationKillRedMonster, object: nil, userInfo: monsterID)
+            NotificationCenter.default.post(name: .notificationKillExtraMonster, object: nil, userInfo: monsterID)
         }
     }
     
@@ -135,10 +143,30 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
         }
     }
     
+    func appear(){
+        guard monsterState == .appearing else {return}
+        speedCounter += 1
+        if speedCounter == currentSpeed {
+            speedCounter = 0
+            position.y += moveDistance
+            if gridOffsetY == 7 {
+                monsterState = .moving
+                gridOffsetY = 0
+                monsterDirection = nextDirection()
+            }
+            gridOffsetY += 1
+        }
+    }
+    
     func move() {
-        guard monsterState != .appearing && monsterState != .dead && monsterState != .still else { return }
+        
+        guard monsterState != .dead && monsterState != .still else { return }
         if monsterState == .falling {
             fall()
+            return
+        }
+        if monsterState == .appearing {
+            appear()
             return
         }
 
@@ -146,7 +174,6 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
         if speedCounter == currentSpeed {
             speedCounter = 0
             if increaseSpeedCounter == 20 {
-                chaseMode()
                 currentSpeed -= 1
                 if currentSpeed < 2 {
                     currentSpeed = 2
@@ -162,7 +189,7 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
                         print("Can't move Left. moving \(monsterDirection)")
                         return
                     }
-                    xPos -= 1
+//                    xPos -= 1
                     let rndDirection = nextDirection()
                     if Int.random(in: 0...6) == 1 && rndDirection != .left {
                         monsterDirection = rndDirection
@@ -170,11 +197,11 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
 //                            gridOffsetX = 7
                         }
 
-                        xPos += 1
+//                        xPos += 1
                         return
                     } else {
                         gridOffsetX = 7
-//                        xPos -= 1
+                        xPos -= 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -195,16 +222,16 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
                     }
                 }
                 if gridOffsetX == 7 {
-                    xPos += 1
+//                    xPos += 1
                    let rndDirection = nextDirection()
                     if Int.random(in: 0...6) == 1 && rndDirection != .right {
 //                        gridOffsetX = 0
-                        xPos -= 1
+//                        xPos -= 1
                         monsterDirection = rndDirection
                         return
                     } else {
                         gridOffsetX = 0
-//                        xPos += 1
+                        xPos += 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -220,18 +247,18 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
                         print("Can't move Up. moving \(monsterDirection)")
                         return
                     }
-                    yPos -= 1
+//                    yPos -= 1
                     let rndDirection = nextDirection()
                     if Int.random(in: 0...6) == 1 && rndDirection != .up {
                         monsterDirection = rndDirection
                         if monsterDirection == .down {
 //                            gridOffsetY = 7
                         }
-                        yPos += 1
+//                        yPos += 1
                         return
                     } else {
                         gridOffsetY = 7
-//                        yPos -= 1
+                        yPos -= 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -250,18 +277,18 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
                     }
                 }
                 if gridOffsetY == 7 {
-                    yPos += 1
+//                    yPos += 1
                     let rndDirection = nextDirection()
                     if Int.random(in: 0...6) == 1 && rndDirection != .down {
                         monsterDirection = rndDirection
                         if monsterDirection == .up {
 //                            gridOffsetY = 0
                         }
-                        yPos -= 1
+//                        yPos -= 1
                         return
                     } else {
                         gridOffsetY = 0
-//                        yPos += 1
+                        yPos += 1
                         increaseSpeedCounter += 1
                     }
                 } else {
@@ -277,26 +304,27 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
         currentAnimationFrame += 1
         if currentAnimationFrame == 8 {
             currentAnimationFrame = 0
-            if monsterState == .appearing {
-                currentImage = appearCount % 2 == 0 ? walkRightFrames[0] : blankFrame
-                appearCount += 1
-                if appearCount == 13 {
-                    monsterState = .moving
-                    monsterDirection = nextDirection()
-                }
-            } else if monsterState == .moving || monsterState == .chasing || monsterState == .still {
+//            if monsterState == .appearing {
+//                currentImage = appearCount % 2 == 0 ? walkRightFrames[0] : blankFrame
+//                appearCount += 1
+//                if appearCount == 13 {
+//                    monsterState = .moving
+//                    monsterDirection = nextDirection()
+//                }
+//            } else
+            if monsterState == .moving || monsterState == .chasing || monsterState == .still || monsterState == .appearing {
                 switch monsterDirection {
                 case .left:
-                    currentImage = leftFrames[actualAnimationFrame]
+                    currentImage = extraType == .monster ? leftFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 case .right:
-                    currentImage = rightFrames[actualAnimationFrame]
+                    currentImage = extraType == .monster ? rightFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 case .up:
-                    currentImage = upFrames[actualAnimationFrame]
+                    currentImage = extraType == .monster ? upFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 case .down:
-                    currentImage = downFrames[actualAnimationFrame]
+                    currentImage = extraType == .monster ? downFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 }
                 actualAnimationFrame += 1
-                if actualAnimationFrame == 3 {
+                if actualAnimationFrame == 2 {
                     actualAnimationFrame = 0
                 }
                 
@@ -305,51 +333,46 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
     }
     
     private func setImages() {
-        for i in 0..<3 {
-            walkRightFrames.append(getTile(name: "RedMonsters", pos: i,y:0)!)
+        for i in 0..<2 {
+            walkRightFrames.append(getTile(name: "BlueMonsters", pos: i)!)
         }
-        for i in 3..<6 {
-            walkDownFrames.append(getTile(name: "RedMonsters", pos: i,y:0)!)
+        for i in 2..<4 {
+            walkDownFrames.append(getTile(name: "BlueMonsters", pos: i)!)
         }
-        for i in 6..<9 {
-            walkLeftFrames.append(getTile(name: "RedMonsters", pos: i,y:0)!)
+        for i in 4..<6 {
+            walkLeftFrames.append(getTile(name: "BlueMonsters", pos: i)!)
         }
-        for i in 9..<12 {
-            walkUpFrames.append(getTile(name: "RedMonsters", pos: i,y:0)!)
+        for i in 6..<8 {
+            walkUpFrames.append(getTile(name: "BlueMonsters", pos: i)!)
         }
-        for i in 0..<3 {
-            chaseRightFrames.append(getTile(name: "RedMonsters", pos: i,y:1)!)
+        for i in 1..<3 {
+            extraFrames.append(getTile(name: "ExtraMonsters", pos: i)!)
         }
-        for i in 3..<6 {
-            chaseDownFrames.append(getTile(name: "RedMonsters", pos: i,y:1)!)
+        for i in 4..<6 {
+            extraFrames.append(getTile(name: "ExtraMonsters", pos: i)!)
         }
-        for i in 6..<9 {
-            chaseLeftFrames.append(getTile(name: "RedMonsters", pos: i,y:1)!)
+        for i in 7..<9 {
+            extraFrames.append(getTile(name: "ExtraMonsters", pos: i)!)
         }
-        for i in 9..<12 {
-            chaseUpFrames.append(getTile(name: "RedMonsters", pos: i,y:1)!)
-        }
-        for i in 0..<3 {
-            stripeRightFrames.append(getTile(name: "RedMonsters", pos: i,y:2)!)
-        }
-        for i in 3..<6 {
-            stripeDownFrames.append(getTile(name: "RedMonsters", pos: i,y:2)!)
-        }
-        for i in 6..<9 {
-            stripeLeftFrames.append(getTile(name: "RedMonsters", pos: i,y:2)!)
-        }
-        for i in 9..<12 {
-            stripeUpFrames.append(getTile(name: "RedMonsters", pos: i,y:2)!)
+        for i in 10..<12 {
+            extraFrames.append(getTile(name: "ExtraMonsters", pos: i)!)
         }
 
-        deadFrame = getTile(name: "RedMonsters", pos: 12,y:0)!
+        deadFrame = getTile(name: "BlueMonsters", pos: 8)!
         blankFrame = getTile(name: "RedMonsters", pos: 12,y:1)!
         
-        leftFrames = walkLeftFrames
-        rightFrames = walkRightFrames
-        upFrames = walkUpFrames
-        downFrames = walkDownFrames
-        
+        if extraType == .letter {
+            leftFrames = [extraFrames[letter * 2],extraFrames[letter * 2 + 1]]
+            rightFrames = [extraFrames[letter * 2],extraFrames[letter * 2 + 1]]
+            upFrames = [extraFrames[letter * 2],extraFrames[letter * 2 + 1]]
+            downFrames = [extraFrames[letter * 2],extraFrames[letter * 2 + 1]]
+
+        } else {
+            leftFrames = walkLeftFrames
+            rightFrames = walkRightFrames
+            upFrames = walkUpFrames
+            downFrames = walkDownFrames
+        }
 //        leftFrames = stripeLeftFrames
 //        rightFrames = stripeRightFrames
 //        upFrames = stripeUpFrames
@@ -357,17 +380,17 @@ final class ExtraMonster:SwiftUISprite,Moveable,Animatable {
 
     }
     
-    private func chaseMode(){
-        leftFrames = chaseLeftFrames
-        rightFrames = chaseRightFrames
-        upFrames = chaseUpFrames
-        downFrames = chaseDownFrames
-        monsterState = .chasing
-        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            screenData.soundFX.backgroundSoundStop()
-            screenData.soundFX.backgroundFastSound()
-        }
-    }
+//    private func chaseMode(){
+//        leftFrames = chaseLeftFrames
+//        rightFrames = chaseRightFrames
+//        upFrames = chaseUpFrames
+//        downFrames = chaseDownFrames
+//        monsterState = .chasing
+//        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+//            screenData.soundFX.backgroundSoundStop()
+//            screenData.soundFX.backgroundFastSound()
+//        }
+//    }
     
     private func nextDirection() -> MonsterDirection {
         var directionArray:[MonsterDirection] = []

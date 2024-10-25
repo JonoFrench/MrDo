@@ -22,7 +22,7 @@ struct ContentViewTV: View {
                         Spacer()
                         Spacer()
                     }
-                    else if manager.gameState == .playing || manager.gameState == .levelend || manager.gameState == .progress || manager.gameState == .progress10 {
+                    else if manager.gameState == .playing || manager.gameState == .levelend || manager.gameState == .progress || manager.gameState == .progress10 || manager.gameState == .extralife {
                         GameView(mrDo: manager.mrDo,ball: manager.ball,appleArray:manager.appleArray,redMonsterArray:manager.redMonsterArray,extraMonsterArray:manager.extraMonsterArray)
                             .zIndex(1.0)
                     }

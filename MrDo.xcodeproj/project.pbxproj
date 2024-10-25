@@ -77,6 +77,10 @@
 		34B9D19E2CC90579001BF478 /* BGMFaster.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D19A2CC90579001BF478 /* BGMFaster.m4a */; };
 		34B9D1A02CC91E08001BF478 /* ExtraMonsterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D19F2CC91E08001BF478 /* ExtraMonsterView.swift */; };
 		34B9D1A22CC91E3B001BF478 /* ExtraMonster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1A12CC91E3B001BF478 /* ExtraMonster.swift */; };
+		34B9D1A42CC94DD9001BF478 /* Monster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1A32CC94DD9001BF478 /* Monster.swift */; };
+		34B9D1A62CCA6D7D001BF478 /* ExtraLifeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1A52CCA6D7D001BF478 /* ExtraLifeView.swift */; };
+		34B9D1A82CCA8233001BF478 /* ExtraLife.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1A72CCA8233001BF478 /* ExtraLife.swift */; };
+		34B9D1AA2CCA8800001BF478 /* ExtraLife.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D1A92CCA8800001BF478 /* ExtraLife.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -152,6 +156,10 @@
 		34B9D19B2CC90579001BF478 /* BGMMuncher.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = BGMMuncher.m4a; sourceTree = "<group>"; };
 		34B9D19F2CC91E08001BF478 /* ExtraMonsterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraMonsterView.swift; sourceTree = "<group>"; };
 		34B9D1A12CC91E3B001BF478 /* ExtraMonster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraMonster.swift; sourceTree = "<group>"; };
+		34B9D1A32CC94DD9001BF478 /* Monster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monster.swift; sourceTree = "<group>"; };
+		34B9D1A52CCA6D7D001BF478 /* ExtraLifeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraLifeView.swift; sourceTree = "<group>"; };
+		34B9D1A72CCA8233001BF478 /* ExtraLife.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraLife.swift; sourceTree = "<group>"; };
+		34B9D1A92CCA8800001BF478 /* ExtraLife.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = ExtraLife.m4a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,6 +256,8 @@
 				340A7B5D2CC1410D00433318 /* RedMonsterView.swift */,
 				34B9D19F2CC91E08001BF478 /* ExtraMonsterView.swift */,
 				34B9D1A12CC91E3B001BF478 /* ExtraMonster.swift */,
+				34B9D1A32CC94DD9001BF478 /* Monster.swift */,
+				34B9D1A72CCA8233001BF478 /* ExtraLife.swift */,
 			);
 			path = Sprites;
 			sourceTree = "<group>";
@@ -279,6 +289,7 @@
 				340A7B3D2CBD4A8A00433318 /* Cherry6.m4a */,
 				340A7B3E2CBD4A8A00433318 /* Cherry7.m4a */,
 				340A7B3F2CBD4A8A00433318 /* Cherry8.m4a */,
+				34B9D1A92CCA8800001BF478 /* ExtraLife.m4a */,
 				340A7B532CBFE27D00433318 /* GameOver.m4a */,
 				340A7B512CBFDB4F00433318 /* LoseLife.m4a */,
 				340A7B572CC0070F00433318 /* NameEntry.m4a */,
@@ -320,6 +331,7 @@
 				34099A2B2C99E68A00F4FE3A /* InfoView.swift */,
 				340A7B4B2CBD5C8700433318 /* ProgressView.swift */,
 				340A7B592CC0FDE000433318 /* Progress10View.swift */,
+				34B9D1A52CCA6D7D001BF478 /* ExtraLifeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -385,6 +397,7 @@
 				340A7B582CC0070F00433318 /* NameEntry.m4a in Resources */,
 				34099A112C99C58800F4FE3A /* mr-do-arcade.ttf in Resources */,
 				340A7B522CBFDB4F00433318 /* LoseLife.m4a in Resources */,
+				34B9D1AA2CCA8800001BF478 /* ExtraLife.m4a in Resources */,
 				340A7B322CBD25EF00433318 /* RoundClear.m4a in Resources */,
 				340A7B342CBD3C4500433318 /* Start.m4a in Resources */,
 				340A7B402CBD4A8A00433318 /* Cherry3.m4a in Resources */,
@@ -434,14 +447,17 @@
 				34099A0F2C99C50E00F4FE3A /* HighScores.xcdatamodeld in Sources */,
 				34099A0D2C99C50E00F4FE3A /* HighScores+CoreDataProperties.swift in Sources */,
 				340999E72C99C15700F4FE3A /* ContentView.swift in Sources */,
+				34B9D1A62CCA6D7D001BF478 /* ExtraLifeView.swift in Sources */,
 				34B9D1A22CC91E3B001BF478 /* ExtraMonster.swift in Sources */,
 				340999FE2C99C25900F4FE3A /* GameManager.swift in Sources */,
 				340999FA2C99C1F000F4FE3A /* ContentViewTV.swift in Sources */,
 				340999E52C99C15700F4FE3A /* MrDoApp.swift in Sources */,
 				34099A0E2C99C50E00F4FE3A /* HighScores+CoreDataClass.swift in Sources */,
+				34B9D1A82CCA8233001BF478 /* ExtraLife.swift in Sources */,
 				34099A192C99CA8300F4FE3A /* BottomView.swift in Sources */,
 				34099A232C99CB2800F4FE3A /* GameView.swift in Sources */,
 				34099A322C9AC5F500F4FE3A /* Apple.swift in Sources */,
+				34B9D1A42CC94DD9001BF478 /* Monster.swift in Sources */,
 				340A7B5C2CC140FA00433318 /* RedMonster.swift in Sources */,
 				34099A212C99CB0D00F4FE3A /* JoyPadView.swift in Sources */,
 				34B951682C9E0A5700FE770B /* BallView.swift in Sources */,

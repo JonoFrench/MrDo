@@ -33,7 +33,7 @@ final class SoundFX {
     private var backGroundFastAudioPlayer: AVAudioPlayer?
     private var backGroundMuncherAudioPlayer: AVAudioPlayer?
     private var backGroundAlphaAudioPlayer: AVAudioPlayer?
-    private var endLevelAudioPlayer: AVAudioPlayer?
+    private var extraLifeAudioPlayer: AVAudioPlayer?
     
     private lazy var roundClearurl = Bundle.main.url(forResource: "RoundClear", withExtension: "m4a")
     private lazy var starturl = Bundle.main.url(forResource: "Start", withExtension: "m4a")
@@ -58,6 +58,7 @@ final class SoundFX {
     private lazy var backgroundFasturl = Bundle.main.url(forResource: "BGMFaster", withExtension: "m4a")
     private lazy var backgroundAlphaurl = Bundle.main.url(forResource: "BGMAlpha", withExtension: "m4a")
     private lazy var backgroundMuncherurl = Bundle.main.url(forResource: "BGMMuncher", withExtension: "m4a")
+    private lazy var extraLifeurl = Bundle.main.url(forResource: "ExtraLife", withExtension: "m4a")
 
     
     init() {
@@ -86,6 +87,7 @@ final class SoundFX {
             backGroundFastAudioPlayer = try AVAudioPlayer(contentsOf: backgroundFasturl!, fileTypeHint: AVFileType.m4a.rawValue)
             backGroundAlphaAudioPlayer = try AVAudioPlayer(contentsOf: backgroundAlphaurl!, fileTypeHint: AVFileType.m4a.rawValue)
             backGroundMuncherAudioPlayer = try AVAudioPlayer(contentsOf: backgroundMuncherurl!, fileTypeHint: AVFileType.m4a.rawValue)
+            extraLifeAudioPlayer = try AVAudioPlayer(contentsOf: extraLifeurl!, fileTypeHint: AVFileType.m4a.rawValue)
 
         } catch let error {
             print(error.localizedDescription)
@@ -122,7 +124,12 @@ final class SoundFX {
         guard let progressAudioPlayer = progressAudioPlayer else { return }
         Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: progressAudioPlayer)
     }
-    
+
+    func extraLifeSound(){
+        guard let extraLifeAudioPlayer = extraLifeAudioPlayer else { return }
+        Thread.detachNewThreadSelector(#selector(play), toTarget: self, with: extraLifeAudioPlayer)
+    }
+
     func backgroundSound(){
         guard let backgroundAudioPlayer = backgroundAudioPlayer else { return }
         backgroundAudioPlayer.numberOfLoops = -1

@@ -102,14 +102,12 @@ struct Progress10View: View {
                                 .padding([.trailing])
                         }.background(.black)
                     }.frame(maxWidth: .infinity, maxHeight: 120, alignment: .leading)
-//                    Spacer()
                         .overlay(alignment:.center, content: {
                             VStack(alignment: .center, spacing: 10) {
                                 
                                 Text("WONDERFUL !")
                                     .foregroundStyle(.yellow)
                                     .font(.custom("MrDo-Arcade", size: ProgressView.subTitleTextSize))
-                                //                            .padding([.leading])
                                     .offset(Progress10View.wonderSize)
                             }
                         })

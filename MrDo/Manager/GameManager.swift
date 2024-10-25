@@ -11,7 +11,7 @@ import Combine
 
 
 enum GameState {
-    case intro,playing,ended,highscore,levelend,progress,progress10
+    case intro,playing,ended,highscore,levelend,progress,progress10,extralife
 }
 
 enum JoyPad {
@@ -19,7 +19,7 @@ enum JoyPad {
 }
 
 enum LevelEndType {
-    case cherry,redmonster
+    case cherry,redmonster,extramonster
 }
 
 struct GameConstants {
@@ -95,6 +95,8 @@ class GameManager: ObservableObject {
     /// For the EXTRA at the top of the screen.
     var extraFrames: [UIImage] = []
     @Published
+    var extraCollected:[Bool] = [false,false,false,false,false]
+    @Published
     var extraCurrent = 0 {
         didSet {
             if extraCurrent == 5 {
@@ -102,9 +104,14 @@ class GameManager: ObservableObject {
             }
         }
     }
+    var extraAppearing = false
     
     @ObservedObject
     var progress:Progress = Progress()
+    @ObservedObject
+    var extraLife:ExtraLife = ExtraLife()
+    @Published
+    var extraLifeFlashOn = true
     
     init() {
         moveDirection = .stop
@@ -158,8 +165,12 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
 //        gameTime = 450
 //        score = 5678
 //        progress10()
-
-        startPlaying()
+        extraCollected = [true,true,true,true,true]
+        gameScreen.soundFX.extraLifeSound()
+        extraLife = ExtraLife()
+        gameState = .extralife
+        extraFlash()
+//        startPlaying()
     }
     
     func handleJoyPad() {
@@ -197,15 +208,28 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
                 progress.move()
         } else if gameState == .ended {
             
+        } else if gameState == .extralife {
+            extraLife.move()
+            extraLife.animate()
+            if extraLife.ball.exploding {
+                extraLife.ball.explode()
+            } else
+            if extraLife.ball.imploding {
+                extraLife.ball.implode()
+            }
         }
     }
     
     func startPlaying() {
+        extraLifeFlashOn = true
         gameScreen.pause = false
         gameScreen.levelEnd = false
         gameScreen.gameOver = false
         extraCurrent = 0
+        extraAppearing = false
+        extraCollected = [false,true,false,true,false]
         redMonsterArray.monsters.removeAll()
+        extraMonsterArray.monsters.removeAll()
         levelScore = 0
         setDataForLevel(level: gameScreen.level)
         startTime = Date()
@@ -224,6 +248,17 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
                 extraCurrent += 1
                 extraHeader()
             }
+        }
+    }
+    
+    func extraFlash() {
+        if gameState == .extralife {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+                extraLifeFlashOn = !extraLifeFlashOn
+                extraFlash()
+            }
+        } else {
+            extraLifeFlashOn = true
         }
     }
     
@@ -252,32 +287,45 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
             mrDo.reset()
             ball.reset()
-            if gameScreen.level % 3 == 0 {
-                ///Every 3 levels display the how we doing screen.
-                progress = Progress()
-                gameState = .progress
-                gameScreen.soundFX.progressSound()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [self] in
-                    gameScreen.level += 1
-                    gameScreen.gameLevel += 1
-                    startPlaying()
-                }
+            
+            /// Check if we have all EXTRA for extra life.
+            if extraCollected.filter({$0 == true}).count == 5 {
+                extraLife = ExtraLife()
+                gameState = .extralife
+                gameScreen.soundFX.extraLifeSound()
+                extraFlash()
             } else {
-                if gameScreen.level % 10 == 0 {
-                    progress10()
-                } else {
-                    gameScreen.level += 1
-                    gameScreen.gameLevel += 1
-                    startPlaying()
-                }
+                checkNextLevel()
             }
         }
     }
     
+    func checkNextLevel() {
+        if gameScreen.level % 3 == 0 {
+        ///Every 3 levels display the how we doing screen.
+        progress = Progress()
+        gameState = .progress
+        gameScreen.soundFX.progressSound()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [self] in
+            gameScreen.level += 1
+            gameScreen.gameLevel += 1
+            startPlaying()
+        }
+    } else {
+        if gameScreen.level % 10 == 0 {
+            progress10()
+        } else {
+            gameScreen.level += 1
+            gameScreen.gameLevel += 1
+            startPlaying()
+        }
+    }
+    }
     private func ballHandling(){
         if ball.thrown {
             catchBall()
-            checkBallHit()
+            checkBallHitRedMonsters()
+            checkBallHitExtraMonsters()
             ball.move()
         } else
         if ball.exploding {
@@ -307,8 +355,21 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
             gameScreen.soundFX.backgroundStopAll()
             gameScreen.soundFX.backgroundAlphaSound()
             redMonsterArray.still()
+            extraAppearing = true
+            addExtraMonsters()
         }
     }
+    
+    private func addExtraMonsters(){
+        guard extraMonsterArray.monsterCount < 6 else {
+            return
+        }
+        extraMonsterArray.add(xPos: 5, yPos: 0,letterPos: extraCurrent)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+            addExtraMonsters()
+        }
+    }
+
     
     private func addRedMonsters(){
         guard redMonsterArray.monsterCount < 6 else {
@@ -323,7 +384,7 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         }
     }
     
-    func checkBallHit() {
+    func checkBallHitRedMonsters() {
         for monster in redMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
             if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
                 ball.setExplode(position: monster.position)
@@ -331,14 +392,37 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
                 score += 500
                 monster.kill()
                 gameScreen.soundFX.ballHitSound()
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
-//                    redMonsterArray.remove(id: monster.id)
-//                    if redMonsterArray.killCount == 5 {
-//                        nextLevel(endType: .redmonster)
-//                    }
-//                }
                 return
             }
+        }
+    }
+
+    func checkBallHitExtraMonsters() {
+        for monster in extraMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
+            if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
+                ball.setExplode(position: monster.position)
+                returnBall()
+                score += 500
+                monster.kill()
+                gameScreen.soundFX.ballHitSound()
+                if monster.extraType == .monster {
+                    appleArray.add(xPos: monster.xPos, yPos: monster.yPos)
+                } else {
+                    extraCollected[extraCurrent] = true
+                    extrasToApples()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+                        nextLevel(endType: .extramonster)
+                    }
+                }
+                return
+            }
+        }
+    }
+    
+    func extrasToApples() {
+        for monster in extraMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
+            appleArray.add(xPos: monster.xPos, yPos: monster.yPos)
+            extraMonsterArray.remove(id: monster.id)
         }
     }
     
@@ -397,6 +481,8 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         case .cherry:
             ImageResource(name: "Cherry", bundle: .main)
         case .redmonster:
+            ImageResource(name: "RedMonster", bundle: .main)
+        case .extramonster:
             ImageResource(name: "RedMonster", bundle: .main)
         }
     }
