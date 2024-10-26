@@ -59,7 +59,7 @@ struct ExtraLifeView: View {
                     .background(.clear)
                     .position(extraLife.monsterPosition)
 
-                if extraLife.moveBall {
+                if extraLife.state == .ballthrown {
                     Image(extraLife.ballImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -67,7 +67,7 @@ struct ExtraLifeView: View {
                         .background(.clear)
                         .position(extraLife.doBallPosition)
                 }
-                if extraLife.showFlag {
+                if extraLife.state == .flagwaving {
                     Image(extraLife.flagImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -80,7 +80,7 @@ struct ExtraLifeView: View {
                     ForEach(extraLife.ball.explodeArray,id: \.id) { ballExplode in
                         BallView(ball: extraLife.ball)
                             .position(ballExplode.position)
-                            .zIndex(3.9)
+                            .zIndex(5.9)
                     }
                 }
 

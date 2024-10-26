@@ -27,7 +27,6 @@ struct BottomView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)  // Make the HStack left-justified
-
             Spacer()
             VStack(alignment: .leading, content: {
                 Text("SCENE....\(String(format: "%02d", manager.gameScreen.gameLevel))")
@@ -39,10 +38,6 @@ struct BottomView: View {
                     .font(.custom("MrDo-Arcade", size: BottomView.topTextSize))
                     .padding([.trailing])
             })
-        }
+        }.zIndex(2.0)
     }
 }
-
-//#Preview {
-//    BottomView()
-//}

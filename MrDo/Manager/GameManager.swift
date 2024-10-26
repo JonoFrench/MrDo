@@ -165,12 +165,12 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
 //        gameTime = 450
 //        score = 5678
 //        progress10()
-        extraCollected = [true,true,true,true,true]
-        gameScreen.soundFX.extraLifeSound()
-        extraLife = ExtraLife()
-        gameState = .extralife
-        extraFlash()
-//        startPlaying()
+//        extraCollected = [true,true,true,true,true]
+//        gameScreen.soundFX.extraLifeSound()
+//        extraLife = ExtraLife()
+//        gameState = .extralife
+//        extraFlash()
+        startPlaying()
     }
     
     func handleJoyPad() {
@@ -282,7 +282,11 @@ print("Asset dim \(gameScreen.assetDimension) width should be \(gameScreen.asset
         cherryCount = 0
         redMonsterArray.monsterCount = 0
         redMonsterArray.killCount = 0
+        extraMonsterArray.monsterCount = 0
+        extraMonsterArray.killCount = 0
         redMonsterArray.monsters.removeAll()
+        extraMonsterArray.monsters.removeAll()
+        extraMonsterArray.letterAdded = false
         gameState = .levelend
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
             mrDo.reset()
