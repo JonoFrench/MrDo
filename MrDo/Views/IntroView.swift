@@ -26,7 +26,7 @@ struct IntroView: View {
             .onAppear {
                 startTimer()
                 print("game size \(proxy.size)")
-                manager.gameScreen.gameSize = proxy.size
+                manager.screenData.gameSize = proxy.size
             }.background(.clear)
         }
     }

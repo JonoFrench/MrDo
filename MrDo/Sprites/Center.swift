@@ -16,7 +16,6 @@ final class Center:SwiftUISprite {
     var collectible = false
     
     init(xPos: Int, yPos:Int) {
-        
 #if os(iOS)
         super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 32, height:  32))
 #elseif os(tvOS)
@@ -27,14 +26,14 @@ final class Center:SwiftUISprite {
         collected = false
     }
     
-    func setBonusFood() {
+    func setBonusFood(level:Int) {
         currentFrame = ImageResource(name: "BonusFood1", bundle: .main)
         collectible = true
     }
+    
     func collectBonusFood(){
         collected = true
         collectible = false
         currentFrame = ImageResource(name: "Blank", bundle: .main)
     }
-    
 }

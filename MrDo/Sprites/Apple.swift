@@ -34,10 +34,18 @@ final class AppleArray: ObservableObject {
                         monster.squash()
                     }
                 }
-                
+            }
+            /// Has the apple landed on any Blue or Extra Monsters?
+            if let monsterInstance:ExtraMonsterArray = ServiceLocator.shared.resolve() {
+                for monster in monsterInstance.monsters {
+                    if apple.xPos == monster.xPos && apple.yPos == monster.yPos {
+                        monster.squash()
+                    }
+                }
             }
         }
     }
+    
     
     func remove(id:UUID) {
         if let index = apples.firstIndex(where: {$0.id == id}) {

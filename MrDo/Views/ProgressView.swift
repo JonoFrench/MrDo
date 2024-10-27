@@ -40,7 +40,7 @@ struct ProgressView: View {
                         .font(.custom("MrDo-Arcade", size: ProgressView.subTitleTextSize))
                         .padding([.leading])
                     Spacer()
-                    Text("\((score.time % 3600) / 60)'\((score.time % 3600) % 60)")
+                    Text("\(String(format: "%02d", (score.time % 3600) / 60))'\(String(format: "%02d",(score.time % 3600) % 60))")
                         .foregroundStyle(.cyan)
                         .font(.custom("MrDo-Arcade", size: ProgressView.subTitleTextSize))
                         .padding([.leading])

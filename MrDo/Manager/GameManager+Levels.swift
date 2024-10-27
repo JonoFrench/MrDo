@@ -12,7 +12,7 @@ extension GameManager {
     func setDataForLevel(level:Int) {
         appleArray.apples.removeAll()
         center = Center(xPos: 5, yPos: 6)
-        gameScreen.levelData.setLevelData(level: level)
+        screenData.levelData.setLevelData(level: level)
         switch level {
         case 1: level1Data()
         case 2: level2Data()
@@ -127,4 +127,45 @@ extension GameManager {
         appleArray.add(xPos: 6, yPos: 9)
     }
 
+    func setExtraFrames() {
+        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 0)!)
+        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 3)!)
+        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 6)!)
+        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 9)!)
+        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 12)!)
+    }
+    
+    /// Move the EXTRA monster along the Header whilst playing.
+    func extraHeader() {
+        if gameState == .playing {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
+                extraCurrent += 1
+                extraHeader()
+            }
+        }
+    }
+    
+    /// Extra Life screen. Flash the EXTRA box at the top of the screen.
+    func extraFlash() {
+        if gameState == .extralife {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+                extraLifeFlashOn = !extraLifeFlashOn
+                extraFlash()
+            }
+        } else {
+            extraLifeFlashOn = true
+        }
+    }
+    /// After Level 10 We show the Progress10 Screen
+    func progress10(){
+        gameState = .progress10
+        screenData.levelData.setProgress10Data()
+        screenData.soundFX.backgroundStopAll()
+        screenData.soundFX.progressSound()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [self] in
+            screenData.level += 1
+            screenData.gameLevel += 1
+            startPlaying()
+        }
+    }
 }

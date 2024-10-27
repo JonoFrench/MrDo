@@ -65,30 +65,29 @@ extension GameManager {
     
     @objc func loseLife(notification: Notification) {
         lives -= 1
-        gameScreen.soundFX.backgroundStopAll()
+        screenData.soundFX.backgroundStopAll()
         if lives == 0 {
             endTime = Date()
             let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
             gameTime += Int(difference)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
-                gameScreen.soundFX.gameOverSound()
-                gameScreen.gameOver = true
+                screenData.soundFX.gameOverSound()
+                screenData.gameOver = true
                 self.objectWillChange.send()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [self] in
-                    if hiScores.isNewHiScore(score: score,level: gameScreen.level, time: gameTime) {
+                    if hiScores.isNewHiScore(score: score,level: screenData.level, time: gameTime) {
                         hiScores.resetInput()
                         gameState = .highscore
-                        gameScreen.soundFX.nameEntrySound()
+                        screenData.soundFX.nameEntrySound()
                     } else {
                         gameState = .intro
                     }
                 }
             }
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [self] in
                 restartPlaying()
             }
-
         }
     }
 
@@ -97,6 +96,7 @@ extension GameManager {
             appleArray.remove(id: id)
         }
     }
+    
     @objc func removeRedMonster(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             redMonsterArray.remove(id: id)
@@ -109,19 +109,15 @@ extension GameManager {
     @objc func removeExtraMonster(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             extraMonsterArray.remove(id: id)
-//            if redMonsterArray.killCount == 6 {
-//                nextLevel(endType: .redmonster)
-//            }
         }
     }
 
-    
     @objc func addScore(notification: Notification) {
         if let value = notification.userInfo?["score"] as? Int,let count = notification.userInfo?["count"] as? Int {
             score += value
             levelScore += value
             if value == 50 {
-                gameScreen.soundFX.cherrySound(count: count)
+                screenData.soundFX.cherrySound(count: count)
                 if count == 8 {
                     score += 500
                     levelScore += 500

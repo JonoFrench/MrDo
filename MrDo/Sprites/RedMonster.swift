@@ -74,6 +74,7 @@ final class RedMonster:Monster,Moveable,Animatable {
         setImages()
         currentImage = walkRightFrames[0]
         actualAnimationFrame = 0
+        monsterType = .redmonster
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
             moveDistance = resolvedInstance.assetDimensionStep
         }
@@ -130,6 +131,8 @@ final class RedMonster:Monster,Moveable,Animatable {
                 if appearCount == 13 {
                     monsterState = .moving
                     monsterDirection = nextDirection()
+                    monsterDirection = .down
+                    setOffsets(direction: monsterDirection)
                 }
             } else if monsterState == .moving || monsterState == .chasing || monsterState == .still {
                 switch monsterDirection {
@@ -146,7 +149,6 @@ final class RedMonster:Monster,Moveable,Animatable {
                 if actualAnimationFrame == 3 {
                     actualAnimationFrame = 0
                 }
-                
             }
         }
     }

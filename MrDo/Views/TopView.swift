@@ -96,7 +96,7 @@ struct TopView: View {
                                 )
                         }.padding(4)
                     )
-            }.frame(width: manager.gameScreen.assetDimension * 4)
+            }.frame(width: manager.screenData.assetDimension * 4)
                 .opacity(manager.extraLifeFlashOn ? 1.0 : 0.0)
             VStack {
             }.frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)

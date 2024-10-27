@@ -85,7 +85,7 @@ struct ExtraLifeView: View {
                 }
 
                 
-            }.frame(width: manager.gameScreen.gameSize.width, height: manager.gameScreen.gameSize.width)
+            }.frame(width: manager.screenData.gameSize.width, height: manager.screenData.gameSize.width)
             ZStack(alignment: .center) {
                 //            Spacer()
                 HStack(alignment: .top,spacing: 20) {

@@ -34,7 +34,7 @@ extension GameManager {
                 gamepad.dpad.valueChangedHandler = {[unowned self] _, xValue, yValue in
                     //                print("Dpad moved: x = \(xValue), y = \(yValue)")
                     DispatchQueue.main.async { [self] in
-                        if xValue == -0.0 && yValue == 0.0 {
+                        if xValue == 0.0 && yValue == 0.0 {
                             if gameState == .playing {
                                 self.moveDirection = .stop
                             }
@@ -66,44 +66,40 @@ extension GameManager {
                     }
                 }
                 
-//                gamepad.leftThumbstick.valueChangedHandler = { [self] (dpad, xValue, yValue) in
-//                    //                print("Left thumbstick moved: x = \(xValue), y = \(yValue)")
-//                    if xValue == -0.0 && yValue == 0.0 {
-//                        if gameState == .playing {
-//                            self.moveDirection = .stop
-//                        }
-//                    } else
-//                    if xValue < 0.0 {
-//                        if gameState == .playing {
-//                            self.moveDirection = .left
-//                        }
-//                    } else
-//                    if xValue > 0.0 {
-//                        if gameState == .playing {
-//                            self.moveDirection = .right
-//                        }
-//                    } else
-//                    if yValue < 0.0 {
-//                        if gameState == .playing {
-//                            self.moveDirection = .down
-//                        } else if gameState == .highscore {
-//                            hiScores.letterDown()
-//                        }
-//                    } else
-//                    if yValue > 0.0 {
-//                        if gameState == .playing {
-//                            self.moveDirection = .up
-//                        } else if gameState == .highscore {
-//                            hiScores.letterUp()
-//                        }
-//                    }
-//                }
+                gamepad.leftThumbstick.valueChangedHandler = { [self] (dpad, xValue, yValue) in
+                    if xValue == 0.0 && yValue == 0.0 {
+                        if gameState == .playing {
+                            self.moveDirection = .stop
+                        }
+                    } else
+                    if xValue < 0.0 {
+                        if gameState == .playing {
+                            self.moveDirection = .left
+                        }
+                    } else
+                    if xValue > 0.0 {
+                        if gameState == .playing {
+                            self.moveDirection = .right
+                        }
+                    } else
+                    if yValue < 0.0 {
+                        if gameState == .playing {
+                            self.moveDirection = .down
+                        } else if gameState == .highscore {
+                            hiScores.letterDown()
+                        }
+                    } else
+                    if yValue > 0.0 {
+                        if gameState == .playing {
+                            self.moveDirection = .up
+                        } else if gameState == .highscore {
+                            hiScores.letterUp()
+                        }
+                    }
+                }
             }
         }
     }
-    
-    
-    
 #endif
     
 }

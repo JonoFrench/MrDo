@@ -19,7 +19,7 @@ struct GameOverView: View {
         ZStack {
             Rectangle()
                 .fill(.black)
-                .frame(width: manager.gameScreen.gameSize.width / 1.50,height: manager.gameScreen.gameSize.width / 4.0,alignment: .center)
+                .frame(width: manager.screenData.gameSize.width / 1.50,height: manager.screenData.gameSize.width / 4.0,alignment: .center)
                 .overlay(alignment: .center, content: {
                     Text("GAME OVER")
                         .foregroundStyle(.cyan)

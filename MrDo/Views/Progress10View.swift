@@ -29,9 +29,9 @@ struct Progress10View: View {
     var body: some View {
         ZStack(alignment: .center) {
             let score = manager.levelScores.last
-            let averageTime = manager.gameTime / manager.gameScreen.level
-            let averageScore = manager.score / manager.gameScreen.level
-            ScreenView(gameScreen: manager.gameScreen)
+            let averageTime = manager.gameTime / manager.screenData.level
+            let averageScore = manager.score / manager.screenData.level
+            ScreenView(gameScreen: manager.screenData)
                 .zIndex(0.5)
                 .overlay(alignment: .top, content: {
                     Spacer()
@@ -52,7 +52,7 @@ struct Progress10View: View {
                                 .foregroundStyle(.cyan)
                                 .font(.custom("MrDo-Arcade", size: Progress10View.subTitleTextSize))
                             Spacer()
-                            Text("\((score!.time % 3600) / 60)'\((score!.time % 3600) % 60)")
+                            Text("\(String(format: "%02d", (score!.time % 3600) / 60))'\(String(format: "%02d",(score!.time % 3600) % 60))")
                                 .foregroundStyle(.cyan)
                                 .font(.custom("MrDo-Arcade", size: Progress10View.subTitleTextSize))
                             Image("Cherry")

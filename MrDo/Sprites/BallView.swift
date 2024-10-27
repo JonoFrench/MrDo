@@ -17,7 +17,6 @@ struct BallView: View {
                     .frame(width: ball.frameSize.width, height: ball.frameSize.height)
                     .background(.clear)
             }.background(.clear)
-//                .position(ball.position)
                 .frame(width: 1,height: 1,alignment: .center)
     }
 }

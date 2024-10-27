@@ -32,9 +32,6 @@ struct TileWall {
     }
 }
 
-//if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
-
-
 class LevelData:ObservableObject {
     let levels = Levels()
     @Published

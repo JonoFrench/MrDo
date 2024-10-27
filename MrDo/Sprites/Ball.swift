@@ -157,7 +157,7 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos > 0 {
                     checkX = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
-                    if checkAsset == .fu || checkAsset == .ch {
+                    if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos-1, yPos: yPos) {
                         direction = .downright
                         print("moveDownLeft to downright X full")
                         return
@@ -174,7 +174,7 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos < resolvedInstance.screenDimensionY - 1 {
                     checkY = 0
                     checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
-                    if checkAsset == .fu || checkAsset == .ch {
+                    if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos+1) {
                         direction = .upright
                         print("moveDownLeft to upright Y full")
                         return
@@ -278,7 +278,7 @@ final class Ball:SwiftUISprite, Moveable {
                 checkX = 0
                 checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
                 
-                if checkAsset == .fu || checkAsset == .ch {
+                if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos+1, yPos: yPos) {
                     direction = .downleft
                     print("moveDownRight to downleft X full")
                     return
@@ -289,7 +289,7 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos < resolvedInstance.screenDimensionY - 1 {
                     checkY = 0
                     checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
-                    if checkAsset == .fu || checkAsset == .ch {
+                    if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos+1) {
                         direction = .upright
                         print("moveDownRight to upright Y full")
                         return
@@ -389,7 +389,7 @@ final class Ball:SwiftUISprite, Moveable {
                 if xPos > 0 {
                     checkX = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
-                    if checkAsset == .fu || checkAsset == .ch {
+                    if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos-1, yPos: yPos) {
                         direction = .upright
                         print("moveUpLeft to upright X full")
                         return
@@ -404,7 +404,7 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos > 0 {
                     checkY = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
-                    if checkAsset == .fu || checkAsset == .ch {
+                    if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos-1) {
                         direction = .downleft
                         print("moveUpLeft to downright Y full")
                         return
@@ -503,7 +503,7 @@ final class Ball:SwiftUISprite, Moveable {
                 checkX = 0
                 checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
                 
-                if checkAsset == .fu || checkAsset == .ch {
+                if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos+1, yPos: yPos) {
                     direction = .upleft
                     print("moveUpRight to upleft X full")
                     return
@@ -514,7 +514,7 @@ final class Ball:SwiftUISprite, Moveable {
                 if yPos > 0 {
                     checkY = 7
                     checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
-                    if checkAsset == .fu || checkAsset == .ch {
+                    if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos - 1) {
                         direction = .downright
                         print("moveUpRight to downright Y full")
                         return
@@ -576,6 +576,17 @@ final class Ball:SwiftUISprite, Moveable {
                 }
             }
         }
+    }
+    
+    private func checkApple(xPos:Int, yPos:Int) -> Bool {
+        if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
+            for apple in appleArray.apples {
+                if apple.xPos == xPos && apple.yPos == yPos {
+                    return true
+                }
+            }
+        }
+        return false
     }
     
     private func checkDirection(checkAsset: TileType) {

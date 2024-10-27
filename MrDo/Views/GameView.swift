@@ -17,7 +17,7 @@ struct GameView: View {
     var body: some View {
         VStack(alignment:.center, spacing: .zero) {
             TopView()
-                .frame(height: manager.gameScreen.assetDimension * 1 , alignment: .center)
+                .frame(height: manager.screenData.assetDimension * 1 , alignment: .center)
                 .background(.black)
                 .zIndex(2.0)
             if manager.gameState == .progress {
@@ -33,7 +33,7 @@ struct GameView: View {
 //                }
             } else {
                 ZStack(alignment: .center) {
-                    ScreenView(gameScreen: manager.gameScreen)
+                    ScreenView(gameScreen: manager.screenData)
                     //.frame(height: manager.gameScreen.assetDimension * 13, alignment: .center)
                         .zIndex(0.5)
                     MrDoView(mrDo: mrDo)
@@ -63,18 +63,20 @@ struct GameView: View {
                         ExtraMonsterView(extraMonster: monster)
                             .zIndex(3.8)
                     }
-                    CenterView(center: manager.center)
-                        .position(manager.center.position)
-                        .zIndex(1.5)
-                    if manager.gameScreen.gameOver {
+                    if !manager.center.collected {
+                        CenterView(center: manager.center)
+                            .position(manager.center.position)
+                            .zIndex(1.5)
+                    }
+                    if manager.screenData.gameOver {
                         GameOverView(manager: _manager)
-                            .position(x:manager.gameScreen.gameSize.width / 2,y: manager.gameScreen.gameSize.height / 2).offset(y: -40)
+                            .position(x:manager.screenData.gameSize.width / 2,y: manager.screenData.gameSize.height / 2).offset(y: -40)
                             .zIndex(5)
                     }
                 }.zIndex(2.9)
             }
             BottomView()
-                .frame(height: manager.gameScreen.assetDimension * 1, alignment: .center)
+                .frame(height: manager.screenData.assetDimension * 1, alignment: .center)
                 .zIndex(3.0)
                 .background(.black)
         }

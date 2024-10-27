@@ -179,10 +179,6 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     func moveNothing(){
     }
     
-    func stateFrames() {
-        
-    }
-    
     func fall(){
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             moveCounter += 1

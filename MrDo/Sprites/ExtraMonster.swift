@@ -39,7 +39,7 @@ final class ExtraMonsterArray: ObservableObject {
     }
     
     func add(xPos:Int,yPos:Int,letterPos:Int) {
-        let monster = ExtraMonster(xPos: xPos, yPos:yPos,type: letterAdded ? .monster : .letter,letter: letterPos)
+        let monster = ExtraMonster(xPos: xPos, yPos:yPos,type: letterAdded ? .bluemonster : .letter,letter: letterPos)
         monsters.append(monster)
         monsterCount += 1
         letterAdded = true
@@ -61,32 +61,23 @@ final class ExtraMonster:Monster,Moveable,Animatable {
     private var walkDownFrames: [UIImage] = []
     
     private var extraFrames: [UIImage] = []
-//    private var extraLeftFrames: [UIImage] = []
-//    private var extraUpFrames: [UIImage] = []
-//    private var extraDownFrames: [UIImage] = []
-    
-//    private var stripeRightFrames: [UIImage] = []
-//    private var stripeLeftFrames: [UIImage] = []
-//    private var stripeUpFrames: [UIImage] = []
-//    private var stripeDownFrames: [UIImage] = []
-    
+    private var swallowFrames: [UIImage] = []
     private var deadExtraFrame: UIImage = UIImage()
     
     private var appearCount = 0
     private var actualAnimationFrame = 0
     private var increaseSpeedCounter = 0
-    var extraType: ExtraType = .letter
     private var letter = 0
-    init(xPos: Int, yPos: Int, type:ExtraType, letter: Int) {
+    init(xPos: Int, yPos: Int, type:MonsterType, letter: Int) {
 #if os(iOS)
         super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 28, height:  28))
 #elseif os(tvOS)
         super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 52, height:  52))
 #endif
-        extraType = type
+        monsterType = type
         setImages()
-        currentImage = extraType == .monster ? rightFrames[0] : extraFrames[0]
-        if extraType == .letter {
+        currentImage = monsterType == .bluemonster ? rightFrames[0] : extraFrames[0]
+        if monsterType == .letter {
             monsterState = .still
         }
         actualAnimationFrame = 0
@@ -158,26 +149,54 @@ final class ExtraMonster:Monster,Moveable,Animatable {
         currentAnimationFrame += 1
         if currentAnimationFrame == 8 {
             currentAnimationFrame = 0
-            if monsterState == .moving || monsterState == .chasing || monsterState == .still || monsterState == .appearing {
+            if monsterType == .swallowmonster {
+                if actualAnimationFrame == 0 {
+                    setSwallowMonster()
+                    currentSpeed = 6
+                    actualAnimationFrame += 1
+                } else {
+                    currentImage = swallowFrames[3 + actualAnimationFrame]
+                    actualAnimationFrame += 1
+                    if actualAnimationFrame == 4 {
+                        actualAnimationFrame = 0
+                        monsterType = .bluemonster
+                        if let appleArray: AppleArray = ServiceLocator.shared.resolve(), let swallowedApple {
+                            appleArray.remove(id: swallowedApple.id)
+                        }
+                    }
+                }
+            }
+            else if monsterState == .moving || monsterState == .chasing || monsterState == .still || monsterState == .appearing {
                 switch monsterDirection {
                 case .left:
-                    currentImage = extraType == .monster ? leftFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
+                    currentImage = monsterType == .bluemonster ? leftFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 case .right:
-                    currentImage = extraType == .monster ? rightFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
+                    currentImage = monsterType == .bluemonster ? rightFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 case .up:
-                    currentImage = extraType == .monster ? upFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
+                    currentImage = monsterType == .bluemonster ? upFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 case .down:
-                    currentImage = extraType == .monster ? downFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
+                    currentImage = monsterType == .bluemonster ? downFrames[actualAnimationFrame] : extraFrames[actualAnimationFrame]
                 }
                 actualAnimationFrame += 1
                 if actualAnimationFrame == 2 {
                     actualAnimationFrame = 0
                 }
-                
             }
         }
     }
     
+    private func setSwallowMonster() {
+        switch monsterDirection {
+        case .left:
+            currentImage = swallowFrames[2]
+        case .right:
+            currentImage = swallowFrames[0]
+        case .up:
+            currentImage = swallowFrames[3]
+        case .down:
+            currentImage = swallowFrames[1]
+        }
+    }
     private func setImages() {
         for i in 0..<2 {
             walkRightFrames.append(getTile(name: "BlueMonsters", pos: i)!)
@@ -203,8 +222,11 @@ final class ExtraMonster:Monster,Moveable,Animatable {
         for i in 10..<12 {
             extraFrames.append(getTile(name: "ExtraMonsters", pos: i)!)
         }
+        for i in 0..<8 {
+            swallowFrames.append(getTile(name: "BlueSwallowMonster", pos: i)!)
+        }
 
-        if extraType == .letter {
+        if monsterType == .letter {
             leftFrames = [extraFrames[letter * 2],extraFrames[letter * 2 + 1]]
             rightFrames = [extraFrames[letter * 2],extraFrames[letter * 2 + 1]]
             upFrames = [extraFrames[letter * 2],extraFrames[letter * 2 + 1]]
@@ -216,10 +238,5 @@ final class ExtraMonster:Monster,Moveable,Animatable {
             upFrames = walkUpFrames
             downFrames = walkDownFrames
         }
-//        leftFrames = stripeLeftFrames
-//        rightFrames = stripeRightFrames
-//        upFrames = stripeUpFrames
-//        downFrames = stripeDownFrames
-
     }
 }
