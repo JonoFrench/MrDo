@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct PointsView: View {
+    @ObservedObject var points:Points
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
-
-#Preview {
-    PointsView()
-}
+        ZStack {
+            Image(points.currentFrame)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: points.frameSize.width, height: points.frameSize.height)
+                .background(.clear)
+        }.background(.clear)
+    }}

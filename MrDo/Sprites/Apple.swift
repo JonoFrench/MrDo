@@ -29,17 +29,23 @@ final class AppleArray: ObservableObject {
             }
             /// Has the apple landed on any Red Monsters?
             if let monsterInstance:RedMonsterArray = ServiceLocator.shared.resolve() {
-                for monster in monsterInstance.monsters {
+                for monster in monsterInstance.monsters where monster.monsterState != .falling && monster.monsterState != .appearing {
                     if apple.xPos == monster.xPos && apple.yPos == monster.yPos {
                         monster.squash()
+                        monster.position = apple.position
+                        monster.position.y -= apple.frameSize.height
+                        monsterInstance.squashCount += 1
                     }
                 }
             }
             /// Has the apple landed on any Blue or Extra Monsters?
             if let monsterInstance:ExtraMonsterArray = ServiceLocator.shared.resolve() {
-                for monster in monsterInstance.monsters {
+                for monster in monsterInstance.monsters where monster.monsterState != .falling {
                     if apple.xPos == monster.xPos && apple.yPos == monster.yPos {
                         monster.squash()
+                        monster.position = apple.position
+                        monster.position.y -= apple.frameSize.height
+                        monsterInstance.squashCount += 1
                     }
                 }
             }
@@ -168,7 +174,8 @@ final class Apple:SwiftUISprite,Moveable {
                 leftImage = getTile(name: "AppleEnd", pos: 4)!
                 rightImage = getTile(name: "AppleEnd", pos: 5)!
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-                    let appleID:[String: UUID] = ["id": self.id]
+                    //let appleID:[String: UUID] = ["id": self.id]
+                    let appleID: [String: Any] = ["id": self.id, "xPos": self.xPos,"yPos":self.yPos]
                     NotificationCenter.default.post(name: .notificationRemoveApple, object: nil, userInfo: appleID)
                 }
             }

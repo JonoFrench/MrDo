@@ -110,7 +110,9 @@ class GameManager: ObservableObject {
     var extraLife:ExtraLife = ExtraLife()
     @Published
     var extraLifeFlashOn = true
-    
+    @Published
+    var points:Points?
+    var chaseMode = false
     init() {
         moveDirection = .stop
         /// Share these instances so they are available from the other Sprites
@@ -141,7 +143,6 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         screenData.gameLevel = 1
         screenData.gameOver = false
         cherryCount = 0
-        
         ///Testing stuff
         
 //        turnOffCollisions = true
@@ -223,7 +224,8 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         screenData.gameOver = false
         extraCurrent = 0
         extraAppearing = false
-        extraCollected = [false,true,false,true,false]
+        extraCollected = [false,false,false,false,false]
+        chaseMode = false
         redMonsterArray.monsters.removeAll()
         extraMonsterArray.monsters.removeAll()
         levelScore = 0
@@ -264,6 +266,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         extraMonsterArray.monsters.removeAll()
         extraMonsterArray.letterAdded = false
         gameState = .levelend
+        chaseMode = false
         center.collected = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
             mrDo.reset()
@@ -320,7 +323,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
     private func appleHandling() {
         appleArray.checkDrop(doXpos: mrDo.xPos,doYpos: mrDo.yPos)
         appleArray.move()
-    }
+     }
     
     private func monsterHandling() {
         redMonsterArray.move()
@@ -364,11 +367,12 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         }
     }
     
-    func checkBallHitRedMonsters() {
+    private func checkBallHitRedMonsters() {
         for monster in redMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
             if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
                 ball.setExplode(position: monster.position)
                 returnBall()
+                points = Points(xPos: monster.xPos, yPos: monster.yPos, value: .fivehundred)
                 score += 500
                 monster.kill()
                 screenData.soundFX.ballHitSound()
@@ -377,11 +381,12 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         }
     }
 
-    func checkBallHitExtraMonsters() {
+    private func checkBallHitExtraMonsters() {
         for monster in extraMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
             if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
                 ball.setExplode(position: monster.position)
                 returnBall()
+                points = Points(xPos: monster.xPos, yPos: monster.yPos, value: .fivehundred)
                 score += 500
                 monster.kill()
                 screenData.soundFX.ballHitSound()
@@ -399,14 +404,14 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         }
     }
     
-    func extrasToApples() {
+    private func extrasToApples() {
         for monster in extraMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
             appleArray.add(xPos: monster.xPos, yPos: monster.yPos)
             extraMonsterArray.remove(id: monster.id)
         }
     }
     
-    func catchBall(){
+    private func catchBall(){
         guard ball.catchable else { return }
         if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: mrDo.position, diameter2: mrDo.frameSize.width / 2 ){
             ball.thrown = false
@@ -436,7 +441,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         mrDo.animate()
     }
     
-    func returnBall(){
+    private func returnBall(){
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
             if gameState == .playing {
                 ball.setImplode(position: mrDo.position)

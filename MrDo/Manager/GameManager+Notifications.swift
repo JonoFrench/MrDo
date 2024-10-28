@@ -18,6 +18,8 @@ extension Notification.Name {
     static let notificationKillRedMonster = Notification.Name("NotificationKillRedMonster")
     static let notificationKillExtraMonster = Notification.Name("NotificationKillExtraMonster")
     static let notificationExtraLife = Notification.Name("NotificationExtraLife")
+    static let notificationRemovePoints = Notification.Name("NotificationRemovePoints")
+    static let notificationChaseMode = Notification.Name("NotificationChaseMode")
 }
 
 extension GameManager {
@@ -30,6 +32,8 @@ extension GameManager {
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeRedMonster(notification:)), name: .notificationKillRedMonster, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeExtraMonster(notification:)), name: .notificationKillExtraMonster, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.addExtraLife(notification:)), name: .notificationExtraLife, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.removePoints(notification:)), name: .notificationRemovePoints, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.startChaseMode(notification:)), name: .notificationChaseMode, object: nil)
 
         
         
@@ -92,11 +96,36 @@ extension GameManager {
     }
 
     @objc func removeApple(notification: Notification) {
-        if let id = notification.userInfo?["id"] as? UUID {
+        if let id = notification.userInfo?["id"] as? UUID, let xPos = notification.userInfo?["xPos"] as? Int, let yPos = notification.userInfo?["yPos"] as? Int {
             appleArray.remove(id: id)
+            
+            let total = redMonsterArray.squashCount + extraMonsterArray.squashCount
+            if total > 0 {
+                appleHits(hits: total, xPos: xPos, yPos: yPos)
+                redMonsterArray.squashCount = 0
+                extraMonsterArray.squashCount = 0
+            }
         }
     }
-    
+    private func appleHits(hits:Int,xPos:Int,yPos:Int){
+            if hits == 1 {
+                score += 1000
+                points = Points(xPos: xPos, yPos: yPos, value: .onethousand)
+            } else if hits == 2 {
+                score += 2000
+                points = Points(xPos: xPos, yPos: yPos, value: .twothousand)
+            } else if hits == 3 {
+                score += 4000
+                points = Points(xPos: xPos, yPos: yPos, value: .fourthousand)
+            } else if hits == 4 {
+                score += 6000
+                points = Points(xPos: xPos, yPos: yPos, value: .fourthousand)
+            } else if hits >= 5 {
+                score += 8000
+                points = Points(xPos: xPos, yPos: yPos, value: .eightthousand)
+            }
+        }
+
     @objc func removeRedMonster(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             redMonsterArray.remove(id: id)
@@ -109,6 +138,12 @@ extension GameManager {
     @objc func removeExtraMonster(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             extraMonsterArray.remove(id: id)
+        }
+    }
+
+    @objc func removePoints(notification: Notification) {
+        if points != nil {
+            self.points = nil
         }
     }
 
@@ -130,6 +165,13 @@ extension GameManager {
         }
     }
 
+    @objc func startChaseMode(notification: Notification) {
+        if !chaseMode {
+            chaseMode = true
+            screenData.soundFX.backgroundSoundStop()
+            screenData.soundFX.backgroundFastSound()
+        }
+    }
     
 #if os(tvOS)
     @objc func controllerDidConnect(notification: Notification) {

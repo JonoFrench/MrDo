@@ -17,6 +17,7 @@ final class ExtraMonsterArray: ObservableObject {
     var monsterCount = 0
     var killCount = 0
     var letterAdded = false
+    var squashCount = 0
     
     func move() {
         for monster in monsters {
@@ -95,7 +96,7 @@ final class ExtraMonster:Monster,Moveable,Animatable {
     }
     
     func kill(){
-        currentImage = UIImage(resource: ImageResource(name: "Points500", bundle: .main))
+        currentImage = deadFrame
         monsterState = .dead
         currentAnimationFrame = 0
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
@@ -110,7 +111,7 @@ final class ExtraMonster:Monster,Moveable,Animatable {
             position.y += screenData.assetDimensionStep
             if moveCounter == 8 {
                 moveCounter = 0
-                if screenData.levelData.checkFalling(xPos: xPos, yPos: yPos) || yPos == screenData.screenDimensionY {
+                if screenData.levelData.checkFalling(xPos: xPos, yPos: yPos) || yPos == screenData.screenDimensionY-1 {
                     kill()
                 }
                 yPos += 1
@@ -184,6 +185,67 @@ final class ExtraMonster:Monster,Moveable,Animatable {
             }
         }
     }
+    
+//    func nextDirection() -> MonsterDirection {
+//        var directionArray:[MonsterDirection] = []
+//        if canMoveUp() {directionArray.append(.up)}
+//        if canMoveDown() {directionArray.append(.down)}
+//        if canMoveLeft() {directionArray.append(.left)}
+//        if canMoveRight() {directionArray.append(.right)}
+//        if monsterState == .chasing {
+//            if let doInstance: MrDo = ServiceLocator.shared.resolve() {
+//                /// Dig mode?
+//                if !canMoveLeft() && doInstance.yPos == yPos && doInstance.xPos > xPos {
+//                    return .left
+//                }
+//                if !canMoveRight() && doInstance.yPos == yPos && doInstance.xPos < xPos {
+//                    return .right
+//                }
+//                if !canMoveDown() && doInstance.yPos >= yPos && doInstance.xPos == xPos {
+//                    return .down
+//                }
+//                if !canMoveUp() && doInstance.yPos <= yPos && doInstance.xPos == xPos {
+//                    return .up
+//                }
+//
+//                
+//                
+//                /// Other direction?
+//                if directionArray.contains(.up) && doInstance.yPos < yPos {
+//                    directionArray.append(.up)
+//                }
+//                if directionArray.contains(.down) && doInstance.yPos > yPos {
+//                    directionArray.append(.down)
+//                }
+//                if directionArray.contains(.left) && doInstance.xPos < xPos {
+//                    directionArray.append(.left)
+//                }
+//                if directionArray.contains(.right) && doInstance.xPos > xPos {
+//                    directionArray.append(.right)
+//                }
+//                
+//                if directionArray.contains(.up) && doInstance.xPos == xPos && doInstance.yPos < yPos {
+//                    directionArray.append(.up)
+//                    directionArray.append(.up)
+//                }
+//                if directionArray.contains(.down) && doInstance.xPos == xPos && doInstance.yPos > yPos {
+//                    directionArray.append(.down)
+//                    directionArray.append(.down)
+//                }
+//                if directionArray.contains(.left) && doInstance.yPos == yPos  && doInstance.xPos < xPos{
+//                    directionArray.append(.left)
+//                    directionArray.append(.left)
+//                }
+//                if directionArray.contains(.right) && doInstance.yPos == yPos  && doInstance.xPos > xPos{
+//                    directionArray.append(.right)
+//                    directionArray.append(.right)
+//                }
+//            }
+//        }
+//        let newDir = directionArray[Int.random(in: 0..<directionArray.count)]
+//        setOffsets(direction: newDir)
+//        return newDir
+//    }
     
     private func setSwallowMonster() {
         switch monsterDirection {

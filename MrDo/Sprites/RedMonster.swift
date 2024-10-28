@@ -12,6 +12,7 @@ final class RedMonsterArray: ObservableObject {
     @Published var monsters: [RedMonster] = []
     var monsterCount = 0
     var killCount = 0
+    var squashCount = 0
     
     func move() {
         for monster in monsters {
@@ -19,13 +20,13 @@ final class RedMonsterArray: ObservableObject {
             monster.animate()
         }
     }
-
+    
     func still() {
         for monster in monsters where monster.monsterState == .moving || monster.monsterState == .chasing {
             monster.monsterState = .still
         }
     }
-
+    
     func remove(id:UUID) {
         if let index = monsters.firstIndex(where: {$0.id == id}) {
             monsters.remove(at: index)
@@ -55,11 +56,6 @@ final class RedMonster:Monster,Moveable,Animatable {
     private var chaseUpFrames: [UIImage] = []
     private var chaseDownFrames: [UIImage] = []
     
-    private var stripeRightFrames: [UIImage] = []
-    private var stripeLeftFrames: [UIImage] = []
-    private var stripeUpFrames: [UIImage] = []
-    private var stripeDownFrames: [UIImage] = []
-        
     private var appearCount = 0
     
     private var actualAnimationFrame = 0
@@ -87,7 +83,7 @@ final class RedMonster:Monster,Moveable,Animatable {
     }
     
     func kill(){
-        currentImage = UIImage(resource: ImageResource(name: "Points500", bundle: .main))
+        currentImage = deadFrame
         monsterState = .dead
         currentAnimationFrame = 0
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
@@ -102,7 +98,7 @@ final class RedMonster:Monster,Moveable,Animatable {
             position.y += screenData.assetDimensionStep
             if moveCounter == 8 {
                 moveCounter = 0
-                if screenData.levelData.checkFalling(xPos: xPos, yPos: yPos) || yPos == screenData.screenDimensionY {
+                if screenData.levelData.checkFalling(xPos: xPos, yPos: yPos) || yPos == screenData.screenDimensionY-1 {
                     kill()
                 }
                 yPos += 1
@@ -116,7 +112,14 @@ final class RedMonster:Monster,Moveable,Animatable {
             fall()
             return
         } else {
-            monsterMove()
+            if monsterType == .digmonster {
+                digMove()
+            } else {
+                monsterMove()
+                if currentSpeed == 2 && monsterState != .chasing {
+                    chaseMode()
+                }
+            }
         }
     }
     
@@ -190,7 +193,7 @@ final class RedMonster:Monster,Moveable,Animatable {
         for i in 9..<12 {
             stripeUpFrames.append(getTile(name: "RedMonsters", pos: i,y:2)!)
         }
-
+        
         deadFrame = getTile(name: "RedMonsters", pos: 12,y:0)!
         blankFrame = getTile(name: "RedMonsters", pos: 12,y:1)!
         
@@ -198,23 +201,380 @@ final class RedMonster:Monster,Moveable,Animatable {
         rightFrames = walkRightFrames
         upFrames = walkUpFrames
         downFrames = walkDownFrames
-        
-//        leftFrames = stripeLeftFrames
-//        rightFrames = stripeRightFrames
-//        upFrames = stripeUpFrames
-//        downFrames = stripeDownFrames
-
     }
     
+//    override func nextDirection() -> MonsterDirection {
+//        var directionArray:[MonsterDirection] = []
+//        if canMoveUp() {directionArray.append(.up)}
+//        if canMoveDown() {directionArray.append(.down)}
+//        if canMoveLeft() {directionArray.append(.left)}
+//        if canMoveRight() {directionArray.append(.right)}
+//        if monsterState == .chasing {
+//            if let doInstance: MrDo = ServiceLocator.shared.resolve() {
+//                /// Dig mode?
+//                if !canMoveLeft() && doInstance.yPos == yPos && doInstance.xPos > xPos {
+//                    digMode()
+//                    return .left
+//                }
+//                if !canMoveRight() && doInstance.yPos == yPos && doInstance.xPos < xPos {
+//                    digMode()
+//                    return .right
+//                }
+//                if !canMoveDown() && doInstance.yPos >= yPos && doInstance.xPos == xPos {
+//                    digMode()
+//                    return .down
+//                }
+//                if !canMoveUp() && doInstance.yPos <= yPos && doInstance.xPos == xPos {
+//                    digMode()
+//                    return .up
+//                }
+//
+//                /// Other direction?
+//                if directionArray.contains(.up) && doInstance.yPos < yPos {
+//                    directionArray.append(.up)
+//                }
+//                if directionArray.contains(.down) && doInstance.yPos > yPos {
+//                    directionArray.append(.down)
+//                }
+//                if directionArray.contains(.left) && doInstance.xPos < xPos {
+//                    directionArray.append(.left)
+//                }
+//                if directionArray.contains(.right) && doInstance.xPos > xPos {
+//                    directionArray.append(.right)
+//                }
+//                
+//                if directionArray.contains(.up) && doInstance.xPos == xPos && doInstance.yPos < yPos {
+//                    directionArray.append(.up)
+//                    directionArray.append(.up)
+//                }
+//                if directionArray.contains(.down) && doInstance.xPos == xPos && doInstance.yPos > yPos {
+//                    directionArray.append(.down)
+//                    directionArray.append(.down)
+//                }
+//                if directionArray.contains(.left) && doInstance.yPos == yPos  && doInstance.xPos < xPos{
+//                    directionArray.append(.left)
+//                    directionArray.append(.left)
+//                }
+//                if directionArray.contains(.right) && doInstance.yPos == yPos  && doInstance.xPos > xPos{
+//                    directionArray.append(.right)
+//                    directionArray.append(.right)
+//                }
+//            }
+//        }
+//        let newDir = directionArray[Int.random(in: 0..<directionArray.count)]
+//        setOffsets(direction: newDir)
+//        return newDir
+//    }
+    
+
     private func chaseMode(){
         leftFrames = chaseLeftFrames
         rightFrames = chaseRightFrames
         upFrames = chaseUpFrames
         downFrames = chaseDownFrames
         monsterState = .chasing
+        NotificationCenter.default.post(name: .notificationChaseMode, object: nil, userInfo: nil)
+    }
+    
+    func digMove(){
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            screenData.soundFX.backgroundSoundStop()
-            screenData.soundFX.backgroundFastSound()
+            speedCounter += 1
+            if speedCounter == currentSpeed {
+                speedCounter = 0
+                switch monsterDirection {
+                case .left:
+                    if gridOffsetX == 0 {
+                        if canMoveLeft() || checkApple(xPos: xPos-1, yPos: yPos) {
+                            monsterType = .redmonster
+                            chaseMode()
+                            monsterDirection = nextDirection()
+                            return
+                        }
+                        gridOffsetX = 7
+                        xPos -= 1
+                        checkGridLeft()
+                    } else {
+                        gridOffsetX -= 1
+                    }
+                    position.x -= moveDistance
+                    
+                case .right:
+                    if gridOffsetX == 7 {
+                        if canMoveRight() || checkApple(xPos: xPos+1, yPos: yPos)  {
+                            monsterType = .redmonster
+                            chaseMode()
+                            monsterDirection = nextDirection()
+                            return
+                        }
+                        
+                        gridOffsetX = 0
+                        xPos += 1
+                        checkGridRight()
+                    } else {
+                        gridOffsetX += 1
+                    }
+                    position.x += moveDistance
+                    
+                case .up:
+                    if gridOffsetY == 0 {
+                        if canMoveUp() || checkApple(xPos: xPos, yPos: yPos-1) || yPos == 0 {
+                            monsterType = .redmonster
+                            chaseMode()
+                            monsterDirection = nextDirection()
+                            return
+                        }
+                        gridOffsetY = 7
+                        yPos -= 1
+                        checkGridUp()
+                    } else {
+                        gridOffsetY -= 1
+                    }
+                    position.y -= moveDistance
+                    
+                case .down:
+                    if gridOffsetY == 7 {
+                        if canMoveDown() || checkApple(xPos: xPos, yPos: yPos+1) || yPos == screenData.screenDimensionY - 1 {
+                            monsterType = .redmonster
+                            chaseMode()
+                            monsterDirection = nextDirection()
+                            return
+                        }
+                        gridOffsetY = 0
+                        yPos += 1
+                        checkGridDown()
+                    } else {
+                        gridOffsetY += 1
+                    }
+                    position.y += moveDistance
+                }
+            }
         }
     }
+    
+    
+    private func checkGridUp() {
+        guard yPos > 0 else {return}
+        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            let previousAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+            if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .tl || gridAsset == .tr || gridAsset == .rt { return }
+            
+            if gridAsset == .fu || gridAsset == .ch  {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .rt
+            }
+            if gridAsset == .rl {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .tl
+            }
+            if gridAsset == .rr {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .tr
+            }
+            if gridAsset == .bl {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .ll
+            }
+            if gridAsset == .br {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lr
+            }
+            if gridAsset == .hz {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lt
+            }
+            if gridAsset == .rb {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .vt
+            }
+            if gridAsset == .lb {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .bk
+            }
+            
+            if previousAsset == .rt {
+                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .vt
+            }
+            if previousAsset == .hz {
+                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .lb
+            }
+            if previousAsset == .tr {
+                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .lr
+            }
+            if previousAsset == .tl {
+                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .ll
+            }
+            if previousAsset == .lt {
+                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .bk
+            }
+            if previousAsset == .rl {
+                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .bl
+            }
+            if previousAsset == .rr {
+                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .br
+            }
+            
+            resolvedInstance.objectWillChange.send()
+        }
+    }
+    private func checkGridDown() {
+        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            guard yPos < resolvedInstance.screenDimensionY - 1 else {return}
+            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            let previousAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+            if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .bl || gridAsset == .br || gridAsset == .rb { return }
+            
+            if gridAsset == .fu || gridAsset == .ch  {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .rb
+            }
+            if gridAsset == .rl {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .tl
+            }
+            if gridAsset == .rr {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .tr
+            }
+            if gridAsset == .tl {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .ll
+            }
+            if gridAsset == .tr {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lr
+            }
+            if gridAsset == .hz {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+            }
+            if gridAsset == .rt {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .vt
+            }
+            
+            if previousAsset == .rb {
+                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .vt
+            }
+            if previousAsset == .hz {
+                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .lt
+            }
+            if previousAsset == .br {
+                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .lr
+            }
+            if previousAsset == .bl {
+                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .ll
+            }
+            if previousAsset == .lb {
+                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .bk
+            }
+            if previousAsset == .rl {
+                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .tl
+            }
+            if previousAsset == .rr {
+                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .tr
+            }
+            
+            resolvedInstance.objectWillChange.send()
+        }
+    }
+    private func checkGridLeft() {
+        guard xPos > 0 else {return}
+        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+            if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tl || gridAsset == .bl { return }
+            
+            if gridAsset == .fu || gridAsset == .ch  {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .rl
+            }
+            if gridAsset == .rt {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .tl
+            }
+            if gridAsset == .rb {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .br
+            }
+            if gridAsset == .tr {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lt
+            }
+            if gridAsset == .bl {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+            }
+            if gridAsset == .vt {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .ll
+            }
+            if gridAsset == .rr {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .hz
+            }
+            if gridAsset == .br {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+            }
+            
+            if previousAsset == .rl {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .hz
+            }
+            if previousAsset == .vt {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .lr
+            }
+            if previousAsset == .tl {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .lt
+            }
+            if previousAsset == .bl {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .lb
+            }
+            if previousAsset == .ll {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .bk
+            }
+            if previousAsset == .lr {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .bk
+            }
+            if previousAsset == .rt {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .tr
+            }
+            if previousAsset == .rb {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .br
+            }
+            
+            resolvedInstance.objectWillChange.send()
+        }
+    }
+    private func checkGridRight() {
+        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+            guard xPos < resolvedInstance.screenDimensionX - 1 else {return}
+            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+            if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tr || gridAsset == .br || gridAsset == .rr { return }
+            
+            if gridAsset == .fu || gridAsset == .ch  {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .rr
+            }
+            if gridAsset == .rt {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .tr
+            }
+            if gridAsset == .rb {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .bl
+            }
+            if gridAsset == .tl {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lt
+            }
+            if gridAsset == .br {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+            }
+            if gridAsset == .vt {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .lr
+            }
+            if gridAsset == .rl {
+                resolvedInstance.levelData.tileArray[yPos][xPos] = .hz
+            }
+            
+            if previousAsset == .rr {
+                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .hz
+            }
+            if previousAsset == .vt {
+                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .ll
+            }
+            if previousAsset == .tr {
+                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .lt
+            }
+            if previousAsset == .br {
+                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .lb
+            }
+            if previousAsset == .lr {
+                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .bk
+            }
+            if previousAsset == .rt {
+                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .tl
+            }
+            if previousAsset == .rb {
+                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .bl
+            }
+            resolvedInstance.objectWillChange.send()
+        }
+    }
+    
 }

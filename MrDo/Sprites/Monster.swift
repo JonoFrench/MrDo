@@ -17,7 +17,7 @@ enum MonsterDirection {
 }
 
 enum MonsterType {
-    case letter,redmonster,bluemonster,swallowmonster
+    case letter,redmonster,bluemonster,swallowmonster,digmonster
 }
 
 
@@ -30,6 +30,12 @@ class Monster:SwiftUISprite {
     private var downSet:Set = [TileType.bk,.vt,.ll,.lr,.rb,.bl,.br,.lb]
     private var leftSet:Set = [TileType.bk,.hz,.lt,.lb,.rl,.tl,.bl,.ll]
     private var rightSet:Set = [TileType.bk,.hz,.lt,.lb,.rr,.tr,.br,.lr]
+    var stripeRightFrames: [UIImage] = []
+    var stripeLeftFrames: [UIImage] = []
+    var stripeUpFrames: [UIImage] = []
+    var stripeDownFrames: [UIImage] = []
+    
+
     lazy var deadFrame: UIImage = UIImage()
     lazy var blankFrame: UIImage = UIImage()
     
@@ -79,7 +85,7 @@ class Monster:SwiftUISprite {
                         return
                     }
                     let rndDirection = nextDirection()
-                    if Int.random(in: 0...6) == 1 && rndDirection != .left {
+                    if (Int.random(in: 0...6) == 1 && rndDirection != .left) || monsterType == .digmonster {
                         monsterDirection = rndDirection
                         return
                     } else {
@@ -99,7 +105,7 @@ class Monster:SwiftUISprite {
                         return
                     }
                     let rndDirection = nextDirection()
-                    if Int.random(in: 0...6) == 1 && rndDirection != .right {
+                    if (Int.random(in: 0...6) == 1 && rndDirection != .right) || monsterType == .digmonster  {
                         monsterDirection = rndDirection
                         return
                     } else {
@@ -119,7 +125,7 @@ class Monster:SwiftUISprite {
                         return
                     }
                     let rndDirection = nextDirection()
-                    if Int.random(in: 0...6) == 1 && rndDirection != .up {
+                    if (Int.random(in: 0...6) == 1 && rndDirection != .up) || monsterType == .digmonster {
                         monsterDirection = rndDirection
                         return
                     } else {
@@ -139,7 +145,7 @@ class Monster:SwiftUISprite {
                         return
                     }
                     let rndDirection = nextDirection()
-                    if Int.random(in: 0...6) == 1 && rndDirection != .down {
+                    if (Int.random(in: 0...6) == 1 && rndDirection != .down) || monsterType == .digmonster  {
                         monsterDirection = rndDirection
                         return
                     } else {
@@ -155,6 +161,15 @@ class Monster:SwiftUISprite {
         }
     }
     
+    private func digMode(){
+        leftFrames = stripeLeftFrames
+        rightFrames = stripeRightFrames
+        upFrames = stripeUpFrames
+        downFrames = stripeDownFrames
+        currentSpeed = 6
+        monsterType = .digmonster
+    }
+    
     func nextDirection() -> MonsterDirection {
         var directionArray:[MonsterDirection] = []
         if canMoveUp() {directionArray.append(.up)}
@@ -163,6 +178,29 @@ class Monster:SwiftUISprite {
         if canMoveRight() {directionArray.append(.right)}
         if monsterState == .chasing {
             if let doInstance: MrDo = ServiceLocator.shared.resolve() {
+                /// Dig mode?
+                if !canMoveLeft() && doInstance.yPos == yPos && doInstance.xPos < xPos && !checkApple(xPos: xPos-1, yPos: yPos) {
+                    digMode()
+                    setOffsets(direction: .left)
+                    return .left
+                }
+                if !canMoveRight() && doInstance.yPos == yPos && doInstance.xPos > xPos && !checkApple(xPos: xPos+1, yPos: yPos) {
+                    digMode()
+                    setOffsets(direction: .right)
+                    return .right
+                }
+                if !canMoveDown() && doInstance.yPos > yPos && doInstance.xPos == xPos && !checkApple(xPos: xPos, yPos: yPos+1){
+                    digMode()
+                    setOffsets(direction: .down)
+                   return .down
+                }
+                if !canMoveUp() && doInstance.yPos < yPos && doInstance.xPos == xPos && !checkApple(xPos: xPos, yPos: yPos-1) {
+                    digMode()
+                    setOffsets(direction: .up)
+                    return .up
+                }
+
+                /// Other direction?
                 if directionArray.contains(.up) && doInstance.yPos < yPos {
                     directionArray.append(.up)
                 }
@@ -199,7 +237,7 @@ class Monster:SwiftUISprite {
         return newDir
     }
     
-    private func canMoveUp() -> Bool {
+    func canMoveUp() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             guard yPos > 0 else {
                 return false }
@@ -212,7 +250,7 @@ class Monster:SwiftUISprite {
         return false
     }
     
-    private func canMoveDown() -> Bool {
+    func canMoveDown() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             guard yPos < screenData.screenDimensionY-1 else {
                 return false }
@@ -225,7 +263,7 @@ class Monster:SwiftUISprite {
         return false
     }
     
-    private func canMoveLeft() -> Bool {
+    func canMoveLeft() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             guard xPos > 0 else {
                 return false }
@@ -238,7 +276,7 @@ class Monster:SwiftUISprite {
         return false
     }
     
-    private func canMoveRight() -> Bool {
+    func canMoveRight() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             guard xPos < screenData.screenDimensionX - 1 else {
                 return false }
@@ -251,7 +289,7 @@ class Monster:SwiftUISprite {
         return false
     }
     
-    private func checkApple(xPos:Int,yPos:Int) -> Bool {
+    func checkApple(xPos:Int,yPos:Int) -> Bool {
         ///Is there an apple?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {

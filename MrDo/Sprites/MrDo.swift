@@ -445,6 +445,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if previousAsset == .ll {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .bk
             }
+            if previousAsset == .lr {
+                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .bk
+            }
             if previousAsset == .rt {
                 resolvedInstance.levelData.tileArray[yPos][xPos+1] = .tr
             }
@@ -547,51 +550,49 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     }
     
     func moveLeft() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            facing = .left
-            if (xPos == 0 && gridOffsetX == 2) {return}
-            if appleLeft() && gridOffsetX == 2 && !canPushLeft() { return }
-            print("Do Left offset \(gridOffsetX) xPos \(xPos)")
-            position.x -= moveDistance
-            if isPushing {
-                pushedApple?.position.x -= moveDistance
-                print("pushing apple")
-            }
-            gridOffsetX -= 1
-            if gridOffsetX < 0 {
-                gridOffsetX = Int(GameConstants.tileSteps) / GameConstants.doSpeed - 1
-                if xPos > 0 {
-                    xPos -= 1
-                    checkGridLeft()
-                    if isPushing {
-                        //                        pushedApple?.position.x -= moveDistance
-                        pushedApple?.isPushed = true
-                        pushedApple?.xPos -= 1
-                        isPushing = false
-                    }
+        facing = .left
+        if (xPos == 0 && gridOffsetX == 2) {return}
+        if appleLeft() && gridOffsetX == 2 && !canPushLeft() { return }
+        print("Do Left offset \(gridOffsetX) xPos \(xPos)")
+        position.x -= moveDistance
+        if isPushing {
+            pushedApple?.position.x -= moveDistance
+            print("pushing apple")
+        }
+        gridOffsetX -= 1
+        if gridOffsetX < 0 {
+            gridOffsetX = Int(GameConstants.tileSteps) / GameConstants.doSpeed - 1
+            if xPos > 0 {
+                xPos -= 1
+                checkGridLeft()
+                if isPushing {
+                    //                        pushedApple?.position.x -= moveDistance
+                    pushedApple?.isPushed = true
+                    pushedApple?.xPos -= 1
+                    isPushing = false
                 }
             }
-            animate()
         }
+        animate()
+        
     }
     
     func moveUp() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            facing = .up
-            print("Do up offset \(gridOffsetY) yPos \(yPos)")
-            if (yPos == 0 && gridOffsetY == 3) {return}
-            if appleAbove() { return }
-            position.y -= moveDistance
-            gridOffsetY -= 1
-            if gridOffsetY < 0 {
-                gridOffsetY = Int(GameConstants.tileSteps) / GameConstants.doSpeed - 1
-                if yPos > 0 {
-                    yPos -= 1
-                    checkGridUp()
-                }
+        facing = .up
+        print("Do up offset \(gridOffsetY) yPos \(yPos)")
+        if (yPos == 0 && gridOffsetY == 3) {return}
+        if appleAbove() { return }
+        position.y -= moveDistance
+        gridOffsetY -= 1
+        if gridOffsetY < 0 {
+            gridOffsetY = Int(GameConstants.tileSteps) / GameConstants.doSpeed - 1
+            if yPos > 0 {
+                yPos -= 1
+                checkGridUp()
             }
-            animate()
         }
+        animate()
+        
     }
     func moveDown() {
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {

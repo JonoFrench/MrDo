@@ -68,6 +68,12 @@ struct GameView: View {
                             .position(manager.center.position)
                             .zIndex(1.5)
                     }
+                    if let points = manager.points {
+                        PointsView(points: points)
+                            .position(points.position)
+                            .zIndex(4.5)
+                    }
+
                     if manager.screenData.gameOver {
                         GameOverView(manager: _manager)
                             .position(x:manager.screenData.gameSize.width / 2,y: manager.screenData.gameSize.height / 2).offset(y: -40)

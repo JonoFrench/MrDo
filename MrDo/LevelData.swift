@@ -314,7 +314,6 @@ class LevelData:ObservableObject {
             return blankWalls[yOffset][xOffset] == 1 ? true : false
         case .tb:
             return tbWalls[yOffset][xOffset] == 1 ? true : false
-
         }
     }
     
@@ -332,7 +331,6 @@ class LevelData:ObservableObject {
         tileImages = setTilesFor(level: 10)
     }
 
-    
     func setTilesFor(level:Int) -> [UIImage] {
         var tiles:[UIImage] = []
         for i in 0...17 {
@@ -351,7 +349,6 @@ class LevelData:ObservableObject {
         return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
     }
 
-    
     func getTile(level:Int,pos:Int) -> UIImage? {
         guard let image = UIImage(named: tileImage) else { return nil }
         let scale = image.scale
@@ -360,32 +357,19 @@ class LevelData:ObservableObject {
                                 y: rect.origin.y * scale,
                                 width: rect.size.width * scale,
                                 height: rect.size.height * scale)
-        //        let rect = CGRect(x: pos * 16, y: level * 16, width: 16 * scale, height: 16 * scale)
         guard let cgImage = image.cgImage?.cropping(to: scaledRect) else { return nil }
         return resizeImage(image:UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation),targetSize: CGSize(width: 72, height: 72))
     }
     
     func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage? {
         let size = image.size
-        
         let widthRatio  = targetSize.width  / size.width
         let heightRatio = targetSize.height / size.height
-        
-        // Determine the scale to apply
         let scaleFactor = min(widthRatio, heightRatio)
-        
-        // Calculate the new size to maintain the aspect ratio
-        let scaledImageSize = CGSize(width: size.width * scaleFactor, height: size.height * scaleFactor)
-        
-        // Create a graphics context and draw the image into the context
         UIGraphicsBeginImageContextWithOptions(targetSize, false, 0.0)
         image.draw(in: CGRect(origin: .zero, size: targetSize))
-        
-        // Get the resized image from the context
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        
         UIGraphicsEndImageContext()
-        
         return newImage
     }
 }
