@@ -118,6 +118,12 @@ public enum GameConstants {
         public static let appleBreakAnimation = 0.1
         public static let extraFlashRate = 0.5
     }
+    
+    public enum Sound {
+        public static let effectsVolume:Float = 1.0
+        public static let backgroundVolume:Float = 1.0
+        public static let musicVolume:Float = 1.0
+    }
 }
 
 
