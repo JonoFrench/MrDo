@@ -81,7 +81,8 @@ final class Progress: ObservableObject, Moveable {
             
             if Int(charPosition.x) == halfWay {
                 pauseFrame = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(GameConstants.Delay.progressPauseDelay))
                     pauseFrame = false
                 }
             }

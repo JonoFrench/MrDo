@@ -234,10 +234,13 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         gameState = .playing
         screenData.soundFX.startSound()
         extraHeader()
-        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.monsterSpawnDelay) { [self] in
+        
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.monsterSpawnDelay))
             screenData.soundFX.backgroundSound()
             addRedMonsters()
         }
+
     }
     
     func restartPlaying(){
@@ -245,7 +248,8 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         moveDirection = .stop
         gameState = .playing
         screenData.soundFX.startSound()
-        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.monsterSpawnDelay) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.monsterSpawnDelay))
             screenData.soundFX.backgroundSound()
             redMonsterArray.moving()
             extraMonsterArray.moving()
@@ -270,7 +274,8 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         gameState = .levelend
         chaseMode = false
         center.collected = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.levelEndDelay) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.levelEndDelay))
             mrDo.reset()
             ball.reset()
             
@@ -292,11 +297,12 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         progress = Progress()
         gameState = .progress
         screenData.soundFX.progressSound()
-            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.showNextLevelDelay) { [self] in
-            screenData.level += 1
-            screenData.gameLevel += 1
-            startPlaying()
-        }
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(GameConstants.Delay.showNextLevelDelay))
+                screenData.level += 1
+                screenData.gameLevel += 1
+                startPlaying()
+            }
     } else {
         if screenData.level % 10 == 0 {
             progress10()
@@ -356,7 +362,8 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             return
         }
         extraMonsterArray.add(xPos: 5, yPos: 0,letterPos: extraCurrent)
-        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.extraMonsterSpawnDelay) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.extraMonsterSpawnDelay))
             addExtraMonsters()
         }
     }
@@ -366,11 +373,13 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             return
         }
         redMonsterArray.add(xPos: 5, yPos: 6)
-        DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in:0...4) + GameConstants.Delay.monsterSpawnDelay) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.monsterSpawnDelay))
             addRedMonsters()
             if redMonsterArray.monsterCount == 6 {
                 center.setBonusFood(level: screenData.level)
             }
+
         }
     }
     
@@ -404,8 +413,10 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
                 } else {
                     extraCollected[extraCurrent] = true
                     extrasToApples()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.nextLevelDelay) { [self] in
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(GameConstants.Delay.nextLevelDelay))
                         nextLevel(endType: .extramonster)
+
                     }
                 }
                 return
@@ -475,7 +486,8 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
     }
     
     private func returnBall(){
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.returnBallDelay))
             if gameState == .playing {
                 ball.setImplode(position: mrDo.position)
                 screenData.soundFX.ballResetSound()

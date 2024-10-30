@@ -93,7 +93,7 @@ final class ExtraLife: ObservableObject, Moveable {
             extraPosition = CGPoint(x: screenData.gameSize.width / 4, y: screenData.gameSize.height - extraAdjust)
             flagPosition = CGPoint(x: screenData.gameSize.width - flagAdjustWidth, y: screenData.gameSize.height / 2 - flagAdjustHeight)
             state = .scrolling
-       }
+        }
     }
     
     func move() {
@@ -122,11 +122,11 @@ final class ExtraLife: ObservableObject, Moveable {
                     state = .flagwaving
                     monsterImage = ImageResource(name: "ExtraLife2", bundle: .main)
                     ball.setExplode(position: doBallPosition)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(GameConstants.Delay.extraLifeDelay1))
                         ball.setImplode(position: extraPosition)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            NotificationCenter.default.post(name: .notificationExtraLife, object: nil, userInfo: nil)
-                        }
+                        try? await Task.sleep(for: .seconds(GameConstants.Delay.extraLifeDelay2))
+                        NotificationCenter.default.post(name: .notificationExtraLife, object: nil, userInfo: nil)
                     }
                 }
             }

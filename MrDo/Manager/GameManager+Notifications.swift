@@ -62,8 +62,10 @@ extension GameManager {
     
     @objc func addExtraLife(notification: Notification) {
         lives += 1
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(3.0))
             checkNextLevel()
+            
         }
     }
     
@@ -71,25 +73,25 @@ extension GameManager {
         lives -= 1
         screenData.soundFX.backgroundStopAll()
         if lives == 0 {
-            endTime = Date()
-            let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
-            gameTime += Int(difference)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+            Task { @MainActor in
+                endTime = Date()
+                let difference = endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970
+                gameTime += Int(difference)
+                try? await Task.sleep(for: .seconds(GameConstants.Delay.gameOverDelay1))
                 screenData.soundFX.gameOverSound()
                 screenData.gameOver = true
-                self.objectWillChange.send()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [self] in
-                    if hiScores.isNewHiScore(score: score,level: screenData.level, time: gameTime) {
-                        hiScores.resetInput()
-                        gameState = .highscore
-                        screenData.soundFX.nameEntrySound()
-                    } else {
-                        gameState = .intro
-                    }
+                try? await Task.sleep(for: .seconds(GameConstants.Delay.gameOverDelay2))
+                if hiScores.isNewHiScore(score: score,level: screenData.level, time: gameTime) {
+                    hiScores.resetInput()
+                    gameState = .highscore
+                    screenData.soundFX.nameEntrySound()
+                } else {
+                    gameState = .intro
                 }
             }
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [self] in
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2.5))
                 restartPlaying()
             }
         }

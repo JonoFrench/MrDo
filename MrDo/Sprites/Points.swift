@@ -18,7 +18,8 @@ final class Points: SwiftUISprite {
         super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.pointsSize)
         setPoints(value: value)
         ///Show the points then remove after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.removePointsDelay))
             NotificationCenter.default.post(name: .notificationRemovePoints, object: nil, userInfo: nil)
         }
     }

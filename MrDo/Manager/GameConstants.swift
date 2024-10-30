@@ -71,6 +71,17 @@ public enum GameConstants {
         public static let extraMonsterSpawnDelay = 1.5
         public static let nextLevelDelay = 2.0
         public static let showNextLevelDelay = 10.0
+        public static let progress10Delay = 10.0
+        public static let gameOverDelay1 = 1.5
+        public static let gameOverDelay2 = 5.0
+        public static let progressPauseDelay = 1.0
+        public static let monsterKillDelay = 1.0
+        public static let extraLetterDelay = 1.5
+        public static let removePointsDelay = 1.5
+        public static let extraLifeDelay1 = 2.0
+        public static let extraLifeDelay2 = 1.0
+        public static let returnBallDelay = 2.0
+        public static let extraHeaderDelay = 2.0
     }
     
     public enum Score {

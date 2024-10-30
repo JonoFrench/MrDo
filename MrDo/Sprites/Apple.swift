@@ -16,7 +16,7 @@ enum AppleState {
 
 final class AppleArray: ObservableObject {
     @Published var apples: [Apple] = []
-
+    
     func move() {
         for apple in apples where apple.appleState == .falling {
             apple.move()
@@ -51,8 +51,7 @@ final class AppleArray: ObservableObject {
             }
         }
     }
-    
-    
+        
     func remove(id:UUID) {
         if let index = apples.firstIndex(where: {$0.id == id}) {
             apples.remove(at: index)
@@ -115,14 +114,11 @@ final class Apple:SwiftUISprite,Moveable {
                 speedCounter = 0
                 moveCounter += 1
                 position.y += screenData.assetDimensionStep
-                print("Apple falling moveCounter \(moveCounter) pos \(position.y)")
                 if moveCounter == 8 {
                     moveCounter = 0
                     dropLevel += 1
                     let checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
-                    print("Apple YPos checkAsset \(checkAsset)")
                     if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
-                        print("Apple fall checkAsset \(checkAsset) dropLevel \(dropLevel)")
                         if dropLevel > 1 {
                             breakApple()
                         } else {
@@ -139,17 +135,16 @@ final class Apple:SwiftUISprite,Moveable {
     
     func dislodge() {
         appleState = .dislodged
-        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
-            currentImage = appleFrames[2]
-            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(GameConstants.Animation.appleAnimation))
+                currentImage = appleFrames[2]
+                try? await Task.sleep(for: .seconds(GameConstants.Animation.appleAnimation))
                 currentImage = appleFrames[0]
-                DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
-                    currentImage = appleFrames[1]
-                    appleState = .falling
-                    if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-                        screenData.soundFX.appleDropSound()
-                    }
-                }
+                try? await Task.sleep(for: .seconds(GameConstants.Animation.appleAnimation))
+                currentImage = appleFrames[1]
+                appleState = .falling
+                screenData.soundFX.appleDropSound()
             }
         }
     }
@@ -158,21 +153,22 @@ final class Apple:SwiftUISprite,Moveable {
         appleState = .breaking
         leftImage = getTile(name: "AppleEnd", pos: 0)!
         rightImage = getTile(name: "AppleEnd", pos: 1)!
-        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleBreakAnimation) { [self] in
-            if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(GameConstants.Animation.appleBreakAnimation))
                 screenData.soundFX.appleDropSoundStop()
                 screenData.soundFX.appleBreakSound()
-            }
-            leftImage = getTile(name: "AppleEnd", pos: 2)!
-            rightImage = getTile(name: "AppleEnd", pos: 3)!
-            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleBreakAnimation) { [self] in
+                leftImage = getTile(name: "AppleEnd", pos: 2)!
+                rightImage = getTile(name: "AppleEnd", pos: 3)!
+                try? await Task.sleep(for: .seconds(GameConstants.Animation.appleBreakAnimation))
                 leftImage = getTile(name: "AppleEnd", pos: 4)!
                 rightImage = getTile(name: "AppleEnd", pos: 5)!
-                DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
-                    //let appleID:[String: UUID] = ["id": self.id]
-                    let appleID: [String: Any] = ["id": self.id, "xPos": self.xPos,"yPos":self.yPos]
-                    NotificationCenter.default.post(name: .notificationRemoveApple, object: nil, userInfo: appleID)
-                }
+                try? await Task.sleep(for: .seconds(GameConstants.Animation.appleAnimation))
+                let appleID: [String: Any] = [
+                    "id": self.id,
+                    "xPos": self.xPos,
+                    "yPos":self.yPos]
+                NotificationCenter.default.post(name: .notificationRemoveApple, object: nil, userInfo: appleID)
             }
         }
     }

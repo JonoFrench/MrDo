@@ -51,7 +51,8 @@ final class ExtraMonsterArray: ObservableObject {
         monsterCount += 1
         letterAdded = true
         if monsterCount == 6 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(GameConstants.Delay.extraLetterDelay))
                 monsters[0].monsterState = .appearing
             }
         }
@@ -101,7 +102,8 @@ final class ExtraMonster:Monster,Moveable,Animatable {
         currentImage = deadFrame
         monsterState = .dead
         currentAnimationFrame = 0
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.monsterKillDelay))
             let monsterID:[String: UUID] = ["id": self.id]
             NotificationCenter.default.post(name: .notificationKillExtraMonster, object: nil, userInfo: monsterID)
         }

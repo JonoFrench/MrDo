@@ -8,7 +8,7 @@
 import Foundation
 
 extension GameManager {
-   
+    
     func setDataForLevel(level:Int) {
         appleArray.apples.removeAll()
         center = Center(xPos: 5, yPos: 6)
@@ -24,7 +24,7 @@ extension GameManager {
         case 8: level8Data()
         case 9: level9Data()
         case 10: level10Data()
-
+            
         default:
             level1Data()
         }
@@ -39,7 +39,7 @@ extension GameManager {
         appleArray.add(xPos: 2, yPos: 5)
         appleArray.add(xPos: 7, yPos: 8)
     }
- 
+    
     func level2Data(){
         mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 8, yPos: 1)
@@ -50,7 +50,7 @@ extension GameManager {
         appleArray.add(xPos: 3, yPos: 4)
         appleArray.add(xPos: 7, yPos: 8)
     }
-
+    
     func level3Data(){
         mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 5, yPos: 1)
@@ -70,7 +70,7 @@ extension GameManager {
         appleArray.add(xPos: 6, yPos: 5)
         appleArray.add(xPos: 10, yPos: 7)
     }
-
+    
     func level5Data(){
         mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 5, yPos: 1)
@@ -80,7 +80,7 @@ extension GameManager {
         appleArray.add(xPos: 8, yPos: 6)
         appleArray.add(xPos: 7, yPos: 7)
     }
-
+    
     func level6Data(){
         mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 5, yPos: 1)
@@ -126,7 +126,7 @@ extension GameManager {
         appleArray.add(xPos: 10, yPos: 5)
         appleArray.add(xPos: 6, yPos: 9)
     }
-
+    
     func setExtraFrames() {
         extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 0)!)
         extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 3)!)
@@ -138,7 +138,8 @@ extension GameManager {
     /// Move the EXTRA monster along the Header whilst playing.
     func extraHeader() {
         if gameState == .playing {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [self] in
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(GameConstants.Delay.extraHeaderDelay))
                 extraCurrent += 1
                 extraHeader()
             }
@@ -148,9 +149,11 @@ extension GameManager {
     /// Extra Life screen. Flash the EXTRA box at the top of the screen.
     func extraFlash() {
         if gameState == .extralife {
-            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.extraFlashRate) { [self] in
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(GameConstants.Animation.extraFlashRate))
                 extraLifeFlashOn = !extraLifeFlashOn
                 extraFlash()
+                
             }
         } else {
             extraLifeFlashOn = true
@@ -162,7 +165,8 @@ extension GameManager {
         screenData.levelData.setProgress10Data()
         screenData.soundFX.backgroundStopAll()
         screenData.soundFX.progressSound()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.progress10Delay))
             screenData.level += 1
             screenData.gameLevel += 1
             startPlaying()

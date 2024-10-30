@@ -19,7 +19,7 @@ extension GameManager {
             // Respond to button presses and axis movements
             gamepad.buttonA.pressedChangedHandler = { [self] (button, value, pressed) in
                 if pressed {
-                    DispatchQueue.main.async { [self] in
+                    Task { @MainActor in
                         print("Button A pressed")
                         if gameState == .intro {
                             startGame()
@@ -32,8 +32,7 @@ extension GameManager {
                 }
                 
                 gamepad.dpad.valueChangedHandler = {[unowned self] _, xValue, yValue in
-                    //                print("Dpad moved: x = \(xValue), y = \(yValue)")
-                    DispatchQueue.main.async { [self] in
+                    Task { @MainActor in
                         if xValue == 0.0 && yValue == 0.0 {
                             if gameState == .playing {
                                 self.moveDirection = .stop
@@ -67,33 +66,35 @@ extension GameManager {
                 }
                 
                 gamepad.leftThumbstick.valueChangedHandler = { [self] (dpad, xValue, yValue) in
-                    if xValue == 0.0 && yValue == 0.0 {
-                        if gameState == .playing {
-                            self.moveDirection = .stop
-                        }
-                    } else
-                    if xValue < 0.0 {
-                        if gameState == .playing {
-                            self.moveDirection = .left
-                        }
-                    } else
-                    if xValue > 0.0 {
-                        if gameState == .playing {
-                            self.moveDirection = .right
-                        }
-                    } else
-                    if yValue < 0.0 {
-                        if gameState == .playing {
-                            self.moveDirection = .down
-                        } else if gameState == .highscore {
-                            hiScores.letterDown()
-                        }
-                    } else
-                    if yValue > 0.0 {
-                        if gameState == .playing {
-                            self.moveDirection = .up
-                        } else if gameState == .highscore {
-                            hiScores.letterUp()
+                    Task { @MainActor in
+                        if xValue == 0.0 && yValue == 0.0 {
+                            if gameState == .playing {
+                                self.moveDirection = .stop
+                            }
+                        } else
+                        if xValue < 0.0 {
+                            if gameState == .playing {
+                                self.moveDirection = .left
+                            }
+                        } else
+                        if xValue > 0.0 {
+                            if gameState == .playing {
+                                self.moveDirection = .right
+                            }
+                        } else
+                        if yValue < 0.0 {
+                            if gameState == .playing {
+                                self.moveDirection = .down
+                            } else if gameState == .highscore {
+                                hiScores.letterDown()
+                            }
+                        } else
+                        if yValue > 0.0 {
+                            if gameState == .playing {
+                                self.moveDirection = .up
+                            } else if gameState == .highscore {
+                                hiScores.letterUp()
+                            }
                         }
                     }
                 }

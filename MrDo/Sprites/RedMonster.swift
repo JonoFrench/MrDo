@@ -88,7 +88,8 @@ final class RedMonster:Monster,Moveable,Animatable {
         currentImage = deadFrame
         monsterState = .dead
         currentAnimationFrame = 0
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.monsterKillDelay))
             let monsterID:[String: UUID] = ["id": self.id]
             NotificationCenter.default.post(name: .notificationKillRedMonster, object: nil, userInfo: monsterID)
         }
@@ -204,70 +205,6 @@ final class RedMonster:Monster,Moveable,Animatable {
         upFrames = walkUpFrames
         downFrames = walkDownFrames
     }
-    
-//    override func nextDirection() -> MonsterDirection {
-//        var directionArray:[MonsterDirection] = []
-//        if canMoveUp() {directionArray.append(.up)}
-//        if canMoveDown() {directionArray.append(.down)}
-//        if canMoveLeft() {directionArray.append(.left)}
-//        if canMoveRight() {directionArray.append(.right)}
-//        if monsterState == .chasing {
-//            if let doInstance: MrDo = ServiceLocator.shared.resolve() {
-//                /// Dig mode?
-//                if !canMoveLeft() && doInstance.yPos == yPos && doInstance.xPos > xPos {
-//                    digMode()
-//                    return .left
-//                }
-//                if !canMoveRight() && doInstance.yPos == yPos && doInstance.xPos < xPos {
-//                    digMode()
-//                    return .right
-//                }
-//                if !canMoveDown() && doInstance.yPos >= yPos && doInstance.xPos == xPos {
-//                    digMode()
-//                    return .down
-//                }
-//                if !canMoveUp() && doInstance.yPos <= yPos && doInstance.xPos == xPos {
-//                    digMode()
-//                    return .up
-//                }
-//
-//                /// Other direction?
-//                if directionArray.contains(.up) && doInstance.yPos < yPos {
-//                    directionArray.append(.up)
-//                }
-//                if directionArray.contains(.down) && doInstance.yPos > yPos {
-//                    directionArray.append(.down)
-//                }
-//                if directionArray.contains(.left) && doInstance.xPos < xPos {
-//                    directionArray.append(.left)
-//                }
-//                if directionArray.contains(.right) && doInstance.xPos > xPos {
-//                    directionArray.append(.right)
-//                }
-//
-//                if directionArray.contains(.up) && doInstance.xPos == xPos && doInstance.yPos < yPos {
-//                    directionArray.append(.up)
-//                    directionArray.append(.up)
-//                }
-//                if directionArray.contains(.down) && doInstance.xPos == xPos && doInstance.yPos > yPos {
-//                    directionArray.append(.down)
-//                    directionArray.append(.down)
-//                }
-//                if directionArray.contains(.left) && doInstance.yPos == yPos  && doInstance.xPos < xPos{
-//                    directionArray.append(.left)
-//                    directionArray.append(.left)
-//                }
-//                if directionArray.contains(.right) && doInstance.yPos == yPos  && doInstance.xPos > xPos{
-//                    directionArray.append(.right)
-//                    directionArray.append(.right)
-//                }
-//            }
-//        }
-//        let newDir = directionArray[Int.random(in: 0..<directionArray.count)]
-//        setOffsets(direction: newDir)
-//        return newDir
-//    }
-    
 
     private func chaseMode(){
         leftFrames = chaseLeftFrames
@@ -352,7 +289,6 @@ final class RedMonster:Monster,Moveable,Animatable {
             }
         }
     }
-    
     
     private func checkGridUp() {
         guard yPos > 0 else {return}
