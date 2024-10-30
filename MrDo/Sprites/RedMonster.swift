@@ -26,7 +26,13 @@ final class RedMonsterArray: ObservableObject {
             monster.monsterState = .still
         }
     }
-    
+
+    func moving() {
+        for monster in monsters where monster.monsterState == .still {
+            monster.monsterState = .moving
+        }
+    }
+
     func remove(id:UUID) {
         if let index = monsters.firstIndex(where: {$0.id == id}) {
             monsters.remove(at: index)
@@ -44,7 +50,7 @@ final class RedMonsterArray: ObservableObject {
 
 final class RedMonster:Monster,Moveable,Animatable {
     static var animateFrames: Int = 0
-    static var speed: Int = GameConstants.monsterSpeed
+    static var speed: Int = GameConstants.Speed.monsterSpeed
     
     private var walkRightFrames: [UIImage] = []
     private var walkLeftFrames: [UIImage] = []
@@ -62,11 +68,7 @@ final class RedMonster:Monster,Moveable,Animatable {
     private var increaseSpeedCounter = 0
     
     init(xPos: Int, yPos: Int) {
-#if os(iOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 28, height:  28))
-#elseif os(tvOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 52, height:  52))
-#endif
+        super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.redMonsterSize)
         setImages()
         currentImage = walkRightFrames[0]
         actualAnimationFrame = 0
@@ -242,7 +244,7 @@ final class RedMonster:Monster,Moveable,Animatable {
 //                if directionArray.contains(.right) && doInstance.xPos > xPos {
 //                    directionArray.append(.right)
 //                }
-//                
+//
 //                if directionArray.contains(.up) && doInstance.xPos == xPos && doInstance.yPos < yPos {
 //                    directionArray.append(.up)
 //                    directionArray.append(.up)

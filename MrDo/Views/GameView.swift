@@ -28,9 +28,7 @@ struct GameView: View {
                 }
             }
             else if manager.gameState == .extralife {
-//                ZStack(alignment: .center) {
                 ExtraLifeView(extraLife:manager.extraLife,ball: manager.extraLife.ball)
-//                }
             } else {
                 ZStack(alignment: .center) {
                     ScreenView(gameScreen: manager.screenData)

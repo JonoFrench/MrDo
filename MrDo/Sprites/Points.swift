@@ -15,11 +15,7 @@ enum PointValues {
 final class Points: SwiftUISprite {
 
     init(xPos: Int, yPos: Int,value:PointValues) {
-#if os(iOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 40, height:  24))
-#elseif os(tvOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 80, height:  48))
-#endif
+        super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.pointsSize)
         setPoints(value: value)
         ///Show the points then remove after 2 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {

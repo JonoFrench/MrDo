@@ -22,6 +22,6 @@ struct ImageView: View {
 }
 
 #Preview {
-    ImageView(image: ImageResource(name: "Girder", bundle: .main),frameSize: CGSize(width: 13.1, height: 13.1))
+    ImageView(image: ImageResource(name: "Life", bundle: .main),frameSize: CGSize(width: 13.1, height: 13.1))
 }
 

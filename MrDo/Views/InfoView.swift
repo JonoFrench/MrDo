@@ -8,28 +8,23 @@
 import SwiftUI
 
 struct InfoView: View {
-#if os(iOS)
-    static var starttextSize:CGFloat = 14
-#elseif os(tvOS)
-    static var starttextSize:CGFloat = 28
-#endif
     var body: some View {
         VStack {
             Image("Title")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-
+            
             //            Spacer()
-//            Image("Instructions")
-//                .resizable()
-//                .aspectRatio(contentMode: .fit)
-//                .frame(width: 50, height: 50)
-//                .rotationEffect(.degrees(90))
+            //            Image("Instructions")
+            //                .resizable()
+            //                .aspectRatio(contentMode: .fit)
+            //                .frame(width: 50, height: 50)
+            //                .rotationEffect(.degrees(90))
             Spacer()
-            Text(GameConstants.startText)
+            Text(GameConstants.Text.startText)
                 .foregroundStyle(.red)
-                .font(.custom("MrDo-Arcade", size: InfoView.starttextSize))
-//            Spacer()
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.starttextSize))
+            //            Spacer()
         }.background(.black)
     }
 }

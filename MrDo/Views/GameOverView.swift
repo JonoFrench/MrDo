@@ -9,11 +9,6 @@ import SwiftUI
 
 struct GameOverView: View {
     @EnvironmentObject var manager: GameManager
-#if os(iOS)
-    static var textSize:CGFloat = 14
-#elseif os(tvOS)
-    static var textSize:CGFloat = 28
-#endif
 
     var body: some View {
         ZStack {
@@ -23,7 +18,7 @@ struct GameOverView: View {
                 .overlay(alignment: .center, content: {
                     Text("GAME OVER")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: GameOverView.textSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.starttextSize))
                 })
         }
     }

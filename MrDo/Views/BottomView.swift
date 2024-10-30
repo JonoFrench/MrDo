@@ -9,21 +9,12 @@ import SwiftUI
 
 struct BottomView: View {
     @EnvironmentObject var manager: GameManager
-#if os(iOS)
-    static var topTextSize:CGFloat = 14
-    static var copyTextSize:CGFloat = 12
-    static var liveSize = CGSize(width: 24, height: 24)
-#elseif os(tvOS)
-    static var topTextSize:CGFloat = 28
-    static var copyTextSize:CGFloat = 28
-    static var liveSize = CGSize(width: 48, height: 48)
-#endif
 
     var body: some View {
         HStack {
             HStack(alignment: .firstTextBaseline, spacing: 4) {  // Adjust spacing to bring images closer
                 ForEach(0..<manager.lives, id: \.self) { _ in
-                    ImageView(image: ImageResource(name: "Life", bundle: .main), frameSize: BottomView.liveSize)
+                    ImageView(image: ImageResource(name: "Life", bundle: .main), frameSize: GameConstants.Size.lifeSize)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)  // Make the HStack left-justified
@@ -31,13 +22,20 @@ struct BottomView: View {
             VStack(alignment: .leading, content: {
                 Text("SCENE....\(String(format: "%02d", manager.screenData.gameLevel))")
                     .foregroundStyle(.green)
-                    .font(.custom("MrDo-Arcade", size: BottomView.topTextSize))
+                    .font(.custom("MrDo-Arcade", size: GameConstants.Text.starttextSize))
                     .padding([.trailing])
                 Text("TOP  \(String(format: "%06d", manager.hiScores.highScore))")
                     .foregroundStyle(.red)
-                    .font(.custom("MrDo-Arcade", size: BottomView.topTextSize))
+                    .font(.custom("MrDo-Arcade", size: GameConstants.Text.starttextSize))
                     .padding([.trailing])
             })
         }.zIndex(2.0)
     }
+}
+
+#Preview {
+    BottomView()
+        .environmentObject(GameManager())
+        .frame(height: 100)
+        .background(.black)
 }

@@ -24,7 +24,7 @@ struct explodeBall {
 
 
 final class Ball:SwiftUISprite, Moveable {
-    static var speed: Int = GameConstants.ballSpeed
+    static var speed: Int = GameConstants.Speed.ballSpeed
     var thrown = false
     @Published
     var exploding = false
@@ -45,11 +45,7 @@ final class Ball:SwiftUISprite, Moveable {
     var implodePosition = CGPoint()
     var explodePosition = CGPoint()
     init() {
-#if os(iOS)
-        super.init(xPos: 0, yPos: 0, frameSize: CGSize(width: 12, height:  12))
-#elseif os(tvOS)
-        super.init(xPos: 0, yPos: 0, frameSize: CGSize(width: 36, height:  36))
-#endif
+        super.init(xPos: 0, yPos: 0, frameSize: GameConstants.Size.ballSize)
     }
     
     func setPosition(xPos: Int, yPos: Int, ballDirection: BallDirection) {
@@ -93,7 +89,7 @@ final class Ball:SwiftUISprite, Moveable {
     
     func move() {
         speedCounter += 1
-        if speedCounter == GameConstants.ballSpeed {
+        if speedCounter == GameConstants.Speed.ballSpeed {
 //            currentFrame = ballSwitch ? ImageResource(name: "Ball1", bundle: .main) : ImageResource(name: "Ball2", bundle: .main)
 //            ballSwitch = !ballSwitch
             switch direction {
@@ -722,4 +718,3 @@ final class Ball:SwiftUISprite, Moveable {
         
     }
 }
-

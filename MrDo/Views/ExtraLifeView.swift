@@ -7,34 +7,11 @@
 
 import SwiftUI
 
-struct WidthKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 struct ExtraLifeView: View {
     @EnvironmentObject var manager: GameManager
     @ObservedObject var extraLife: ExtraLife
     @ObservedObject var ball:Ball
 
-#if os(iOS)
-    static var titleTextSize:CGFloat = 18
-    static var subTitleTextSize:CGFloat = 12
-    static var scoreTextSize:CGFloat = 16
-    static var starttextSize:CGFloat = 14
-    static var typeSize = 30.0
-    static var wonderSize = CGSize(width: 0, height: 236)
-#elseif os(tvOS)
-    static var titleTextSize:CGFloat = 28
-    static var subTitleTextSize:CGFloat = 24
-    static var scoreTextSize:CGFloat = 24
-    static var starttextSize:CGFloat = 28
-    static var typeSize = 60.0
-    static var wonderSize = CGSize(width: 0, height: 586)
-#endif
-    
     var body: some View {
         ZStack {
             ZStack(alignment: .center) {
@@ -96,24 +73,24 @@ struct ExtraLifeView: View {
                         Text("")
                         Text("CONGRATULATIONS")
                             .foregroundStyle(.yellow)
-                            .font(.custom("MrDo-Arcade", size: ExtraLifeView.titleTextSize))
+                            .font(.custom("MrDo-Arcade", size: GameConstants.Text.titleTextSize))
                             .padding([.leading, .trailing])
                             .lineLimit(1)
                             .fixedSize()
                         Text("YOU WIN")
                             .foregroundStyle(.black)
-                            .font(.custom("MrDo-Arcade", size: ExtraLifeView.titleTextSize))
+                            .font(.custom("MrDo-Arcade", size: GameConstants.Text.titleTextSize))
                             .padding([.leading])
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
                             Text("EXTRA")
                                 .foregroundStyle(.black)
-                                .font(.custom("MrDo-Arcade", size: ExtraLifeView.titleTextSize))
+                                .font(.custom("MrDo-Arcade", size: GameConstants.Text.titleTextSize))
                                 .padding([.leading])
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Text("MR DO!")
                                 .foregroundStyle(.pink)
-                                .font(.custom("MrDo-Arcade", size: ExtraLifeView.titleTextSize))
+                                .font(.custom("MrDo-Arcade", size: GameConstants.Text.titleTextSize))
                                 .padding([.trailing])
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                         }
@@ -126,4 +103,10 @@ struct ExtraLifeView: View {
             }
         }
     }
+}
+
+#Preview {
+    ExtraLifeView(extraLife: ExtraLife(), ball: Ball())
+        .environmentObject(GameManager())
+        .background(.green)
 }

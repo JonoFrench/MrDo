@@ -22,19 +22,19 @@ enum LevelEndType {
     case cherry,redmonster,extramonster
 }
 
-struct GameConstants {
-    static let tileSteps = 8.0
-    static let doSpeed = 2
-    static let ballSpeed = 2
-    static let monsterSpeed = 4
-#if os(iOS)
-    static var doSize = CGSize(width: 32, height: 32)
-   static var startText = "PRESS JUMP TO START"
-#elseif os(tvOS)
-    static var doSize = CGSize(width: 64, height: 64)
-    static var startText = "PRESS A TO START"
-#endif
-}
+//struct GameConstants {
+//    static let tileSteps = 8.0
+//    static let doSpeed = 2
+//    static let ballSpeed = 2
+//    static let monsterSpeed = 4
+//#if os(iOS)
+//    static var doSize = CGSize(width: 32, height: 32)
+//   static var startText = "PRESS JUMP TO START"
+//#elseif os(tvOS)
+//    static var doSize = CGSize(width: 64, height: 64)
+//    static var startText = "PRESS A TO START"
+//#endif
+//}
 
 struct LevelScores {
     let id = UUID()
@@ -65,7 +65,7 @@ class GameManager: ObservableObject {
         }
     }
     @ObservedObject
-    var mrDo:MrDo = MrDo(xPos: 0, yPos: 0, frameSize: GameConstants.doSize)
+    var mrDo:MrDo = MrDo(xPos: 0, yPos: 0, frameSize: GameConstants.Size.doSize)
     @ObservedObject
     var appleArray:AppleArray = AppleArray()
     @ObservedObject
@@ -135,7 +135,7 @@ class GameManager: ObservableObject {
         gameScreen.assetDimension = gameScreen.gameSize.height / 14 //Double(gameScreen.screenDimensionX + 3)
 #endif
 print("Asset dim \(screenData.assetDimension) width should be \(screenData.assetDimension * 12)")
-        screenData.assetDimensionStep = screenData.assetDimension / GameConstants.tileSteps
+        screenData.assetDimensionStep = screenData.assetDimension / GameConstants.Speed.tileSteps
         lives = 3
         score = 0
         gameTime = 0
@@ -234,7 +234,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         gameState = .playing
         screenData.soundFX.startSound()
         extraHeader()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.monsterSpawnDelay) { [self] in
             screenData.soundFX.backgroundSound()
             addRedMonsters()
         }
@@ -245,8 +245,10 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         moveDirection = .stop
         gameState = .playing
         screenData.soundFX.startSound()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.monsterSpawnDelay) { [self] in
             screenData.soundFX.backgroundSound()
+            redMonsterArray.moving()
+            extraMonsterArray.moving()
         }
     }
     
@@ -268,7 +270,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         gameState = .levelend
         chaseMode = false
         center.collected = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.levelEndDelay) { [self] in
             mrDo.reset()
             ball.reset()
             
@@ -290,7 +292,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         progress = Progress()
         gameState = .progress
         screenData.soundFX.progressSound()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.showNextLevelDelay) { [self] in
             screenData.level += 1
             screenData.gameLevel += 1
             startPlaying()
@@ -332,6 +334,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
     
     private func doHandling() {
         mrDo.move()
+        guard mrDo.doState != .dead && mrDo.doState != .falling else { return}
         /// Collect the bonus food and enter EXTRA mode
         if mrDo.xPos == 5 && mrDo.yPos == 6 && center.collectible == true {
             center.collectBonusFood()
@@ -342,6 +345,10 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             extraAppearing = true
             addExtraMonsters()
         }
+        ///So we can test everything else!
+        if !turnOffCollisions {
+            doCaught()
+        }
     }
     
     private func addExtraMonsters(){
@@ -349,7 +356,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             return
         }
         extraMonsterArray.add(xPos: 5, yPos: 0,letterPos: extraCurrent)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.extraMonsterSpawnDelay) { [self] in
             addExtraMonsters()
         }
     }
@@ -359,7 +366,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             return
         }
         redMonsterArray.add(xPos: 5, yPos: 6)
-        DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in:0...5) + 2.0) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in:0...4) + GameConstants.Delay.monsterSpawnDelay) { [self] in
             addRedMonsters()
             if redMonsterArray.monsterCount == 6 {
                 center.setBonusFood(level: screenData.level)
@@ -373,7 +380,8 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
                 ball.setExplode(position: monster.position)
                 returnBall()
                 points = Points(xPos: monster.xPos, yPos: monster.yPos, value: .fivehundred)
-                score += 500
+                score += GameConstants.Score.monsterPoints
+                levelScore += GameConstants.Score.monsterPoints
                 monster.kill()
                 screenData.soundFX.ballHitSound()
                 return
@@ -387,7 +395,8 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
                 ball.setExplode(position: monster.position)
                 returnBall()
                 points = Points(xPos: monster.xPos, yPos: monster.yPos, value: .fivehundred)
-                score += 500
+                score += GameConstants.Score.monsterPoints
+                levelScore += GameConstants.Score.monsterPoints
                 monster.kill()
                 screenData.soundFX.ballHitSound()
                 if monster.monsterType == .bluemonster {
@@ -395,13 +404,37 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
                 } else {
                     extraCollected[extraCurrent] = true
                     extrasToApples()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [self] in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Delay.nextLevelDelay) { [self] in
                         nextLevel(endType: .extramonster)
                     }
                 }
                 return
             }
         }
+    }
+    
+    private func doCaught() {
+        for monster in redMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
+            if circlesIntersect(center1: mrDo.position, diameter1: mrDo.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ) {
+                redMonsterArray.remove(id: monster.id)
+                killDo()
+                return
+            }
+        }
+        for monster in extraMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
+            if circlesIntersect(center1: mrDo.position, diameter1: mrDo.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
+                extraMonsterArray.remove(id: monster.id)
+                killDo()
+                return
+            }
+        }
+    }
+    
+    private func killDo() {
+        screenData.soundFX.backgroundStopAll()
+        redMonsterArray.still()
+        extraMonsterArray.still()
+        mrDo.killed()
     }
     
     private func extrasToApples() {

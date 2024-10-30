@@ -17,7 +17,7 @@ enum DoDirection {
 
 final class MrDo:SwiftUISprite,Moveable,Animatable {
     static var animateFrames: Int = 0
-    static var speed: Int = GameConstants.doSpeed
+    static var speed: Int = GameConstants.Speed.doSpeed
     private var walkRightFrames: [UIImage] = []
     private var walkLeftFrames: [UIImage] = []
     private var walkUpFrames: [UIImage] = []
@@ -71,7 +71,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         facing = .right
         hasBall = true
         if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            moveDistance = resolvedInstance.assetDimensionStep * Double(GameConstants.doSpeed)
+            moveDistance = resolvedInstance.assetDimensionStep * Double(GameConstants.Speed.doSpeed)
         }
     }
     
@@ -152,7 +152,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             return
         }
         speedCounter += 1
-        if speedCounter == GameConstants.doSpeed + 1 {
+        if speedCounter == GameConstants.Speed.doSpeed + 1 {
             speedCounter = 0
             if doState == .dead {
                 die()
@@ -194,6 +194,15 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
                 }
                 yPos += 1
             }
+        }
+    }
+    
+    func killed() {
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            doState = .dead
+            currentAnimationFrame = 0
+            screenData.soundFX.loseLifeSound()
+            die()
         }
     }
     
@@ -267,8 +276,8 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         } else {
             cherryCount = 1
         }
-        let value:[String: Int] = ["score": 50,"count":cherryCount]
-        NotificationCenter.default.post(name: .notificationAddScore, object: nil, userInfo: value)
+        let value:[String: Int] = ["count":cherryCount]
+        NotificationCenter.default.post(name: .notificationCherryScore, object: nil, userInfo: value)
         wasCherry = true
     }
     
@@ -532,7 +541,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             }
             
             gridOffsetX += 1
-            if gridOffsetX >= Int(GameConstants.tileSteps) / GameConstants.doSpeed {
+            if gridOffsetX >= Int(GameConstants.Speed.tileSteps) / GameConstants.Speed.doSpeed {
                 gridOffsetX = 0
                 if xPos < resolvedInstance.screenDimensionX {
                     xPos += 1
@@ -561,7 +570,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
         gridOffsetX -= 1
         if gridOffsetX < 0 {
-            gridOffsetX = Int(GameConstants.tileSteps) / GameConstants.doSpeed - 1
+            gridOffsetX = Int(GameConstants.Speed.tileSteps) / GameConstants.Speed.doSpeed - 1
             if xPos > 0 {
                 xPos -= 1
                 checkGridLeft()
@@ -585,7 +594,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         position.y -= moveDistance
         gridOffsetY -= 1
         if gridOffsetY < 0 {
-            gridOffsetY = Int(GameConstants.tileSteps) / GameConstants.doSpeed - 1
+            gridOffsetY = Int(GameConstants.Speed.tileSteps) / GameConstants.Speed.doSpeed - 1
             if yPos > 0 {
                 yPos -= 1
                 checkGridUp()
@@ -602,7 +611,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if appleBelow() { return }
             position.y += moveDistance
             gridOffsetY += 1
-            if gridOffsetY >= Int(GameConstants.tileSteps) / GameConstants.doSpeed {
+            if gridOffsetY >= Int(GameConstants.Speed.tileSteps) / GameConstants.Speed.doSpeed {
                 gridOffsetY = 0
                 if yPos < resolvedInstance.screenDimensionY {
                     yPos += 1

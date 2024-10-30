@@ -96,12 +96,7 @@ final class Apple:SwiftUISprite,Moveable {
     var appleFrames: [UIImage] = []
     var isPushed = false
     init(xPos: Int, yPos:Int) {
-        
-#if os(iOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 30, height:  30))
-#elseif os(tvOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 64, height:  64))
-#endif
+        super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.appleSize)
         setImages()
         currentImage = appleFrames[1]
         isShowing = true
@@ -144,11 +139,11 @@ final class Apple:SwiftUISprite,Moveable {
     
     func dislodge() {
         appleState = .dislodged
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
             currentImage = appleFrames[2]
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
                 currentImage = appleFrames[0]
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
                     currentImage = appleFrames[1]
                     appleState = .falling
                     if let screenData: ScreenData = ServiceLocator.shared.resolve() {
@@ -163,17 +158,17 @@ final class Apple:SwiftUISprite,Moveable {
         appleState = .breaking
         leftImage = getTile(name: "AppleEnd", pos: 0)!
         rightImage = getTile(name: "AppleEnd", pos: 1)!
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleBreakAnimation) { [self] in
             if let screenData: ScreenData = ServiceLocator.shared.resolve() {
                 screenData.soundFX.appleDropSoundStop()
                 screenData.soundFX.appleBreakSound()
             }
             leftImage = getTile(name: "AppleEnd", pos: 2)!
             rightImage = getTile(name: "AppleEnd", pos: 3)!
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleBreakAnimation) { [self] in
                 leftImage = getTile(name: "AppleEnd", pos: 4)!
                 rightImage = getTile(name: "AppleEnd", pos: 5)!
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.appleAnimation) { [self] in
                     //let appleID:[String: UUID] = ["id": self.id]
                     let appleID: [String: Any] = ["id": self.id, "xPos": self.xPos,"yPos":self.yPos]
                     NotificationCenter.default.post(name: .notificationRemoveApple, object: nil, userInfo: appleID)

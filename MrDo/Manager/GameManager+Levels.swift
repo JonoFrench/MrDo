@@ -148,7 +148,7 @@ extension GameManager {
     /// Extra Life screen. Flash the EXTRA box at the top of the screen.
     func extraFlash() {
         if gameState == .extralife {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + GameConstants.Animation.extraFlashRate) { [self] in
                 extraLifeFlashOn = !extraLifeFlashOn
                 extraFlash()
             }

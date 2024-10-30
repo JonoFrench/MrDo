@@ -11,19 +11,6 @@ struct ProgressView: View {
     @EnvironmentObject var manager: GameManager
     @ObservedObject var progress: Progress
 
-#if os(iOS)
-    static var titleTextSize:CGFloat = 18
-    static var subTitleTextSize:CGFloat = 12
-    static var scoreTextSize:CGFloat = 16
-    static var starttextSize:CGFloat = 14
-    static var typeSize = 30.0
-#elseif os(tvOS)
-    static var titleTextSize:CGFloat = 28
-    static var subTitleTextSize:CGFloat = 24
-    static var scoreTextSize:CGFloat = 24
-    static var starttextSize:CGFloat = 28
-    static var typeSize = 60.0
-#endif
     var body: some View {
         VStack {
             Spacer()
@@ -32,30 +19,30 @@ struct ProgressView: View {
                     Spacer()
                     Text("Scene \(score.level)")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: ProgressView.subTitleTextSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.subTitleTextSize))
                         .padding([.leading])
                     Spacer()
                     Text("\(String(format: "%05d", score.levelScore))")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: ProgressView.subTitleTextSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.subTitleTextSize))
                         .padding([.leading])
                     Spacer()
                     Text("\(String(format: "%02d", (score.time % 3600) / 60))'\(String(format: "%02d",(score.time % 3600) % 60))")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: ProgressView.subTitleTextSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.subTitleTextSize))
                         .padding([.leading])
                     Spacer()
                     Image(manager.levelEndImage(type: score.endType))
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: ProgressView.typeSize, height: ProgressView.typeSize)
+                        .frame(width: GameConstants.Size.typeSize, height: GameConstants.Size.typeSize)
                     Spacer()
                 }
             }
             
             Text("VERY GOOD !")
                 .foregroundStyle(.red)
-                .font(.custom("MrDo-Arcade", size: ProgressView.titleTextSize))
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.titleTextSize))
             
             Spacer()
             ZStack {
@@ -79,14 +66,17 @@ struct ProgressView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: progress.doFrameSize.width, height: progress.doFrameSize.height)
                     .position(progress.doPosition)
-
-                
             }
             Spacer()
         }
     }
 }
 
-//#Preview {
-//    ProgressView()
-//}
+#Preview {
+    GeometryReader { geometry in
+        ProgressView(progress: Progress())
+            .environmentObject(GameManager())
+            .frame(width: geometry.size.width, height: geometry.size.width)
+            .background(.black)
+    }
+}

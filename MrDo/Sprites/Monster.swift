@@ -24,7 +24,7 @@ enum MonsterType {
 class Monster:SwiftUISprite {
     var monsterState:MonsterState = .appearing
     var monsterDirection:MonsterDirection = .down
-    var currentSpeed:Int = GameConstants.monsterSpeed
+    var currentSpeed:Int = GameConstants.Speed.monsterSpeed
     private var increaseSpeedCounter = 0
     private var upSet:Set = [TileType.bk,.vt,.ll,.lr,.rt,.tl,.tr,.lt]
     private var downSet:Set = [TileType.bk,.vt,.ll,.lr,.rb,.bl,.br,.lb]

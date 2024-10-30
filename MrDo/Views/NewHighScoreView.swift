@@ -8,19 +8,7 @@
 import SwiftUI
 
 struct NewHighScoreView: View {
-#if os(iOS)
-    static var titleTextSize:CGFloat = 24
-    static var subTitleTextSize:CGFloat = 18
-    static var letterTextSize:CGFloat = 30
-    static var starttextSize:CGFloat = 24
-    static var infoTextSize:CGFloat = 12
-#elseif os(tvOS)
-    static var titleTextSize:CGFloat = 48
-    static var subTitleTextSize:CGFloat = 36
-    static var letterTextSize:CGFloat = 60
-    static var starttextSize:CGFloat = 48
-    static var infoTextSize:CGFloat = 24
-#endif
+
     @ObservedObject var hiScores:MrDoHighScores
     var body: some View {
         VStack {
@@ -31,29 +19,29 @@ struct NewHighScoreView: View {
             Spacer()
             Text("New High Score")
                 .foregroundStyle(.red)
-                .font(.custom("MrDo-Arcade", size: NewHighScoreView.titleTextSize))
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.highScoreTextSize))
             Spacer()
             Text("Enter your initials")
                 .foregroundStyle(.white)
-                .font(.custom("MrDo-Arcade", size: NewHighScoreView.subTitleTextSize))
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.titleTextSize))
 
             HStack {
                 Spacer()
                 Text(String(hiScores.letterArray[0]))
                     .foregroundStyle(.white)
-                    .font(.custom("MrDo-Arcade", size: NewHighScoreView.letterTextSize))
+                    .font(.custom("MrDo-Arcade", size: GameConstants.Text.letterTextSize))
                     .padding()
                     .border(hiScores.letterIndex == 0 ? Color.red : Color.white , width: 2)
                 Spacer()
                 Text(String(hiScores.letterArray[1]))
                     .foregroundStyle(.white)
-                    .font(.custom("MrDo-Arcade", size: NewHighScoreView.letterTextSize))
+                    .font(.custom("MrDo-Arcade", size: GameConstants.Text.letterTextSize))
                     .padding()
                     .border(hiScores.letterIndex == 1 ? Color.red : Color.white, width: 2)
                 Spacer()
                 Text(String(hiScores.letterArray[2]))
                     .foregroundStyle(.white)
-                    .font(.custom("MrDo-Arcade", size: NewHighScoreView.letterTextSize))
+                    .font(.custom("MrDo-Arcade", size: GameConstants.Text.letterTextSize))
                     .padding()
                     .border(hiScores.letterIndex == 2 ? Color.red : Color.white, width: 2)
                 Spacer()
@@ -62,11 +50,11 @@ struct NewHighScoreView: View {
             Spacer()
             Text("Press Up / Down")
                 .foregroundStyle(.red)
-                .font(.custom("MrDo-Arcade", size: NewHighScoreView.infoTextSize))
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.copyTextSize))
             Spacer()
             Text("Jump to select")
                 .foregroundStyle(.red)
-                .font(.custom("MrDo-Arcade", size: NewHighScoreView.infoTextSize))
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.copyTextSize))
 
             Spacer()
         }.background(.black)

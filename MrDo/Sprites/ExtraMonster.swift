@@ -31,6 +31,12 @@ final class ExtraMonsterArray: ObservableObject {
             monster.monsterState = .still
         }
     }
+    
+    func moving() {
+        for monster in monsters where monster.monsterState == .still {
+            monster.monsterState = .moving
+        }
+    }
 
     func remove(id:UUID) {
         if let index = monsters.firstIndex(where: {$0.id == id}) {
@@ -54,7 +60,7 @@ final class ExtraMonsterArray: ObservableObject {
 
 final class ExtraMonster:Monster,Moveable,Animatable {
     static var animateFrames: Int = 0
-    static var speed:Int = GameConstants.monsterSpeed
+    static var speed:Int = GameConstants.Speed.monsterSpeed
     
     private var walkRightFrames: [UIImage] = []
     private var walkLeftFrames: [UIImage] = []
@@ -70,11 +76,7 @@ final class ExtraMonster:Monster,Moveable,Animatable {
     private var increaseSpeedCounter = 0
     private var letter = 0
     init(xPos: Int, yPos: Int, type:MonsterType, letter: Int) {
-#if os(iOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 28, height:  28))
-#elseif os(tvOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 52, height:  52))
-#endif
+        super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.extraMonsterSize)
         monsterType = type
         setImages()
         currentImage = monsterType == .bluemonster ? rightFrames[0] : extraFrames[0]
@@ -208,8 +210,8 @@ final class ExtraMonster:Monster,Moveable,Animatable {
 //                    return .up
 //                }
 //
-//                
-//                
+//
+//
 //                /// Other direction?
 //                if directionArray.contains(.up) && doInstance.yPos < yPos {
 //                    directionArray.append(.up)
@@ -223,7 +225,7 @@ final class ExtraMonster:Monster,Moveable,Animatable {
 //                if directionArray.contains(.right) && doInstance.xPos > xPos {
 //                    directionArray.append(.right)
 //                }
-//                
+//
 //                if directionArray.contains(.up) && doInstance.xPos == xPos && doInstance.yPos < yPos {
 //                    directionArray.append(.up)
 //                    directionArray.append(.up)

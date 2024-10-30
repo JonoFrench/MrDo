@@ -10,17 +10,6 @@ import SwiftUI
 struct HiScoreView: View {
     @EnvironmentObject var manager: GameManager
     
-#if os(iOS)
-    static var titleTextSize:CGFloat = 24
-    static var subTitleTextSize:CGFloat = 12
-    static var scoreTextSize:CGFloat = 16
-    static var starttextSize:CGFloat = 14
-#elseif os(tvOS)
-    static var titleTextSize:CGFloat = 28
-    static var subTitleTextSize:CGFloat = 18
-    static var scoreTextSize:CGFloat = 24
-    static var starttextSize:CGFloat = 28
-#endif
     var body: some View {
         let scores = manager.hiScores
         VStack {
@@ -29,29 +18,29 @@ struct HiScoreView: View {
                 .aspectRatio(contentMode: .fit)
             Text("High Scores")
                 .foregroundStyle(.red)
-                .font(.custom("MrDo-Arcade", size: HiScoreView.titleTextSize))
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.highScoreTextSize))
             Spacer()
             VStack(alignment: .center, content: {
                 HStack{
                     Spacer()
                     Text("Name")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: HiScoreView.subTitleTextSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.subTitleTextSize))
                         .padding([.leading])
                     Spacer()
                     Text("Score")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: HiScoreView.subTitleTextSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.subTitleTextSize))
                         .padding([.trailing])
                     Spacer()
                     Text("Level")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: HiScoreView.subTitleTextSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.subTitleTextSize))
                         .padding([.trailing])
                     Spacer()
                     Text("Time")
                         .foregroundStyle(.cyan)
-                        .font(.custom("MrDo-Arcade", size: HiScoreView.subTitleTextSize))
+                        .font(.custom("MrDo-Arcade", size: GameConstants.Text.subTitleTextSize))
                         .padding([.trailing])
                     Spacer()
                 }
@@ -61,23 +50,23 @@ struct HiScoreView: View {
                         Spacer()
                         Text("\(score.initials!)")
                             .foregroundStyle(.white)
-                            .font(.custom("MrDo-Arcade", size: HiScoreView.scoreTextSize))
+                            .font(.custom("MrDo-Arcade", size: GameConstants.Text.scoreTextSize))
                             .padding([.leading])
                         Spacer()
                         Text("\(String(format: "%05d", score.score))")
                             .foregroundStyle(.white)
-                            .font(.custom("MrDo-Arcade", size: HiScoreView.scoreTextSize))
+                            .font(.custom("MrDo-Arcade", size: GameConstants.Text.scoreTextSize))
                             .padding([.trailing])
                         Spacer()
                         Text("\(String(format: "%02d", score.level))")
                             .foregroundStyle(.white)
-                            .font(.custom("MrDo-Arcade", size: HiScoreView.scoreTextSize))
+                            .font(.custom("MrDo-Arcade", size: GameConstants.Text.scoreTextSize))
                             .padding([.trailing])
                         Spacer()
                         
                         Text("\((score.time % 3600) / 60)'\(String(format: "%02d",(score.time % 3600) % 60))")
                             .foregroundStyle(.white)
-                            .font(.custom("MrDo-Arcade", size: HiScoreView.scoreTextSize))
+                            .font(.custom("MrDo-Arcade", size: GameConstants.Text.scoreTextSize))
                             .padding([.trailing])
                         Spacer()
                     }
@@ -85,9 +74,9 @@ struct HiScoreView: View {
                 }
             })
             Spacer()
-            Text(GameConstants.startText)
+            Text(GameConstants.Text.startText)
                 .foregroundStyle(.red)
-                .font(.custom("MrDo-Arcade", size: HiScoreView.starttextSize))
+                .font(.custom("MrDo-Arcade", size: GameConstants.Text.starttextSize))
 
         }.background(.black)
     }

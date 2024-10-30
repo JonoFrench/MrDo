@@ -83,6 +83,7 @@
 		34B9D1AA2CCA8800001BF478 /* ExtraLife.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 34B9D1A92CCA8800001BF478 /* ExtraLife.m4a */; };
 		34B9D1AC2CCED872001BF478 /* Points.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1AB2CCED872001BF478 /* Points.swift */; };
 		34B9D1AE2CCED888001BF478 /* PointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1AD2CCED888001BF478 /* PointsView.swift */; };
+		34B9D1B12CD1251F001BF478 /* GameConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B9D1B02CD1251F001BF478 /* GameConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -164,6 +165,7 @@
 		34B9D1A92CCA8800001BF478 /* ExtraLife.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = ExtraLife.m4a; sourceTree = "<group>"; };
 		34B9D1AB2CCED872001BF478 /* Points.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Points.swift; sourceTree = "<group>"; };
 		34B9D1AD2CCED888001BF478 /* PointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointsView.swift; sourceTree = "<group>"; };
+		34B9D1B02CD1251F001BF478 /* GameConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -240,6 +242,7 @@
 				340999FF2C99C3D100F4FE3A /* GameManager+Notifications.swift */,
 				34099A012C99C45C00F4FE3A /* GameManager+TV.swift */,
 				340A7B2F2CBBE14100433318 /* GameManager+Levels.swift */,
+				34B9D1B02CD1251F001BF478 /* GameConstants.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -483,6 +486,7 @@
 				34099A022C99C45C00F4FE3A /* GameManager+TV.swift in Sources */,
 				34099A042C99C4CF00F4FE3A /* SoundFX.swift in Sources */,
 				34099A152C99CA3600F4FE3A /* ImageView.swift in Sources */,
+				34B9D1B12CD1251F001BF478 /* GameConstants.swift in Sources */,
 				34099A282C99E52500F4FE3A /* IntroView.swift in Sources */,
 				340A7B5E2CC1410D00433318 /* RedMonsterView.swift in Sources */,
 				34099A2E2C99E6F100F4FE3A /* ScreenData.swift in Sources */,

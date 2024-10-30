@@ -13,7 +13,7 @@ import GameController
 extension Notification.Name {
     static let notificationNewGame = Notification.Name("NotificationNewGame")
     static let notificationRemoveApple = Notification.Name("NotificationRemoveApple")
-    static let notificationAddScore = Notification.Name("NotificationAddScore")
+    static let notificationCherryScore = Notification.Name("NotificationCherryScore")
     static let notificationLoseLife = Notification.Name("NotificationLoseLife")
     static let notificationKillRedMonster = Notification.Name("NotificationKillRedMonster")
     static let notificationKillExtraMonster = Notification.Name("NotificationKillExtraMonster")
@@ -27,14 +27,14 @@ extension GameManager {
     func notificationObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(self.nextGame(notification:)), name: .notificationNewGame, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeApple(notification:)), name: .notificationRemoveApple, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.addScore(notification:)), name: .notificationAddScore, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.addCherryScore(notification:)), name: .notificationCherryScore, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.loseLife(notification:)), name: .notificationLoseLife, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeRedMonster(notification:)), name: .notificationKillRedMonster, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeExtraMonster(notification:)), name: .notificationKillExtraMonster, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.addExtraLife(notification:)), name: .notificationExtraLife, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removePoints(notification:)), name: .notificationRemovePoints, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.startChaseMode(notification:)), name: .notificationChaseMode, object: nil)
-
+        
         
         
 #if os(tvOS)
@@ -94,7 +94,7 @@ extension GameManager {
             }
         }
     }
-
+    
     @objc func removeApple(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID, let xPos = notification.userInfo?["xPos"] as? Int, let yPos = notification.userInfo?["yPos"] as? Int {
             appleArray.remove(id: id)
@@ -108,24 +108,24 @@ extension GameManager {
         }
     }
     private func appleHits(hits:Int,xPos:Int,yPos:Int){
-            if hits == 1 {
-                score += 1000
-                points = Points(xPos: xPos, yPos: yPos, value: .onethousand)
-            } else if hits == 2 {
-                score += 2000
-                points = Points(xPos: xPos, yPos: yPos, value: .twothousand)
-            } else if hits == 3 {
-                score += 4000
-                points = Points(xPos: xPos, yPos: yPos, value: .fourthousand)
-            } else if hits == 4 {
-                score += 6000
-                points = Points(xPos: xPos, yPos: yPos, value: .fourthousand)
-            } else if hits >= 5 {
-                score += 8000
-                points = Points(xPos: xPos, yPos: yPos, value: .eightthousand)
-            }
+        if hits == 1 {
+            score += 1000
+            points = Points(xPos: xPos, yPos: yPos, value: .onethousand)
+        } else if hits == 2 {
+            score += 2000
+            points = Points(xPos: xPos, yPos: yPos, value: .twothousand)
+        } else if hits == 3 {
+            score += 4000
+            points = Points(xPos: xPos, yPos: yPos, value: .fourthousand)
+        } else if hits == 4 {
+            score += 6000
+            points = Points(xPos: xPos, yPos: yPos, value: .fourthousand)
+        } else if hits >= 5 {
+            score += 8000
+            points = Points(xPos: xPos, yPos: yPos, value: .eightthousand)
         }
-
+    }
+    
     @objc func removeRedMonster(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             redMonsterArray.remove(id: id)
@@ -134,37 +134,35 @@ extension GameManager {
             }
         }
     }
-
+    
     @objc func removeExtraMonster(notification: Notification) {
         if let id = notification.userInfo?["id"] as? UUID {
             extraMonsterArray.remove(id: id)
         }
     }
-
+    
     @objc func removePoints(notification: Notification) {
         if points != nil {
             self.points = nil
         }
     }
-
-    @objc func addScore(notification: Notification) {
-        if let value = notification.userInfo?["score"] as? Int,let count = notification.userInfo?["count"] as? Int {
-            score += value
-            levelScore += value
-            if value == 50 {
-                screenData.soundFX.cherrySound(count: count)
-                if count == 8 {
-                    score += 500
-                    levelScore += 500
-                }
-                cherryCount += 1
-                if cherryCount == 40 {
-                    nextLevel(endType: .cherry)
-                }
+    
+    @objc func addCherryScore(notification: Notification) {
+        if let count = notification.userInfo?["count"] as? Int {
+            score += GameConstants.Score.cherryPoints
+            levelScore += GameConstants.Score.cherryPoints
+            screenData.soundFX.cherrySound(count: count)
+            if count == 8 {
+                score += GameConstants.Score.allCherryPoints
+                levelScore += GameConstants.Score.allCherryPoints
+            }
+            cherryCount += 1
+            if cherryCount == 40 {
+                nextLevel(endType: .cherry)
             }
         }
     }
-
+    
     @objc func startChaseMode(notification: Notification) {
         if !chaseMode {
             chaseMode = true
@@ -180,10 +178,10 @@ extension GameManager {
             setupController(controller)
         }
     }
-
+    
     @objc func controllerDidDisconnect(notification: Notification) {
         // Handle controller disconnection if needed
     }
-    #endif
+#endif
     
 }
