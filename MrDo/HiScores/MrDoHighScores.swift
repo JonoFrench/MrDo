@@ -10,6 +10,14 @@ import CoreData
 
 var coreDataStack = CoreDataStack(modelName: "HighScores")
 
+struct LevelScores {
+    let id = UUID()
+    var level = 0
+    var time = 0
+    var levelScore = 0
+    var endType:LevelEndType
+}
+
 public class MrDoHighScores:ObservableObject {
     lazy var managedObjectContext: NSManagedObjectContext = {
         var coreDataStack = CoreDataStack(modelName: "HighScores")

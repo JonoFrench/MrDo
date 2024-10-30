@@ -15,17 +15,14 @@ final class Center:SwiftUISprite {
     @Published
     var collectible = false
     
-    init(xPos: Int, yPos:Int) {
-#if os(iOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 32, height:  32))
-#elseif os(tvOS)
-        super.init(xPos: xPos, yPos: yPos, frameSize: CGSize(width: 64, height:  64))
-#endif
+    init(){
+        super.init(xPos: 5, yPos: 6, frameSize: GameConstants.Size.centerSize)
         currentFrame = ImageResource(name: "CenterMonster", bundle: .main)
         collectible = false
         collected = false
+
     }
-    
+
     func setBonusFood(level:Int) {
         currentFrame = ImageResource(name: "BonusFood1", bundle: .main)
         collectible = true

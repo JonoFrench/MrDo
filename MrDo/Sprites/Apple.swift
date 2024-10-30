@@ -83,17 +83,17 @@ final class AppleArray: ObservableObject {
 }
 
 final class Apple:SwiftUISprite,Moveable {
-    static var speed: Int = 1
-    
+    static var speed: Int = GameConstants.Speed.appleSpeed
     @Published
     var appleState:AppleState = .sitting
-    var dropLevel = 0
     @Published
     var leftImage:UIImage = UIImage()
     @Published
     var rightImage:UIImage = UIImage()
-    var appleFrames: [UIImage] = []
     var isPushed = false
+    private var appleFrames: [UIImage] = []
+    private var dropLevel = 0
+
     init(xPos: Int, yPos:Int) {
         super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.appleSize)
         setImages()

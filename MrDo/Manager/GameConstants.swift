@@ -7,12 +7,27 @@
 
 import CoreGraphics
 
+public enum GameState {
+    case intro,playing,ended,highscore,levelend,progress,progress10,extralife
+}
+
+public enum JoyPad {
+    case left,right,up,down,stop
+}
+
+public enum LevelEndType {
+    case cherry,redmonster,extramonster
+}
+
 public enum GameConstants {
+    
     public enum Speed {
         public static let tileSteps = 8.0
         public static let doSpeed = 2
         public static let ballSpeed = 2
         public static let monsterSpeed = 4
+        public static let digSpeed = 6
+        public static let appleSpeed = 1
     }
     
     public enum Size {
@@ -26,6 +41,7 @@ public enum GameConstants {
         public static let typeSize = 30.0
         public static let wonderSize = CGSize(width: 0, height: 236)
         public static let lifeSize = CGSize(width: 24, height: 24)
+        public static let centerSize = CGSize(width: 32, height: 32)
 
 #elseif os(tvOS)
         public static let doSize = CGSize(width: 64, height: 64)
@@ -37,6 +53,7 @@ public enum GameConstants {
         public static let typeSize = 60.0
         public static let wonderSize = CGSize(width: 0, height: 586)
         public static let lifeSize = CGSize(width: 48, height: 48)
+        public static let centerSize = CGSize(width: 64, height: 64)
 #endif
     }
     
@@ -66,7 +83,7 @@ public enum GameConstants {
     }
     
     public enum Delay {
-        public static let levelEndDelay = 3.0
+        public static let levelEndDelay = 3.5
         public static let monsterSpawnDelay = 2.3
         public static let extraMonsterSpawnDelay = 1.5
         public static let nextLevelDelay = 2.0

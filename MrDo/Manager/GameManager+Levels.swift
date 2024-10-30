@@ -11,7 +11,7 @@ extension GameManager {
     
     func setDataForLevel(level:Int) {
         appleArray.apples.removeAll()
-        center = Center(xPos: 5, yPos: 6)
+        center = Center()
         screenData.levelData.setLevelData(level: level)
         switch level {
         case 1: level1Data()

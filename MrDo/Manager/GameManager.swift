@@ -9,41 +9,6 @@ import QuartzCore
 import SwiftUI
 import Combine
 
-
-enum GameState {
-    case intro,playing,ended,highscore,levelend,progress,progress10,extralife
-}
-
-enum JoyPad {
-    case left,right,up,down,stop
-}
-
-enum LevelEndType {
-    case cherry,redmonster,extramonster
-}
-
-//struct GameConstants {
-//    static let tileSteps = 8.0
-//    static let doSpeed = 2
-//    static let ballSpeed = 2
-//    static let monsterSpeed = 4
-//#if os(iOS)
-//    static var doSize = CGSize(width: 32, height: 32)
-//   static var startText = "PRESS JUMP TO START"
-//#elseif os(tvOS)
-//    static var doSize = CGSize(width: 64, height: 64)
-//    static var startText = "PRESS A TO START"
-//#endif
-//}
-
-struct LevelScores {
-    let id = UUID()
-    var level = 0
-    var time = 0
-    var levelScore = 0
-    var endType:LevelEndType
-}
-
 class GameManager: ObservableObject {
     let hiScores:MrDoHighScores = MrDoHighScores()
     @Published
@@ -65,15 +30,15 @@ class GameManager: ObservableObject {
         }
     }
     @ObservedObject
-    var mrDo:MrDo = MrDo(xPos: 0, yPos: 0, frameSize: GameConstants.Size.doSize)
+    var mrDo:MrDo = MrDo()
     @ObservedObject
     var appleArray:AppleArray = AppleArray()
     @ObservedObject
     var redMonsterArray:RedMonsterArray = RedMonsterArray()
     @ObservedObject
     var extraMonsterArray:ExtraMonsterArray = ExtraMonsterArray()
-
-    var center:Center = Center(xPos: 5, yPos: 6)
+    
+    var center:Center = Center()
     @ObservedObject
     var ball:Ball = Ball()
     /// So we can turn off collisions to test
@@ -89,7 +54,7 @@ class GameManager: ObservableObject {
     var levelScores:[LevelScores] = []
     var startTime: Date = Date()
     var endTime: Date = Date()
-
+    
     /// For the EXTRA at the top of the screen.
     var extraFrames: [UIImage] = []
     @Published
@@ -134,7 +99,7 @@ class GameManager: ObservableObject {
 #elseif os(tvOS)
         gameScreen.assetDimension = gameScreen.gameSize.height / 14 //Double(gameScreen.screenDimensionX + 3)
 #endif
-print("Asset dim \(screenData.assetDimension) width should be \(screenData.assetDimension * 12)")
+        print("Asset dim \(screenData.assetDimension) width should be \(screenData.assetDimension * 12)")
         screenData.assetDimensionStep = screenData.assetDimension / GameConstants.Speed.tileSteps
         lives = 3
         score = 0
@@ -145,33 +110,33 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
         cherryCount = 0
         ///Testing stuff
         
-//        turnOffCollisions = true
+        //        turnOffCollisions = true
         
         
         ///Testing Progess screen.
-//        progress = Progress()
-//        levelScores.append(LevelScores(level: 1, time: Int(45),levelScore: 1000,endType: .cherry))
-//        levelScores.append(LevelScores(level: 2, time: Int(83),levelScore: 2500,endType: .redmonster))
-//        levelScores.append(LevelScores(level: 10, time: Int(96),levelScore: 4600,endType: .redmonster))
-//        gameState = .progress
-//        gameScreen.soundFX.progressSound()
-//        gameScreen.level = 10
-//        gameScreen.gameLevel = 10
-//        gameTime = 450
-//        score = 5678
-//        progress10()
+        //        progress = Progress()
+        //        levelScores.append(LevelScores(level: 1, time: Int(45),levelScore: 1000,endType: .cherry))
+        //        levelScores.append(LevelScores(level: 2, time: Int(83),levelScore: 2500,endType: .redmonster))
+        //        levelScores.append(LevelScores(level: 10, time: Int(96),levelScore: 4600,endType: .redmonster))
+        //        gameState = .progress
+        //        gameScreen.soundFX.progressSound()
+        //        gameScreen.level = 10
+        //        gameScreen.gameLevel = 10
+        //        gameTime = 450
+        //        score = 5678
+        //        progress10()
         
         ///Testing Extra screen
-//        extraCollected = [true,true,true,true,true]
-//        gameScreen.soundFX.extraLifeSound()
-//        extraLife = ExtraLife()
-//        gameState = .extralife
-//        extraFlash()
+        //        extraCollected = [true,true,true,true,true]
+        //        gameScreen.soundFX.extraLifeSound()
+        //        extraLife = ExtraLife()
+        //        gameState = .extralife
+        //        extraFlash()
         startPlaying()
     }
     
     func handleJoyPad() {
-//        guard !mrDo.willStop else {return}
+        //        guard !mrDo.willStop else {return}
         switch moveDirection {
         case .down:
             if gameState == .playing {
@@ -187,7 +152,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             }
         case .up:
             if gameState == .playing {
-                    mrDo.direction = .up
+                mrDo.direction = .up
             }
         case.stop:
             print("handleJoyPad stop")
@@ -202,7 +167,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             appleHandling()
             monsterHandling()
         } else if gameState == .progress {
-                progress.move()
+            progress.move()
         } else if gameState == .ended {
             
         } else if gameState == .extralife {
@@ -219,7 +184,6 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
     
     func startPlaying() {
         extraLifeFlashOn = true
-        screenData.pause = false
         screenData.levelEnd = false
         screenData.gameOver = false
         extraCurrent = 0
@@ -240,7 +204,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             screenData.soundFX.backgroundSound()
             addRedMonsters()
         }
-
+        
     }
     
     func restartPlaying(){
@@ -293,25 +257,25 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
     
     func checkNextLevel() {
         if screenData.level % 3 == 0 {
-        ///Every 3 levels display the how we doing screen.
-        progress = Progress()
-        gameState = .progress
-        screenData.soundFX.progressSound()
+            ///Every 3 levels display the how we doing screen.
+            progress = Progress()
+            gameState = .progress
+            screenData.soundFX.progressSound()
             Task { @MainActor in
                 try? await Task.sleep(for: .seconds(GameConstants.Delay.showNextLevelDelay))
                 screenData.level += 1
                 screenData.gameLevel += 1
                 startPlaying()
             }
-    } else {
-        if screenData.level % 10 == 0 {
-            progress10()
         } else {
-            screenData.level += 1
-            screenData.gameLevel += 1
-            startPlaying()
+            if screenData.level % 10 == 0 {
+                progress10()
+            } else {
+                screenData.level += 1
+                screenData.gameLevel += 1
+                startPlaying()
+            }
         }
-    }
     }
     private func ballHandling(){
         if ball.thrown {
@@ -331,7 +295,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
     private func appleHandling() {
         appleArray.checkDrop(doXpos: mrDo.xPos,doYpos: mrDo.yPos)
         appleArray.move()
-     }
+    }
     
     private func monsterHandling() {
         redMonsterArray.move()
@@ -367,7 +331,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             addExtraMonsters()
         }
     }
-
+    
     private func addRedMonsters(){
         guard redMonsterArray.monsterCount < 6 else {
             return
@@ -379,7 +343,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             if redMonsterArray.monsterCount == 6 {
                 center.setBonusFood(level: screenData.level)
             }
-
+            
         }
     }
     
@@ -397,7 +361,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             }
         }
     }
-
+    
     private func checkBallHitExtraMonsters() {
         for monster in extraMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
             if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
@@ -416,7 +380,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
                     Task { @MainActor in
                         try? await Task.sleep(for: .seconds(GameConstants.Delay.nextLevelDelay))
                         nextLevel(endType: .extramonster)
-
+                        
                     }
                 }
                 return
@@ -494,7 +458,7 @@ print("Asset dim \(screenData.assetDimension) width should be \(screenData.asset
             }
         }
     }
-        
+    
     func levelEndImage(type:LevelEndType) -> ImageResource {
         switch type {
         case .cherry:

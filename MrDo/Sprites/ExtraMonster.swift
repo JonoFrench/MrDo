@@ -60,7 +60,6 @@ final class ExtraMonsterArray: ObservableObject {
 }
 
 final class ExtraMonster:Monster,Moveable,Animatable {
-    static var animateFrames: Int = 0
     static var speed:Int = GameConstants.Speed.monsterSpeed
     
     private var walkRightFrames: [UIImage] = []
@@ -85,9 +84,9 @@ final class ExtraMonster:Monster,Moveable,Animatable {
             monsterState = .still
         }
         actualAnimationFrame = 0
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            moveDistance = resolvedInstance.assetDimensionStep
-            position.y -= resolvedInstance.assetDimension
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            moveDistance = screenData.assetDimensionStep
+            position.y -= screenData.assetDimension
         }
         gridOffsetY = 0
         self.letter = letter

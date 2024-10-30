@@ -166,7 +166,7 @@ class Monster:SwiftUISprite {
         rightFrames = stripeRightFrames
         upFrames = stripeUpFrames
         downFrames = stripeDownFrames
-        currentSpeed = 6
+        currentSpeed = GameConstants.Speed.digSpeed
         monsterType = .digmonster
     }
     

@@ -36,9 +36,9 @@ class LevelData:ObservableObject {
     let levels = Levels()
     @Published
     var tileArray:[[TileType]] = [[]]
-    let tileImage = "Tiles"
+    private let tileImage = "Tiles"
     var tileImages:[UIImage] = []
-    let tileBackground:[Int] = [0,1,2,3,4,2,5,6,7,8,12]
+    private let tileBackground:[Int] = [0,1,2,3,4,2,5,6,7,8,12]
     private var fallSet:Set = [TileType.rb,.lb,.br,.bl,.ch,.fu,.hz,.rl,.rr]
 
     init() {
@@ -50,7 +50,6 @@ class LevelData:ObservableObject {
         }
         return false
     }
-    
     
     let fullWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
@@ -338,7 +337,6 @@ class LevelData:ObservableObject {
         }
         //last one is blank for under the EXTRA
         tiles.append(getTile(level: tileBackground[level - 1], pos: 17)!)
-
         return tiles
     }
 
@@ -362,10 +360,6 @@ class LevelData:ObservableObject {
     }
     
     func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage? {
-        let size = image.size
-        let widthRatio  = targetSize.width  / size.width
-        let heightRatio = targetSize.height / size.height
-        let scaleFactor = min(widthRatio, heightRatio)
         UIGraphicsBeginImageContextWithOptions(targetSize, false, 0.0)
         image.draw(in: CGRect(origin: .zero, size: targetSize))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()

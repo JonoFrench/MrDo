@@ -22,34 +22,31 @@ struct explodeBall {
     var position:CGPoint
 }
 
-
 final class Ball:SwiftUISprite, Moveable {
     static var speed: Int = GameConstants.Speed.ballSpeed
-    var thrown = false
     @Published
     var exploding = false
     @Published
     var imploding = false
-    var direction:BallDirection = .downright
-    var xAdjust = 0.0
-    var yAdjust = 0.0
-    var adjustedPosition = CGPoint()
-    var tileDirection:TileDirection = .horizontal
-    var previousDirection:TileDirection = .horizontal
-    ///Can't catch until first change of direction. Otherwise the ball will be caught as soon as thrown.
-    var catchable = false
-    var ballSwitch = false
     @Published
     var explodeArray:[explodeBall] = []
-    var explodeCount = 0
-    var implodePosition = CGPoint()
-    var explodePosition = CGPoint()
+    var direction:BallDirection = .downright
+    ///Can't catch until first change of direction. Otherwise the ball will be caught as soon as thrown.
+    var catchable = false
+    var thrown = false
+    private var explodeCount = 0
+    private var implodePosition = CGPoint()
+    private var explodePosition = CGPoint()
+    private var tileDirection:TileDirection = .horizontal
+    private var previousDirection:TileDirection = .horizontal
+    private var ballSwitch = false
+
     init() {
         super.init(xPos: 0, yPos: 0, frameSize: GameConstants.Size.ballSize)
     }
     
     func setPosition(xPos: Int, yPos: Int, ballDirection: BallDirection) {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             currentFrame = ImageResource(name: "Ball", bundle: .main)
             self.setPosition(xPos: xPos, yPos: yPos)
             direction = ballDirection
@@ -58,25 +55,24 @@ final class Ball:SwiftUISprite, Moveable {
             case .downleft:
                 gridOffsetX = 4
                 gridOffsetY = 3
-                position.x += resolvedInstance.assetDimensionStep / 2
-                position.y -= (resolvedInstance.assetDimensionStep / 8) * 3
+                position.x += screenData.assetDimensionStep / 2
+                position.y -= (screenData.assetDimensionStep / 8) * 3
             case .upleft:
                 gridOffsetX = 4
                 gridOffsetY = 3
-                //                position.x += resolvedInstance.assetDimensionStep * 1.5
-                //                position.y += resolvedInstance.assetDimensionStep * 0.5
+                //                position.x += screenData.assetDimensionStep * 1.5
+                //                position.y += screenData.assetDimensionStep * 0.5
             case .downright:
                 gridOffsetX = 4
                 gridOffsetY = 3
-                position.x += resolvedInstance.assetDimensionStep / 2
-                position.y -= (resolvedInstance.assetDimensionStep / 8) * 3
+                position.x += screenData.assetDimensionStep / 2
+                position.y -= (screenData.assetDimensionStep / 8) * 3
             case .upright:
                 gridOffsetX = 4
                 gridOffsetY = 3
-                //                position.x += resolvedInstance.assetDimensionStep * 0.5
-                //                position.y += resolvedInstance.assetDimensionStep * 1.5
+                //                position.x += screenData.assetDimensionStep * 0.5
+                //                position.y += screenData.assetDimensionStep * 1.5
             }
-            adjustedPosition = position
         }
     }
     
@@ -117,9 +113,9 @@ final class Ball:SwiftUISprite, Moveable {
     }
     
     func moveDownLeft() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            position.x -= resolvedInstance.assetDimensionStep
-            position.y += resolvedInstance.assetDimensionStep
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            position.x -= screenData.assetDimensionStep
+            position.y += screenData.assetDimensionStep
             gridOffsetX -= 1
             gridOffsetY += 1
             if gridOffsetX <= -1 {
@@ -137,8 +133,8 @@ final class Ball:SwiftUISprite, Moveable {
                 catchable = true
                 yPos += 1
                 gridOffsetY = 0
-                if yPos == resolvedInstance.screenDimensionY {
-                    yPos = resolvedInstance.screenDimensionY-1
+                if yPos == screenData.screenDimensionY {
+                    yPos = screenData.screenDimensionY-1
                     gridOffsetY = 7
                     direction = .upright
                     print("moveDownLeft to upright Y edge")
@@ -146,13 +142,13 @@ final class Ball:SwiftUISprite, Moveable {
                 }
             }
             
-            var checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            var checkAsset = screenData.levelData.tileArray[yPos][xPos]
             var checkX = gridOffsetX-1
             var checkY = gridOffsetY+1
             if checkX < 0 {
                 if xPos > 0 {
                     checkX = 7
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                    checkAsset = screenData.levelData.tileArray[yPos][xPos-1]
                     if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos-1, yPos: yPos) {
                         direction = .downright
                         print("moveDownLeft to downright X full")
@@ -167,9 +163,9 @@ final class Ball:SwiftUISprite, Moveable {
                 }
             }
             if checkY > 7 {
-                if yPos < resolvedInstance.screenDimensionY - 1 {
+                if yPos < screenData.screenDimensionY - 1 {
                     checkY = 0
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                    checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
                     if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos+1) {
                         direction = .upright
                         print("moveDownLeft to upright Y full")
@@ -185,28 +181,28 @@ final class Ball:SwiftUISprite, Moveable {
             }
             checkDirection(checkAsset: checkAsset)
             //1
-            if !resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+            if !screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                 return
             } else {
                 //2
                 
                 if checkX == -1 && checkY == 8 {
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos-1]
+                    checkAsset = screenData.levelData.tileArray[yPos-1][xPos-1]
                     checkX = 7
                     checkY = 0
                 } else {
                     if checkX == -1 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                        checkAsset = screenData.levelData.tileArray[yPos][xPos-1]
                         checkX = 7
                     }
                     if checkY == 8 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                        checkAsset = screenData.levelData.tileArray[yPos-1][xPos]
                         checkY = 0
                     }
                     checkDirection(checkAsset: checkAsset)
                 }
                 
-                if resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+                if screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                     if checkAsset == .rb && checkY > 5 {
                         print("downleft to upright asset \(checkAsset)")
                         direction = .upright
@@ -227,7 +223,7 @@ final class Ball:SwiftUISprite, Moveable {
                         print("downleft to downright asset \(checkAsset)")
                     }
                 } else {
-                    if resolvedInstance.levelData.getWall(type: checkAsset,xOffset: gridOffsetX-1,yOffset: gridOffsetY+1) {
+                    if screenData.levelData.getWall(type: checkAsset,xOffset: gridOffsetX-1,yOffset: gridOffsetY+1) {
                         direction = .upright
                         print("downleft to upright asset \(checkAsset)")
                     }
@@ -237,9 +233,9 @@ final class Ball:SwiftUISprite, Moveable {
     }
     
     func moveDownRight() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            position.x += resolvedInstance.assetDimensionStep
-            position.y += resolvedInstance.assetDimensionStep
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            position.x += screenData.assetDimensionStep
+            position.y += screenData.assetDimensionStep
             gridOffsetX += 1
             gridOffsetY += 1
 
@@ -247,8 +243,8 @@ final class Ball:SwiftUISprite, Moveable {
                 catchable = true
                 xPos += 1
                 gridOffsetX = 0
-                if xPos == resolvedInstance.screenDimensionX {
-                    xPos = resolvedInstance.screenDimensionX-1
+                if xPos == screenData.screenDimensionX {
+                    xPos = screenData.screenDimensionX-1
                     gridOffsetY = 7
                     direction = .downleft
                     print("moveDownRight to downleft X edge")
@@ -258,8 +254,8 @@ final class Ball:SwiftUISprite, Moveable {
                 catchable = true
                 yPos += 1
                 gridOffsetY = 0
-                if yPos == resolvedInstance.screenDimensionY {
-                    yPos = resolvedInstance.screenDimensionY-1
+                if yPos == screenData.screenDimensionY {
+                    yPos = screenData.screenDimensionY-1
                     gridOffsetY = 7
                     direction = .upleft
                     print("moveDownRight to upleft Y edge")
@@ -267,12 +263,12 @@ final class Ball:SwiftUISprite, Moveable {
                 }
                 
             }
-            var checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            var checkAsset = screenData.levelData.tileArray[yPos][xPos]
             var checkX = gridOffsetX+1
             var checkY = gridOffsetY+1
             if checkX > 7 {
                 checkX = 0
-                checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+                checkAsset = screenData.levelData.tileArray[yPos][xPos+1]
                 
                 if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos+1, yPos: yPos) {
                     direction = .downleft
@@ -282,9 +278,9 @@ final class Ball:SwiftUISprite, Moveable {
                 
             }
             if checkY > 7 {
-                if yPos < resolvedInstance.screenDimensionY - 1 {
+                if yPos < screenData.screenDimensionY - 1 {
                     checkY = 0
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                    checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
                     if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos+1) {
                         direction = .upright
                         print("moveDownRight to upright Y full")
@@ -299,28 +295,28 @@ final class Ball:SwiftUISprite, Moveable {
             }
             checkDirection(checkAsset: checkAsset)
             //1 As you where
-            if !resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+            if !screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                 return
             } else {
                 //2
                 
                 if checkX == 8 && checkY == 8 {
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos+1]
+                    checkAsset = screenData.levelData.tileArray[yPos+1][xPos+1]
                     checkX = 0
                     checkY = 0
                 } else {
                     if checkX == 8 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+                        checkAsset = screenData.levelData.tileArray[yPos][xPos+1]
                         checkX = 0
                     }
                     if checkY == 8 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                        checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
                         checkY = 0
                     }
                     checkDirection(checkAsset: checkAsset)
                 }
                 
-                if resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+                if screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                     if checkAsset == .rb && checkY > 5 {
                         print("downright to upleft asset \(checkAsset)")
                         direction = .upleft
@@ -348,9 +344,9 @@ final class Ball:SwiftUISprite, Moveable {
         }
     }
     func moveUpLeft() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            position.x -= resolvedInstance.assetDimensionStep
-            position.y -= resolvedInstance.assetDimensionStep
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            position.x -= screenData.assetDimensionStep
+            position.y -= screenData.assetDimensionStep
             gridOffsetX -= 1
             gridOffsetY -= 1
 
@@ -378,13 +374,13 @@ final class Ball:SwiftUISprite, Moveable {
                     return
                 }
             }
-            var checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            var checkAsset = screenData.levelData.tileArray[yPos][xPos]
             var checkX = gridOffsetX-1
             var checkY = gridOffsetY-1
             if checkX < 0 {
                 if xPos > 0 {
                     checkX = 7
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                    checkAsset = screenData.levelData.tileArray[yPos][xPos-1]
                     if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos-1, yPos: yPos) {
                         direction = .upright
                         print("moveUpLeft to upright X full")
@@ -399,7 +395,7 @@ final class Ball:SwiftUISprite, Moveable {
             if checkY < 0 {
                 if yPos > 0 {
                     checkY = 7
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                    checkAsset = screenData.levelData.tileArray[yPos-1][xPos]
                     if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos-1) {
                         direction = .downleft
                         print("moveUpLeft to downright Y full")
@@ -413,27 +409,27 @@ final class Ball:SwiftUISprite, Moveable {
             }
             checkDirection(checkAsset: checkAsset)
             //1
-            if !resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+            if !screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                 return
             } else {
                 //2
                 if checkX == -1 && checkY == -1 {
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos-1]
+                    checkAsset = screenData.levelData.tileArray[yPos+1][xPos-1]
                     checkX = 7
                     checkY = 7
                 } else {
                     if checkX == -1 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+                        checkAsset = screenData.levelData.tileArray[yPos][xPos-1]
                         checkX = 7
                     }
                     if checkY == -1 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+                        checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
                         checkY = 7
                     }
                     checkDirection(checkAsset: checkAsset)
                 }
                 
-                if resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+                if screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                     
                     if checkAsset == .rt && checkY < 3 {
                         print("upleft to downright asset \(checkAsset)")
@@ -462,9 +458,9 @@ final class Ball:SwiftUISprite, Moveable {
     }
     
     func moveUpRight() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            position.x += resolvedInstance.assetDimensionStep
-            position.y -= resolvedInstance.assetDimensionStep
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            position.x += screenData.assetDimensionStep
+            position.y -= screenData.assetDimensionStep
             gridOffsetX += 1
             gridOffsetY -= 1
 
@@ -472,8 +468,8 @@ final class Ball:SwiftUISprite, Moveable {
                 catchable = true
                 xPos += 1
                 gridOffsetX = 0
-                if xPos == resolvedInstance.screenDimensionX {
-                    xPos = resolvedInstance.screenDimensionX - 1
+                if xPos == screenData.screenDimensionX {
+                    xPos = screenData.screenDimensionX - 1
                     gridOffsetY = 7
                     direction = .upleft
                     print("moveUpRight to upleft X edge")
@@ -492,12 +488,12 @@ final class Ball:SwiftUISprite, Moveable {
                     return
                 }
             }
-            var checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
+            var checkAsset = screenData.levelData.tileArray[yPos][xPos]
             var checkX = gridOffsetX+1
             var checkY = gridOffsetY-1
             if checkX > 7 {
                 checkX = 0
-                checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+                checkAsset = screenData.levelData.tileArray[yPos][xPos+1]
                 
                 if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos+1, yPos: yPos) {
                     direction = .upleft
@@ -509,7 +505,7 @@ final class Ball:SwiftUISprite, Moveable {
             if checkY < 0 {
                 if yPos > 0 {
                     checkY = 7
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                    checkAsset = screenData.levelData.tileArray[yPos-1][xPos]
                     if checkAsset == .fu || checkAsset == .ch || checkApple(xPos: xPos, yPos: yPos - 1) {
                         direction = .downright
                         print("moveUpRight to downright Y full")
@@ -523,28 +519,28 @@ final class Ball:SwiftUISprite, Moveable {
             }
             checkDirection(checkAsset: checkAsset)
             //1 As you where
-            if !resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+            if !screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                 return
             } else {
                 //2
                 
                 if checkX == 8 && checkY == -1 {
-                    checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos+1]
+                    checkAsset = screenData.levelData.tileArray[yPos-1][xPos+1]
                     checkX = 0
                     checkY = 7
                 } else {
                     if checkX == 8 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+                        checkAsset = screenData.levelData.tileArray[yPos][xPos+1]
                         checkX = 0
                     }
                     if checkY == -1 {
-                        checkAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+                        checkAsset = screenData.levelData.tileArray[yPos-1][xPos]
                         checkY = 7
                     }
                     checkDirection(checkAsset: checkAsset)
                 }
                 
-                if resolvedInstance.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
+                if screenData.levelData.getWall(type: checkAsset,xOffset: checkX,yOffset: checkY) {
                     if checkAsset == .rt && checkY < 3 {
                         print("upright to downleft asset \(checkAsset)")
                         direction = .downleft
@@ -565,7 +561,7 @@ final class Ball:SwiftUISprite, Moveable {
                         print("upright to upleft asset \(checkAsset)")
                     }
                 } else {
-                    if resolvedInstance.levelData.getWall(type: checkAsset,xOffset: gridOffsetX+1,yOffset: gridOffsetY-1) {
+                    if screenData.levelData.getWall(type: checkAsset,xOffset: gridOffsetX+1,yOffset: gridOffsetY-1) {
                         direction = .downleft
                         print("upright to downleft asset \(checkAsset)")
                     }
@@ -586,8 +582,8 @@ final class Ball:SwiftUISprite, Moveable {
     }
     
     private func checkDirection(checkAsset: TileType) {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            tileDirection = resolvedInstance.levelData.getTileDirection(type: checkAsset)
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            tileDirection = screenData.levelData.getTileDirection(type: checkAsset)
             if tileDirection == .both {
                 if previousDirection == .vertical {
                     tileDirection = .horizontal

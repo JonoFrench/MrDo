@@ -16,8 +16,12 @@ enum DoDirection {
 }
 
 final class MrDo:SwiftUISprite,Moveable,Animatable {
-    static var animateFrames: Int = 0
     static var speed: Int = GameConstants.Speed.doSpeed
+    @Published
+    var hasBall = false
+    @Published
+    var isPushing = false
+
     private var walkRightFrames: [UIImage] = []
     private var walkLeftFrames: [UIImage] = []
     private var walkUpFrames: [UIImage] = []
@@ -36,10 +40,12 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     private var pushUpBallFrames: [UIImage] = []
     private var pushDownBallFrames: [UIImage] = []
     private var dieFrames: [UIImage] = []
-    
-    
+    private var wasCherry = false
+    private var cherryCount = 0
+    private var pushedApple: Apple?
+
     var direction:DoDirection = .stop
-    var previousDirection:DoDirection = .stop
+    private var previousDirection:DoDirection = .stop
     var facing:DoDirection = .right {
         didSet {
             if oldValue != facing {
@@ -48,17 +54,10 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         }
     }
     var willStop = false
-    @Published
-    var hasBall = false
-    @Published
-    var isPushing = false
-    var wasCherry = false
-    var cherryCount = 0
-    var pushedApple: Apple?
     var doState:DoState = .still
     
-    override init(xPos: Int, yPos: Int, frameSize: CGSize) {
-        super.init(xPos: xPos, yPos: yPos, frameSize: frameSize)
+    init () {
+        super.init(xPos: 0, yPos: 0, frameSize: GameConstants.Size.doSize)
         setImages()
         currentImage = walkRightBallFrames[0]
         gridOffsetX = 2
@@ -70,8 +69,8 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         direction = .stop
         facing = .right
         hasBall = true
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            moveDistance = resolvedInstance.assetDimensionStep * Double(GameConstants.Speed.doSpeed)
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            moveDistance = screenData.assetDimensionStep * Double(GameConstants.Speed.doSpeed)
         }
     }
     
@@ -282,9 +281,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
     }
     
     private func checkGridUp() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-            let previousAsset = resolvedInstance.levelData.tileArray[yPos+1][xPos]
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+            let previousAsset = screenData.levelData.tileArray[yPos+1][xPos]
             if gridAsset == .ch {
                 // add cherry to score
                 addCherry()
@@ -294,59 +293,59 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .tl || gridAsset == .tr || gridAsset == .rt { return }
             
             if gridAsset == .fu || gridAsset == .ch  {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .rt
+                screenData.levelData.tileArray[yPos][xPos] = .rt
             }
             if gridAsset == .rl {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .tl
+                screenData.levelData.tileArray[yPos][xPos] = .tl
             }
             if gridAsset == .rr {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .tr
+                screenData.levelData.tileArray[yPos][xPos] = .tr
             }
             if gridAsset == .bl {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .ll
+                screenData.levelData.tileArray[yPos][xPos] = .ll
             }
             if gridAsset == .br {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lr
+                screenData.levelData.tileArray[yPos][xPos] = .lr
             }
             if gridAsset == .hz {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lt
+                screenData.levelData.tileArray[yPos][xPos] = .lt
             }
             if gridAsset == .rb {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .vt
+                screenData.levelData.tileArray[yPos][xPos] = .vt
             }
             if gridAsset == .lb {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .bk
+                screenData.levelData.tileArray[yPos][xPos] = .bk
             }
             
             if previousAsset == .rt {
-                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .vt
+                screenData.levelData.tileArray[yPos+1][xPos] = .vt
             }
             if previousAsset == .hz {
-                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .lb
+                screenData.levelData.tileArray[yPos+1][xPos] = .lb
             }
             if previousAsset == .tr {
-                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .lr
+                screenData.levelData.tileArray[yPos+1][xPos] = .lr
             }
             if previousAsset == .tl {
-                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .ll
+                screenData.levelData.tileArray[yPos+1][xPos] = .ll
             }
             if previousAsset == .lt {
-                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .bk
+                screenData.levelData.tileArray[yPos+1][xPos] = .bk
             }
             if previousAsset == .rl {
-                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .bl
+                screenData.levelData.tileArray[yPos+1][xPos] = .bl
             }
             if previousAsset == .rr {
-                resolvedInstance.levelData.tileArray[yPos+1][xPos] = .br
+                screenData.levelData.tileArray[yPos+1][xPos] = .br
             }
             
-            resolvedInstance.objectWillChange.send()
+            screenData.objectWillChange.send()
         }
     }
     private func checkGridDown() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-            let previousAsset = resolvedInstance.levelData.tileArray[yPos-1][xPos]
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+            let previousAsset = screenData.levelData.tileArray[yPos-1][xPos]
             if gridAsset == .ch {
                 // add cherry to score
                 addCherry()
@@ -356,56 +355,56 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .bl || gridAsset == .br || gridAsset == .rb { return }
             
             if gridAsset == .fu || gridAsset == .ch  {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .rb
+                screenData.levelData.tileArray[yPos][xPos] = .rb
             }
             if gridAsset == .rl {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .tl
+                screenData.levelData.tileArray[yPos][xPos] = .tl
             }
             if gridAsset == .rr {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .tr
+                screenData.levelData.tileArray[yPos][xPos] = .tr
             }
             if gridAsset == .tl {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .ll
+                screenData.levelData.tileArray[yPos][xPos] = .ll
             }
             if gridAsset == .tr {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lr
+                screenData.levelData.tileArray[yPos][xPos] = .lr
             }
             if gridAsset == .hz {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+                screenData.levelData.tileArray[yPos][xPos] = .lb
             }
             if gridAsset == .rt {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .vt
+                screenData.levelData.tileArray[yPos][xPos] = .vt
             }
             
             if previousAsset == .rb {
-                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .vt
+                screenData.levelData.tileArray[yPos-1][xPos] = .vt
             }
             if previousAsset == .hz {
-                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .lt
+                screenData.levelData.tileArray[yPos-1][xPos] = .lt
             }
             if previousAsset == .br {
-                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .lr
+                screenData.levelData.tileArray[yPos-1][xPos] = .lr
             }
             if previousAsset == .bl {
-                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .ll
+                screenData.levelData.tileArray[yPos-1][xPos] = .ll
             }
             if previousAsset == .lb {
-                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .bk
+                screenData.levelData.tileArray[yPos-1][xPos] = .bk
             }
             if previousAsset == .rl {
-                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .tl
+                screenData.levelData.tileArray[yPos-1][xPos] = .tl
             }
             if previousAsset == .rr {
-                resolvedInstance.levelData.tileArray[yPos-1][xPos] = .tr
+                screenData.levelData.tileArray[yPos-1][xPos] = .tr
             }
             
-            resolvedInstance.objectWillChange.send()
+            screenData.objectWillChange.send()
         }
     }
     private func checkGridLeft() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-            let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos+1]
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+            let previousAsset = screenData.levelData.tileArray[yPos][xPos+1]
             if gridAsset == .ch {
                 // add cherry to score
                 addCherry()
@@ -415,62 +414,62 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tl || gridAsset == .bl { return }
             
             if gridAsset == .fu || gridAsset == .ch  {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .rl
+                screenData.levelData.tileArray[yPos][xPos] = .rl
             }
             if gridAsset == .rt {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .tl
+                screenData.levelData.tileArray[yPos][xPos] = .tl
             }
             if gridAsset == .rb {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .br
+                screenData.levelData.tileArray[yPos][xPos] = .br
             }
             if gridAsset == .tr {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lt
+                screenData.levelData.tileArray[yPos][xPos] = .lt
             }
             if gridAsset == .bl {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+                screenData.levelData.tileArray[yPos][xPos] = .lb
             }
             if gridAsset == .vt {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .ll
+                screenData.levelData.tileArray[yPos][xPos] = .ll
             }
             if gridAsset == .rr {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .hz
+                screenData.levelData.tileArray[yPos][xPos] = .hz
             }
             if gridAsset == .br {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+                screenData.levelData.tileArray[yPos][xPos] = .lb
             }
             
             if previousAsset == .rl {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .hz
+                screenData.levelData.tileArray[yPos][xPos+1] = .hz
             }
             if previousAsset == .vt {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .lr
+                screenData.levelData.tileArray[yPos][xPos+1] = .lr
             }
             if previousAsset == .tl {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .lt
+                screenData.levelData.tileArray[yPos][xPos+1] = .lt
             }
             if previousAsset == .bl {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .lb
+                screenData.levelData.tileArray[yPos][xPos+1] = .lb
             }
             if previousAsset == .ll {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .bk
+                screenData.levelData.tileArray[yPos][xPos+1] = .bk
             }
             if previousAsset == .lr {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .bk
+                screenData.levelData.tileArray[yPos][xPos+1] = .bk
             }
             if previousAsset == .rt {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .tr
+                screenData.levelData.tileArray[yPos][xPos+1] = .tr
             }
             if previousAsset == .rb {
-                resolvedInstance.levelData.tileArray[yPos][xPos+1] = .br
+                screenData.levelData.tileArray[yPos][xPos+1] = .br
             }
             
-            resolvedInstance.objectWillChange.send()
+            screenData.objectWillChange.send()
         }
     }
     private func checkGridRight() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
-            let gridAsset = resolvedInstance.levelData.tileArray[yPos][xPos]
-            let previousAsset = resolvedInstance.levelData.tileArray[yPos][xPos-1]
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+            let previousAsset = screenData.levelData.tileArray[yPos][xPos-1]
             if gridAsset == .ch {
                 // add cherry to score
                 addCherry()
@@ -480,58 +479,58 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tr || gridAsset == .br || gridAsset == .rr { return }
             
             if gridAsset == .fu || gridAsset == .ch  {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .rr
+                screenData.levelData.tileArray[yPos][xPos] = .rr
             }
             if gridAsset == .rt {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .tr
+                screenData.levelData.tileArray[yPos][xPos] = .tr
             }
             if gridAsset == .rb {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .bl
+                screenData.levelData.tileArray[yPos][xPos] = .bl
             }
             if gridAsset == .tl {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lt
+                screenData.levelData.tileArray[yPos][xPos] = .lt
             }
             if gridAsset == .br {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lb
+                screenData.levelData.tileArray[yPos][xPos] = .lb
             }
             if gridAsset == .vt {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .lr
+                screenData.levelData.tileArray[yPos][xPos] = .lr
             }
             if gridAsset == .rl {
-                resolvedInstance.levelData.tileArray[yPos][xPos] = .hz
+                screenData.levelData.tileArray[yPos][xPos] = .hz
             }
             
             if previousAsset == .rr {
-                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .hz
+                screenData.levelData.tileArray[yPos][xPos-1] = .hz
             }
             if previousAsset == .vt {
-                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .ll
+                screenData.levelData.tileArray[yPos][xPos-1] = .ll
             }
             if previousAsset == .tr {
-                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .lt
+                screenData.levelData.tileArray[yPos][xPos-1] = .lt
             }
             if previousAsset == .br {
-                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .lb
+                screenData.levelData.tileArray[yPos][xPos-1] = .lb
             }
             if previousAsset == .lr {
-                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .bk
+                screenData.levelData.tileArray[yPos][xPos-1] = .bk
             }
             if previousAsset == .rt {
-                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .tl
+                screenData.levelData.tileArray[yPos][xPos-1] = .tl
             }
             if previousAsset == .rb {
-                resolvedInstance.levelData.tileArray[yPos][xPos-1] = .bl
+                screenData.levelData.tileArray[yPos][xPos-1] = .bl
             }
             
-            resolvedInstance.objectWillChange.send()
+            screenData.objectWillChange.send()
             
         }
     }
     
     func moveRight() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             facing = .right
-            if (xPos == resolvedInstance.screenDimensionX - 1 && gridOffsetX == 2) {return}
+            if (xPos == screenData.screenDimensionX - 1 && gridOffsetX == 2) {return}
             if appleRight() && gridOffsetX == 2 && !canPushRight() { return }
             print("Do Right offset \(gridOffsetX) xPos \(xPos)")
             position.x += moveDistance
@@ -543,7 +542,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             gridOffsetX += 1
             if gridOffsetX >= Int(GameConstants.Speed.tileSteps) / GameConstants.Speed.doSpeed {
                 gridOffsetX = 0
-                if xPos < resolvedInstance.screenDimensionX {
+                if xPos < screenData.screenDimensionX {
                     xPos += 1
                     checkGridRight()
                     if isPushing {
@@ -604,16 +603,16 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         
     }
     func moveDown() {
-        if let resolvedInstance: ScreenData = ServiceLocator.shared.resolve() {
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             facing = .down
             print("Do down offset \(gridOffsetY) yPos \(yPos)")
-            if (yPos == resolvedInstance.screenDimensionY - 1 && gridOffsetY == 3) {return}
+            if (yPos == screenData.screenDimensionY - 1 && gridOffsetY == 3) {return}
             if appleBelow() { return }
             position.y += moveDistance
             gridOffsetY += 1
             if gridOffsetY >= Int(GameConstants.Speed.tileSteps) / GameConstants.Speed.doSpeed {
                 gridOffsetY = 0
-                if yPos < resolvedInstance.screenDimensionY {
+                if yPos < screenData.screenDimensionY {
                     yPos += 1
                     checkGridDown()
                 }
