@@ -280,252 +280,340 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         wasCherry = true
     }
     
-    private func checkGridUp() {
+    private func checkGridUp(){
+        let prevTiles = [TileType.ro,.vt,.rb,.bl,.br,.vt,.lb,.ll,.lr,.br,.bl,.bk,.ll,.lb,.lr,.fu,.ch,.bk]
+        let swapTiles = [TileType.ro,.rt,.vt,.tl,.tr,.vt,.lt,.tl,.tr,.lr,.ll,.lt,.ll,.bk,.lr,.rt,.rt,.bk]
+        let upSet:Set = [TileType.ll,.lr,.vt,.tl,.tr,.rt]
+        guard yPos > 0 else {return}
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos+1][xPos]
-            if gridAsset == .ch {
-                // add cherry to score
-                addCherry()
-            } else {
-                wasCherry = false
+            if upSet.contains(gridAsset) { return }
+            if gridAsset == .ch { addCherry()
+            } else { wasCherry = false }
+            let i = fullTiles.firstIndex(of: gridAsset)
+            let p = fullTiles.firstIndex(of: previousAsset)
+            Task { @MainActor in
+                //try? await Task.sleep(for: .seconds(0.5))
+                screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
+                screenData.levelData.tileArray[yPos+1][xPos] = prevTiles[p!]
+                screenData.objectWillChange.send()
             }
-            if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .tl || gridAsset == .tr || gridAsset == .rt { return }
-            
-            if gridAsset == .fu || gridAsset == .ch  {
-                screenData.levelData.tileArray[yPos][xPos] = .rt
-            }
-            if gridAsset == .rl {
-                screenData.levelData.tileArray[yPos][xPos] = .tl
-            }
-            if gridAsset == .rr {
-                screenData.levelData.tileArray[yPos][xPos] = .tr
-            }
-            if gridAsset == .bl {
-                screenData.levelData.tileArray[yPos][xPos] = .ll
-            }
-            if gridAsset == .br {
-                screenData.levelData.tileArray[yPos][xPos] = .lr
-            }
-            if gridAsset == .hz {
-                screenData.levelData.tileArray[yPos][xPos] = .lt
-            }
-            if gridAsset == .rb {
-                screenData.levelData.tileArray[yPos][xPos] = .vt
-            }
-            if gridAsset == .lb {
-                screenData.levelData.tileArray[yPos][xPos] = .bk
-            }
-            
-            if previousAsset == .rt {
-                screenData.levelData.tileArray[yPos+1][xPos] = .vt
-            }
-            if previousAsset == .hz {
-                screenData.levelData.tileArray[yPos+1][xPos] = .lb
-            }
-            if previousAsset == .tr {
-                screenData.levelData.tileArray[yPos+1][xPos] = .lr
-            }
-            if previousAsset == .tl {
-                screenData.levelData.tileArray[yPos+1][xPos] = .ll
-            }
-            if previousAsset == .lt {
-                screenData.levelData.tileArray[yPos+1][xPos] = .bk
-            }
-            if previousAsset == .rl {
-                screenData.levelData.tileArray[yPos+1][xPos] = .bl
-            }
-            if previousAsset == .rr {
-                screenData.levelData.tileArray[yPos+1][xPos] = .br
-            }
-            
-            screenData.objectWillChange.send()
         }
     }
-    private func checkGridDown() {
+    
+    private func checkGridDown(){
+        let swapTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lb,.ll,.lr,.lr,.ll,.lt,.ll,.bk,.lr,.rb,.rb,.bk]
+        let prevTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lt,.ll,.lr,.lr,.ll,.bk,.ll,.bk,.lr,.fu,.ch,.bk]
+        let downSet:Set = [TileType.ll,.lr,.vt,.bl,.br,.rb]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            guard yPos < screenData.screenDimensionY - 1 else {return}
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos-1][xPos]
-            if gridAsset == .ch {
-                // add cherry to score
-                addCherry()
-            } else {
-                wasCherry = false
+            if downSet.contains(gridAsset) { return }
+            if gridAsset == .ch { addCherry()
+            } else { wasCherry = false }
+            let i = fullTiles.firstIndex(of: gridAsset)
+            let p = fullTiles.firstIndex(of: previousAsset)
+            Task { @MainActor in
+                //try? await Task.sleep(for: .seconds(0.5))
+                screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
+                screenData.levelData.tileArray[yPos-1][xPos] = prevTiles[p!]
+                screenData.objectWillChange.send()
             }
-            if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .bl || gridAsset == .br || gridAsset == .rb { return }
-            
-            if gridAsset == .fu || gridAsset == .ch  {
-                screenData.levelData.tileArray[yPos][xPos] = .rb
-            }
-            if gridAsset == .rl {
-                screenData.levelData.tileArray[yPos][xPos] = .tl
-            }
-            if gridAsset == .rr {
-                screenData.levelData.tileArray[yPos][xPos] = .tr
-            }
-            if gridAsset == .tl {
-                screenData.levelData.tileArray[yPos][xPos] = .ll
-            }
-            if gridAsset == .tr {
-                screenData.levelData.tileArray[yPos][xPos] = .lr
-            }
-            if gridAsset == .hz {
-                screenData.levelData.tileArray[yPos][xPos] = .lb
-            }
-            if gridAsset == .rt {
-                screenData.levelData.tileArray[yPos][xPos] = .vt
-            }
-            
-            if previousAsset == .rb {
-                screenData.levelData.tileArray[yPos-1][xPos] = .vt
-            }
-            if previousAsset == .hz {
-                screenData.levelData.tileArray[yPos-1][xPos] = .lt
-            }
-            if previousAsset == .br {
-                screenData.levelData.tileArray[yPos-1][xPos] = .lr
-            }
-            if previousAsset == .bl {
-                screenData.levelData.tileArray[yPos-1][xPos] = .ll
-            }
-            if previousAsset == .lb {
-                screenData.levelData.tileArray[yPos-1][xPos] = .bk
-            }
-            if previousAsset == .rl {
-                screenData.levelData.tileArray[yPos-1][xPos] = .tl
-            }
-            if previousAsset == .rr {
-                screenData.levelData.tileArray[yPos-1][xPos] = .tr
-            }
-            
-            screenData.objectWillChange.send()
         }
     }
-    private func checkGridLeft() {
+    
+    private func checkGridLeft(){
+        let swapTiles = [TileType.ro,.tl,.br,.tl,.hz,.ll,.lb,.ll,.lt,.lb,.lb,.lt,.ll,.bk,.lr,.rl,.rl,.bk]
+        let prevTiles = [TileType.ro,.tr,.br,.hz,.tr,.lr,.lt,.lt,.lr,.lr,.lb,.bk,.bk,.bk,.bk,.fu,.ch,.bk]
+        let leftSet:Set = [TileType.lt,.lb,.hz,.tl,.bl,.lr]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            guard yPos < screenData.screenDimensionY - 1 else {return}
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos][xPos+1]
-            if gridAsset == .ch {
-                // add cherry to score
-                addCherry()
-            } else {
-                wasCherry = false
+            if leftSet.contains(gridAsset) { return }
+            if gridAsset == .ch { addCherry()
+            } else { wasCherry = false }
+            let i = fullTiles.firstIndex(of: gridAsset)
+            let p = fullTiles.firstIndex(of: previousAsset)
+            Task { @MainActor in
+                //try? await Task.sleep(for: .seconds(0.5))
+                screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
+                screenData.levelData.tileArray[yPos][xPos+1] = prevTiles[p!]
+                screenData.objectWillChange.send()
             }
-            if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tl || gridAsset == .bl { return }
-            
-            if gridAsset == .fu || gridAsset == .ch  {
-                screenData.levelData.tileArray[yPos][xPos] = .rl
-            }
-            if gridAsset == .rt {
-                screenData.levelData.tileArray[yPos][xPos] = .tl
-            }
-            if gridAsset == .rb {
-                screenData.levelData.tileArray[yPos][xPos] = .br
-            }
-            if gridAsset == .tr {
-                screenData.levelData.tileArray[yPos][xPos] = .lt
-            }
-            if gridAsset == .bl {
-                screenData.levelData.tileArray[yPos][xPos] = .lb
-            }
-            if gridAsset == .vt {
-                screenData.levelData.tileArray[yPos][xPos] = .ll
-            }
-            if gridAsset == .rr {
-                screenData.levelData.tileArray[yPos][xPos] = .hz
-            }
-            if gridAsset == .br {
-                screenData.levelData.tileArray[yPos][xPos] = .lb
-            }
-            
-            if previousAsset == .rl {
-                screenData.levelData.tileArray[yPos][xPos+1] = .hz
-            }
-            if previousAsset == .vt {
-                screenData.levelData.tileArray[yPos][xPos+1] = .lr
-            }
-            if previousAsset == .tl {
-                screenData.levelData.tileArray[yPos][xPos+1] = .lt
-            }
-            if previousAsset == .bl {
-                screenData.levelData.tileArray[yPos][xPos+1] = .lb
-            }
-            if previousAsset == .ll {
-                screenData.levelData.tileArray[yPos][xPos+1] = .bk
-            }
-            if previousAsset == .lr {
-                screenData.levelData.tileArray[yPos][xPos+1] = .bk
-            }
-            if previousAsset == .rt {
-                screenData.levelData.tileArray[yPos][xPos+1] = .tr
-            }
-            if previousAsset == .rb {
-                screenData.levelData.tileArray[yPos][xPos+1] = .br
-            }
-            
-            screenData.objectWillChange.send()
         }
     }
-    private func checkGridRight() {
+    
+    private func checkGridRight(){
+        let swapTiles = [TileType.ro,.tr,.bl,.hz,.hz,.lr,.lb,.lt,.lt,.lb,.lb,.lt,.ll,.bk,.lr,.rr,.rr,.bk]
+        let prevTiles = [TileType.ro,.tl,.bl,.hz,.hz,.ll,.lt,.lt,.lt,.lb,.lb,.bk,.bk,.bk,.bk,.fu,.ch,.bk]
+        let rightSet:Set = [TileType.lt,.lb,.hz,.tr,.br,.rr]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            guard yPos < screenData.screenDimensionY - 1 else {return}
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos][xPos-1]
-            if gridAsset == .ch {
-                // add cherry to score
-                addCherry()
-            } else {
-                wasCherry = false
+            if rightSet.contains(gridAsset) { return }
+            if gridAsset == .ch { addCherry()
+            } else { wasCherry = false }
+            let i = fullTiles.firstIndex(of: gridAsset)
+            let p = fullTiles.firstIndex(of: previousAsset)
+            Task { @MainActor in
+                //try? await Task.sleep(for: .seconds(0.5))
+                screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
+                screenData.levelData.tileArray[yPos][xPos-1] = prevTiles[p!]
+                screenData.objectWillChange.send()
             }
-            if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tr || gridAsset == .br || gridAsset == .rr { return }
-            
-            if gridAsset == .fu || gridAsset == .ch  {
-                screenData.levelData.tileArray[yPos][xPos] = .rr
-            }
-            if gridAsset == .rt {
-                screenData.levelData.tileArray[yPos][xPos] = .tr
-            }
-            if gridAsset == .rb {
-                screenData.levelData.tileArray[yPos][xPos] = .bl
-            }
-            if gridAsset == .tl {
-                screenData.levelData.tileArray[yPos][xPos] = .lt
-            }
-            if gridAsset == .br {
-                screenData.levelData.tileArray[yPos][xPos] = .lb
-            }
-            if gridAsset == .vt {
-                screenData.levelData.tileArray[yPos][xPos] = .lr
-            }
-            if gridAsset == .rl {
-                screenData.levelData.tileArray[yPos][xPos] = .hz
-            }
-            
-            if previousAsset == .rr {
-                screenData.levelData.tileArray[yPos][xPos-1] = .hz
-            }
-            if previousAsset == .vt {
-                screenData.levelData.tileArray[yPos][xPos-1] = .ll
-            }
-            if previousAsset == .tr {
-                screenData.levelData.tileArray[yPos][xPos-1] = .lt
-            }
-            if previousAsset == .br {
-                screenData.levelData.tileArray[yPos][xPos-1] = .lb
-            }
-            if previousAsset == .lr {
-                screenData.levelData.tileArray[yPos][xPos-1] = .bk
-            }
-            if previousAsset == .rt {
-                screenData.levelData.tileArray[yPos][xPos-1] = .tl
-            }
-            if previousAsset == .rb {
-                screenData.levelData.tileArray[yPos][xPos-1] = .bl
-            }
-            
-            screenData.objectWillChange.send()
-            
         }
     }
+    
+//    private func checkGridUp() {
+//        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+//            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+//            let previousAsset = screenData.levelData.tileArray[yPos+1][xPos]
+//            if gridAsset == .ch {
+//                // add cherry to score
+//                addCherry()
+//            } else {
+//                wasCherry = false
+//            }
+//            if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .tl || gridAsset == .tr || gridAsset == .rt { return }
+//            
+//            if gridAsset == .fu || gridAsset == .ch  {
+//                screenData.levelData.tileArray[yPos][xPos] = .rt
+//            }
+//            if gridAsset == .rl {
+//                screenData.levelData.tileArray[yPos][xPos] = .tl
+//            }
+//            if gridAsset == .rr {
+//                screenData.levelData.tileArray[yPos][xPos] = .tr
+//            }
+//            if gridAsset == .bl {
+//                screenData.levelData.tileArray[yPos][xPos] = .ll
+//            }
+//            if gridAsset == .br {
+//                screenData.levelData.tileArray[yPos][xPos] = .lr
+//            }
+//            if gridAsset == .hz {
+//                screenData.levelData.tileArray[yPos][xPos] = .lt
+//            }
+//            if gridAsset == .rb {
+//                screenData.levelData.tileArray[yPos][xPos] = .vt
+//            }
+//            if gridAsset == .lb {
+//                screenData.levelData.tileArray[yPos][xPos] = .bk
+//            }
+//            
+//            if previousAsset == .rt {
+//                screenData.levelData.tileArray[yPos+1][xPos] = .vt
+//            }
+//            if previousAsset == .hz {
+//                screenData.levelData.tileArray[yPos+1][xPos] = .lb
+//            }
+//            if previousAsset == .tr {
+//                screenData.levelData.tileArray[yPos+1][xPos] = .lr
+//            }
+//            if previousAsset == .tl {
+//                screenData.levelData.tileArray[yPos+1][xPos] = .ll
+//            }
+//            if previousAsset == .lt {
+//                screenData.levelData.tileArray[yPos+1][xPos] = .bk
+//            }
+//            if previousAsset == .rl {
+//                screenData.levelData.tileArray[yPos+1][xPos] = .bl
+//            }
+//            if previousAsset == .rr {
+//                screenData.levelData.tileArray[yPos+1][xPos] = .br
+//            }
+//            
+//            screenData.objectWillChange.send()
+//        }
+//    }
+//    private func checkGridDown() {
+//        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+//            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+//            let previousAsset = screenData.levelData.tileArray[yPos-1][xPos]
+//            if gridAsset == .ch {
+//                // add cherry to score
+//                addCherry()
+//            } else {
+//                wasCherry = false
+//            }
+//            if gridAsset == .ll || gridAsset == .lr || gridAsset == .vt || gridAsset == .bl || gridAsset == .br || gridAsset == .rb { return }
+//            
+//            if gridAsset == .fu || gridAsset == .ch  {
+//                screenData.levelData.tileArray[yPos][xPos] = .rb
+//            }
+//            if gridAsset == .rl {
+//                screenData.levelData.tileArray[yPos][xPos] = .tl
+//            }
+//            if gridAsset == .rr {
+//                screenData.levelData.tileArray[yPos][xPos] = .tr
+//            }
+//            if gridAsset == .tl {
+//                screenData.levelData.tileArray[yPos][xPos] = .ll
+//            }
+//            if gridAsset == .tr {
+//                screenData.levelData.tileArray[yPos][xPos] = .lr
+//            }
+//            if gridAsset == .hz {
+//                screenData.levelData.tileArray[yPos][xPos] = .lb
+//            }
+//            if gridAsset == .rt {
+//                screenData.levelData.tileArray[yPos][xPos] = .vt
+//            }
+//            
+//            if previousAsset == .rb {
+//                screenData.levelData.tileArray[yPos-1][xPos] = .vt
+//            }
+//            if previousAsset == .hz {
+//                screenData.levelData.tileArray[yPos-1][xPos] = .lt
+//            }
+//            if previousAsset == .br {
+//                screenData.levelData.tileArray[yPos-1][xPos] = .lr
+//            }
+//            if previousAsset == .bl {
+//                screenData.levelData.tileArray[yPos-1][xPos] = .ll
+//            }
+//            if previousAsset == .lb {
+//                screenData.levelData.tileArray[yPos-1][xPos] = .bk
+//            }
+//            if previousAsset == .rl {
+//                screenData.levelData.tileArray[yPos-1][xPos] = .tl
+//            }
+//            if previousAsset == .rr {
+//                screenData.levelData.tileArray[yPos-1][xPos] = .tr
+//            }
+//            
+//            screenData.objectWillChange.send()
+//        }
+//    }
+//    private func checkGridLeft() {
+//        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+//            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+//            let previousAsset = screenData.levelData.tileArray[yPos][xPos+1]
+//            if gridAsset == .ch {
+//                // add cherry to score
+//                addCherry()
+//            } else {
+//                wasCherry = false
+//            }
+//            if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tl || gridAsset == .bl { return }
+//            
+//            if gridAsset == .fu || gridAsset == .ch  {
+//                screenData.levelData.tileArray[yPos][xPos] = .rl
+//            }
+//            if gridAsset == .rt {
+//                screenData.levelData.tileArray[yPos][xPos] = .tl
+//            }
+//            if gridAsset == .rb {
+//                screenData.levelData.tileArray[yPos][xPos] = .br
+//            }
+//            if gridAsset == .tr {
+//                screenData.levelData.tileArray[yPos][xPos] = .lt
+//            }
+//            if gridAsset == .bl {
+//                screenData.levelData.tileArray[yPos][xPos] = .lb
+//            }
+//            if gridAsset == .vt {
+//                screenData.levelData.tileArray[yPos][xPos] = .ll
+//            }
+//            if gridAsset == .rr {
+//                screenData.levelData.tileArray[yPos][xPos] = .hz
+//            }
+//            if gridAsset == .br {
+//                screenData.levelData.tileArray[yPos][xPos] = .lb
+//            }
+//            
+//            if previousAsset == .rl {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .hz
+//            }
+//            if previousAsset == .vt {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .lr
+//            }
+//            if previousAsset == .tl {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .lt
+//            }
+//            if previousAsset == .bl {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .lb
+//            }
+//            if previousAsset == .ll {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .bk
+//            }
+//            if previousAsset == .lr {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .bk
+//            }
+//            if previousAsset == .rt {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .tr
+//            }
+//            if previousAsset == .rb {
+//                screenData.levelData.tileArray[yPos][xPos+1] = .br
+//            }
+//            
+//            screenData.objectWillChange.send()
+//        }
+//    }
+//    private func checkGridRight() {
+//        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+//            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+//            let previousAsset = screenData.levelData.tileArray[yPos][xPos-1]
+//            if gridAsset == .ch {
+//                // add cherry to score
+//                addCherry()
+//            } else {
+//                wasCherry = false
+//            }
+//            if gridAsset == .lt || gridAsset == .lb || gridAsset == .hz || gridAsset == .tr || gridAsset == .br || gridAsset == .rr { return }
+//            
+//            if gridAsset == .fu || gridAsset == .ch  {
+//                screenData.levelData.tileArray[yPos][xPos] = .rr
+//            }
+//            if gridAsset == .rt {
+//                screenData.levelData.tileArray[yPos][xPos] = .tr
+//            }
+//            if gridAsset == .rb {
+//                screenData.levelData.tileArray[yPos][xPos] = .bl
+//            }
+//            if gridAsset == .tl {
+//                screenData.levelData.tileArray[yPos][xPos] = .lt
+//            }
+//            if gridAsset == .br {
+//                screenData.levelData.tileArray[yPos][xPos] = .lb
+//            }
+//            if gridAsset == .vt {
+//                screenData.levelData.tileArray[yPos][xPos] = .lr
+//            }
+//            if gridAsset == .rl {
+//                screenData.levelData.tileArray[yPos][xPos] = .hz
+//            }
+//            
+//            if previousAsset == .rr {
+//                screenData.levelData.tileArray[yPos][xPos-1] = .hz
+//            }
+//            if previousAsset == .vt {
+//                screenData.levelData.tileArray[yPos][xPos-1] = .ll
+//            }
+//            if previousAsset == .tr {
+//                screenData.levelData.tileArray[yPos][xPos-1] = .lt
+//            }
+//            if previousAsset == .br {
+//                screenData.levelData.tileArray[yPos][xPos-1] = .lb
+//            }
+//            if previousAsset == .lr {
+//                screenData.levelData.tileArray[yPos][xPos-1] = .bk
+//            }
+//            if previousAsset == .rt {
+//                screenData.levelData.tileArray[yPos][xPos-1] = .tl
+//            }
+//            if previousAsset == .rb {
+//                screenData.levelData.tileArray[yPos][xPos-1] = .bl
+//            }
+//            
+//            screenData.objectWillChange.send()
+//            
+//        }
+//    }
     
     func moveRight() {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {

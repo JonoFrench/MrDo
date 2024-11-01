@@ -21,6 +21,13 @@ public enum LevelEndType {
 
 public enum GameConstants {
     
+    public enum Game {
+        public static let extraLifeLetters = 5
+        public static let initialLives = 3
+        public static let screenWidth = 12
+        public static let screenHeight = 13
+    }
+    
     public enum Speed {
         public static let tileSteps = 8.0
         public static let doSpeed = 2
@@ -32,13 +39,14 @@ public enum GameConstants {
     
     public enum Size {
 #if os(iOS)
-        public static let doSize = CGSize(width: 32, height: 32)
-        public static let appleSize = CGSize(width: 30, height: 30)
+        public static let doSize = CGSize(width: 30, height: 30)
+        public static let appleSize = CGSize(width: 28, height: 28)
         public static let ballSize = CGSize(width: 12, height: 12)
         public static let redMonsterSize = CGSize(width: 28, height: 28)
         public static let extraMonsterSize = CGSize(width: 28, height: 28)
         public static let pointsSize = CGSize(width: 40, height: 24)
         public static let typeSize = 30.0
+        public static let extraSpacing = 8.0
         public static let wonderSize = CGSize(width: 0, height: 236)
         public static let lifeSize = CGSize(width: 24, height: 24)
         public static let centerSize = CGSize(width: 32, height: 32)
@@ -46,11 +54,12 @@ public enum GameConstants {
 #elseif os(tvOS)
         public static let doSize = CGSize(width: 64, height: 64)
         public static let appleSize = CGSize(width: 64, height: 64)
-        public static let ballSize = CGSize(width: 30, height: 30)
+        public static let ballSize = CGSize(width: 24, height: 24)
         public static let redMonsterSize = CGSize(width: 52, height: 52)
         public static let extraMonsterSize = CGSize(width: 52, height: 52)
         public static let pointsSize = CGSize(width: 80, height: 48)
         public static let typeSize = 60.0
+        public static let extraSpacing = 16.0
         public static let wonderSize = CGSize(width: 0, height: 586)
         public static let lifeSize = CGSize(width: 48, height: 48)
         public static let centerSize = CGSize(width: 64, height: 64)
@@ -74,7 +83,7 @@ public enum GameConstants {
         public static let starttextSize:CGFloat = 24
         public static let copyTextSize:CGFloat = 28
         public static let titleTextSize:CGFloat = 28
-        public static let extraTextSize:CGFloat = 44
+        public static let extraTextSize:CGFloat = 36
         public static let highScoreTextSize:CGFloat = 28
         public static let subTitleTextSize:CGFloat = 12
         public static let scoreTextSize:CGFloat = 16
@@ -86,7 +95,7 @@ public enum GameConstants {
         public static let levelEndDelay = 3.5
         public static let monsterSpawnDelay = 2.3
         public static let extraMonsterSpawnDelay = 1.5
-        public static let nextLevelDelay = 2.0
+        public static let nextLevelDelay = 3.0
         public static let showNextLevelDelay = 10.0
         public static let progress10Delay = 10.0
         public static let gameOverDelay1 = 1.5

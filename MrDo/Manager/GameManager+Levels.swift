@@ -9,29 +9,45 @@ import Foundation
 
 extension GameManager {
     
-    func setDataForLevel(level:Int) {
+    func setDataForLevel(level: Int) {
+        resetLevelState()
+        configureLevel(level)
+    }
+    
+    private func resetLevelState() {
         appleArray.apples.removeAll()
         center = Center()
+        mrDo.setup(xPos: 5, yPos: 12)
+    }
+    
+    private func configureLevel(_ level: Int) {
         screenData.levelData.setLevelData(level: level)
+        
         switch level {
-        case 1: level1Data()
-        case 2: level2Data()
-        case 3: level3Data()
-        case 4: level4Data()
-        case 5: level5Data()
-        case 6: level6Data()
-        case 7: level7Data()
-        case 8: level8Data()
-        case 9: level9Data()
-        case 10: level10Data()
-            
+        case 1...10:
+            configureLevelData(for: level)
         default:
-            level1Data()
+            configureLevelData(for: 1)
         }
     }
     
+    private func configureLevelData(for level: Int) {
+        let levelConfigurations: [Int: () -> Void] = [
+            1: level1Data,
+            2: level2Data,
+            3: level3Data,
+            4: level4Data,
+            5: level5Data,
+            6: level6Data,
+            7: level7Data,
+            8: level8Data,
+            9: level9Data,
+            10: level10Data
+        ]
+        levelConfigurations[level]?()
+    }
+
     func level1Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 2, yPos: 0)
         appleArray.add(xPos: 4, yPos: 2)
         appleArray.add(xPos: 10, yPos: 3)
@@ -41,7 +57,6 @@ extension GameManager {
     }
     
     func level2Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 8, yPos: 1)
         appleArray.add(xPos: 6, yPos: 2)
         appleArray.add(xPos: 1, yPos: 3)
@@ -52,7 +67,6 @@ extension GameManager {
     }
     
     func level3Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 5, yPos: 1)
         appleArray.add(xPos: 7, yPos: 1)
         appleArray.add(xPos: 10, yPos: 3)
@@ -62,7 +76,6 @@ extension GameManager {
     }
     
     func level4Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 8, yPos: 1)
         appleArray.add(xPos: 5, yPos: 2)
         appleArray.add(xPos: 2, yPos: 3)
@@ -72,7 +85,6 @@ extension GameManager {
     }
     
     func level5Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 5, yPos: 1)
         appleArray.add(xPos: 1, yPos: 2)
         appleArray.add(xPos: 7, yPos: 2)
@@ -82,7 +94,6 @@ extension GameManager {
     }
     
     func level6Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 5, yPos: 1)
         appleArray.add(xPos: 8, yPos: 2)
         appleArray.add(xPos: 1, yPos: 3)
@@ -91,7 +102,6 @@ extension GameManager {
         appleArray.add(xPos: 9, yPos: 9)
     }
     func level7Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 1, yPos: 1)
         appleArray.add(xPos: 8, yPos: 1)
         appleArray.add(xPos: 6, yPos: 2)
@@ -100,7 +110,6 @@ extension GameManager {
         appleArray.add(xPos: 9, yPos: 8)
     }
     func level8Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 4, yPos: 1)
         appleArray.add(xPos: 5, yPos: 1)
         appleArray.add(xPos: 1, yPos: 3)
@@ -109,7 +118,6 @@ extension GameManager {
         appleArray.add(xPos: 7, yPos: 9)
     }
     func level9Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 4, yPos: 1)
         appleArray.add(xPos: 2, yPos: 2)
         appleArray.add(xPos: 4, yPos: 2)
@@ -118,7 +126,6 @@ extension GameManager {
         appleArray.add(xPos: 4, yPos: 8)
     }
     func level10Data(){
-        mrDo.setup(xPos: 5, yPos: 12)
         appleArray.add(xPos: 4, yPos: 1)
         appleArray.add(xPos: 6, yPos: 2)
         appleArray.add(xPos: 8, yPos: 2)
@@ -128,35 +135,34 @@ extension GameManager {
     }
     
     func setExtraFrames() {
-        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 0)!)
-        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 3)!)
-        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 6)!)
-        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 9)!)
-        extraFrames.append(screenData.levelData.getTile(name: "ExtraMonsters", pos: 12)!)
+        extraFrames = [
+              screenData.levelData.getTile(name: "ExtraMonsters", pos: 0),
+              screenData.levelData.getTile(name: "ExtraMonsters", pos: 3),
+              screenData.levelData.getTile(name: "ExtraMonsters", pos: 6),
+              screenData.levelData.getTile(name: "ExtraMonsters", pos: 9),
+              screenData.levelData.getTile(name: "ExtraMonsters", pos: 12)
+          ].compactMap { $0 }
     }
     
     /// Move the EXTRA monster along the Header whilst playing.
     func extraHeader() {
-        if gameState == .playing {
-            Task { @MainActor in
-                try? await Task.sleep(for: .seconds(GameConstants.Delay.extraHeaderDelay))
-                extraCurrent += 1
-                extraHeader()
-            }
+        guard gameState == .playing && !extraAppearing else { return }
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.extraHeaderDelay))
+            extraCurrent += 1
+            extraHeader()
         }
     }
     
     /// Extra Life screen. Flash the EXTRA box at the top of the screen.
     func extraFlash() {
-        if gameState == .extralife {
-            Task { @MainActor in
-                try? await Task.sleep(for: .seconds(GameConstants.Animation.extraFlashRate))
-                extraLifeFlashOn = !extraLifeFlashOn
-                extraFlash()
-                
-            }
-        } else {
+        guard gameState == .extralife else {
             extraLifeFlashOn = true
+            return }
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Animation.extraFlashRate))
+            extraLifeFlashOn.toggle()
+            extraFlash()
         }
     }
     /// After Level 10 We show the Progress10 Screen

@@ -88,7 +88,7 @@ public class MrDoHighScores:ObservableObject {
         self.newTime = time
         self.newLevel = level
         for s in hiScores {
-            if s.score < Int16(score) {
+            if s.score < Int32(score) {
                 return true
             }
         }

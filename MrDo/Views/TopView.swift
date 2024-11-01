@@ -27,7 +27,7 @@ struct TopView: View {
                     .stroke(.yellow,lineWidth: 3)
                     .background(.black)
                     .overlay(
-                        HStack {
+                        HStack(alignment: .center, spacing: GameConstants.Size.extraSpacing) {
                             Text("E")
                                 .foregroundStyle(manager.extraCollected[0] ? .yellow : .gray)
                                 .font(.custom("MrDo-Arcade", size: GameConstants.Text.extraTextSize))

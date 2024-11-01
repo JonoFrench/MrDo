@@ -40,6 +40,7 @@ class SwiftUISprite:ObservableObject {
     var moveDistance = 0.0
     var speedCounter: Int = 0
     var moveCounter = 0
+    let fullTiles = [TileType.ro,.rt,.rb,.rl,.rr,.vt,.hz,.tl,.tr,.br,.bl,.lt,.ll,.lb,.lr,.fu,.ch,.bk]
 
     init(xPos: Int, yPos: Int, frameSize: CGSize) {
         self.xPos = xPos

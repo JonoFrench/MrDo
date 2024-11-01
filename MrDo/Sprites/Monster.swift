@@ -25,17 +25,18 @@ class Monster:SwiftUISprite {
     var monsterState:MonsterState = .appearing
     var monsterDirection:MonsterDirection = .down
     var currentSpeed:Int = GameConstants.Speed.monsterSpeed
+    var actualAnimationFrame = 0
     private var increaseSpeedCounter = 0
-    private var upSet:Set = [TileType.bk,.vt,.ll,.lr,.rt,.tl,.tr,.lt]
-    private var downSet:Set = [TileType.bk,.vt,.ll,.lr,.rb,.bl,.br,.lb]
-    private var leftSet:Set = [TileType.bk,.hz,.lt,.lb,.rl,.tl,.bl,.ll]
-    private var rightSet:Set = [TileType.bk,.hz,.lt,.lb,.rr,.tr,.br,.lr]
-    var stripeRightFrames: [UIImage] = []
-    var stripeLeftFrames: [UIImage] = []
-    var stripeUpFrames: [UIImage] = []
-    var stripeDownFrames: [UIImage] = []
+    private let upSet:Set = [TileType.bk,.vt,.ll,.lr,.rt,.tl,.tr,.lt]
+    private let downSet:Set = [TileType.bk,.vt,.ll,.lr,.rb,.bl,.br,.lb]
+    private let leftSet:Set = [TileType.bk,.hz,.lt,.lb,.rl,.tl,.bl,.ll]
+    private let rightSet:Set = [TileType.bk,.hz,.lt,.lb,.rr,.tr,.br,.lr]
+    lazy var stripeRightFrames: [UIImage] = []
+    lazy var stripeLeftFrames: [UIImage] = []
+    lazy var stripeUpFrames: [UIImage] = []
+    lazy var stripeDownFrames: [UIImage] = []
+    lazy var swallowFrames: [UIImage] = []
     
-
     lazy var deadFrame: UIImage = UIImage()
     lazy var blankFrame: UIImage = UIImage()
     
@@ -53,16 +54,13 @@ class Monster:SwiftUISprite {
         blankFrame = getTile(name: "RedMonsters", pos: 12,y:1)!
     }
     
+    ///Set the initial offsets depending on direction.
     func setOffsets(direction:MonsterDirection){
         switch direction {
-        case .left:
-            gridOffsetX = 0
-        case .right:
-            gridOffsetX = 7
-        case .up:
-            gridOffsetY = 0
-        case .down:
-            gridOffsetY = 7
+        case .left: gridOffsetX = 0
+        case .right: gridOffsetX = 7
+        case .up: gridOffsetY = 0
+        case .down: gridOffsetY = 7
         }
     }
     
@@ -92,10 +90,9 @@ class Monster:SwiftUISprite {
                         gridOffsetX = 7
                         xPos -= 1
                         increaseSpeedCounter += 1
+                        if monsterType == .bluemonster {checkSwallowApple()}
                     }
-                } else {
-                    gridOffsetX -= 1
-                }
+                } else { gridOffsetX -= 1 }
                 position.x -= moveDistance
                 
             case .right:
@@ -112,10 +109,9 @@ class Monster:SwiftUISprite {
                         gridOffsetX = 0
                         xPos += 1
                         increaseSpeedCounter += 1
+                        if monsterType == .bluemonster {checkSwallowApple()}
                     }
-                } else {
-                    gridOffsetX += 1
-                }
+                } else { gridOffsetX += 1 }
                 position.x += moveDistance
                 
             case .up:
@@ -132,10 +128,9 @@ class Monster:SwiftUISprite {
                         gridOffsetY = 7
                         yPos -= 1
                         increaseSpeedCounter += 1
+                        if monsterType == .bluemonster {checkSwallowApple()}
                     }
-                } else {
-                    gridOffsetY -= 1
-                }
+                } else { gridOffsetY -= 1 }
                 position.y -= moveDistance
                 
             case .down:
@@ -152,10 +147,9 @@ class Monster:SwiftUISprite {
                         gridOffsetY = 0
                         yPos += 1
                         increaseSpeedCounter += 1
+                        if monsterType == .bluemonster {checkSwallowApple()}
                     }
-                } else {
-                    gridOffsetY += 1
-                }
+                } else { gridOffsetY += 1 }
                 position.y += moveDistance
             }
         }
@@ -176,8 +170,8 @@ class Monster:SwiftUISprite {
         if canMoveDown() {directionArray.append(.down)}
         if canMoveLeft() {directionArray.append(.left)}
         if canMoveRight() {directionArray.append(.right)}
-        if monsterState == .chasing {
-            if let doInstance: MrDo = ServiceLocator.shared.resolve() {
+        if let doInstance: MrDo = ServiceLocator.shared.resolve() {
+            if monsterState == .chasing {
                 /// Dig mode?
                 if !canMoveLeft() && doInstance.yPos == yPos && doInstance.xPos < xPos && !checkApple(xPos: xPos-1, yPos: yPos) {
                     digMode()
@@ -192,44 +186,43 @@ class Monster:SwiftUISprite {
                 if !canMoveDown() && doInstance.yPos > yPos && doInstance.xPos == xPos && !checkApple(xPos: xPos, yPos: yPos+1){
                     digMode()
                     setOffsets(direction: .down)
-                   return .down
+                    return .down
                 }
                 if !canMoveUp() && doInstance.yPos < yPos && doInstance.xPos == xPos && !checkApple(xPos: xPos, yPos: yPos-1) {
                     digMode()
                     setOffsets(direction: .up)
                     return .up
                 }
-
-                /// Other direction?
-                if directionArray.contains(.up) && doInstance.yPos < yPos {
-                    directionArray.append(.up)
-                }
-                if directionArray.contains(.down) && doInstance.yPos > yPos {
-                    directionArray.append(.down)
-                }
-                if directionArray.contains(.left) && doInstance.xPos < xPos {
-                    directionArray.append(.left)
-                }
-                if directionArray.contains(.right) && doInstance.xPos > xPos {
-                    directionArray.append(.right)
-                }
-                
-                if directionArray.contains(.up) && doInstance.xPos == xPos && doInstance.yPos < yPos {
-                    directionArray.append(.up)
-                    directionArray.append(.up)
-                }
-                if directionArray.contains(.down) && doInstance.xPos == xPos && doInstance.yPos > yPos {
-                    directionArray.append(.down)
-                    directionArray.append(.down)
-                }
-                if directionArray.contains(.left) && doInstance.yPos == yPos  && doInstance.xPos < xPos{
-                    directionArray.append(.left)
-                    directionArray.append(.left)
-                }
-                if directionArray.contains(.right) && doInstance.yPos == yPos  && doInstance.xPos > xPos{
-                    directionArray.append(.right)
-                    directionArray.append(.right)
-                }
+            }
+            /// Other direction?
+            if directionArray.contains(.up) && doInstance.yPos < yPos {
+                directionArray.append(.up)
+            }
+            if directionArray.contains(.down) && doInstance.yPos > yPos {
+                directionArray.append(.down)
+            }
+            if directionArray.contains(.left) && doInstance.xPos < xPos {
+                directionArray.append(.left)
+            }
+            if directionArray.contains(.right) && doInstance.xPos > xPos {
+                directionArray.append(.right)
+            }
+            
+            if directionArray.contains(.up) && doInstance.xPos == xPos && doInstance.yPos < yPos {
+                directionArray.append(.up)
+                directionArray.append(.up)
+            }
+            if directionArray.contains(.down) && doInstance.xPos == xPos && doInstance.yPos > yPos {
+                directionArray.append(.down)
+                directionArray.append(.down)
+            }
+            if directionArray.contains(.left) && doInstance.yPos == yPos  && doInstance.xPos < xPos{
+                directionArray.append(.left)
+                directionArray.append(.left)
+            }
+            if directionArray.contains(.right) && doInstance.yPos == yPos  && doInstance.xPos > xPos{
+                directionArray.append(.right)
+                directionArray.append(.right)
             }
         }
         let newDir = directionArray[Int.random(in: 0..<directionArray.count)]
@@ -290,20 +283,39 @@ class Monster:SwiftUISprite {
     }
     
     func checkApple(xPos:Int,yPos:Int) -> Bool {
+        guard monsterType != .bluemonster else { return false }
         ///Is there an apple?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {
                 if apple.xPos == xPos && apple.yPos == yPos {
-                    if monsterType == .bluemonster {
-                        swallowedApple = apple
-                        monsterType = .swallowmonster
-                        return false
-                    } else {
-                        return true
-                    }
+                    return true
                 }
             }
         }
         return false
+    }
+    func checkSwallowApple() {
+        ///Is there an apple?
+        if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
+            for apple in appleArray.apples {
+                if apple.xPos == xPos && apple.yPos == yPos {
+                    swallowedApple = apple
+                    setSwallowMonster()
+                }
+            }
+        }
+    }
+    
+    private func setSwallowMonster() {
+        monsterType = .swallowmonster
+        switch monsterDirection {
+        case .left: currentImage = swallowFrames[2]
+        case .right: currentImage = swallowFrames[0]
+        case .up: currentImage = swallowFrames[3]
+        case .down:currentImage = swallowFrames[1]
+        }
+        actualAnimationFrame = 0
+        currentAnimationFrame = 0
+        currentSpeed = 6
     }
 }

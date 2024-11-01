@@ -24,7 +24,7 @@ extension Notification.Name {
 
 extension GameManager {
     
-    func notificationObservers() {
+    func setNotificationObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(self.nextGame(notification:)), name: .notificationNewGame, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removeApple(notification:)), name: .notificationRemoveApple, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.addCherryScore(notification:)), name: .notificationCherryScore, object: nil)
@@ -151,12 +151,14 @@ extension GameManager {
     
     @objc func addCherryScore(notification: Notification) {
         if let count = notification.userInfo?["count"] as? Int {
-            score += GameConstants.Score.cherryPoints
-            levelScore += GameConstants.Score.cherryPoints
-            screenData.soundFX.cherrySound(count: count)
-            if count == 8 {
-                score += GameConstants.Score.allCherryPoints
-                levelScore += GameConstants.Score.allCherryPoints
+            if count >= 0 { /// count of -1 means cherry eaten by digger
+                score += GameConstants.Score.cherryPoints
+                levelScore += GameConstants.Score.cherryPoints
+                screenData.soundFX.cherrySound(count: count)
+                if count == 8 {
+                    score += GameConstants.Score.allCherryPoints
+                    levelScore += GameConstants.Score.allCherryPoints
+                }
             }
             cherryCount += 1
             if cherryCount == 40 {

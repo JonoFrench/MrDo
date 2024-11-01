@@ -9,41 +9,63 @@ import QuartzCore
 import SwiftUI
 import Combine
 
-class GameManager: ObservableObject {
-    let hiScores:MrDoHighScores = MrDoHighScores()
-    @Published
-    var screenData:ScreenData = ScreenData()
-    @Published
-    var gameState:GameState = .intro
-    @Published
-    var lives = 3
-    @Published
-    var score = 0
+@MainActor
+final class GameManager: ObservableObject {
+    // MARK: - Published Properties
+    @Published var gameState: GameState = .intro
+    @Published var lives = GameConstants.Game.initialLives
+    @Published var score = 0
+    @Published var extraCollected: [Bool] = []
+    @Published var extraCurrent = 0 {
+        didSet {
+            if extraCurrent == GameConstants.Game.extraLifeLetters {
+                extraCurrent = 0
+            }
+        }
+    }
+    @Published var extraLifeFlashOn = true
+    @Published var points: Points?
+    
+    // MARK: - Game Objects
+    let hiScores: MrDoHighScores = MrDoHighScores()
+    @Published var screenData: ScreenData = ScreenData()
+    // MARK: - Assets
+    var extraFrames: [UIImage] = []
+
+    // MARK: - Sprites
+    @ObservedObject private(set) var mrDo: MrDo = MrDo()
+    @ObservedObject private(set) var appleArray: AppleArray = AppleArray()
+    @ObservedObject private(set) var redMonsterArray: RedMonsterArray = RedMonsterArray()
+    @ObservedObject private(set) var extraMonsterArray: ExtraMonsterArray = ExtraMonsterArray()
+    @ObservedObject private(set) var ball: Ball = Ball()
+    @ObservedObject private(set) var progress: Progress = Progress()
+    @ObservedObject private(set) var extraLife: ExtraLife = ExtraLife()
+    
+    // MARK: - Game State
     var levelScore = 0
     var cherryCount = 0
     var gameTime = 0
-    var moveDirection: JoyPad {
+    var chaseMode = false
+    var center: Center = Center()
+    var levelScores: [LevelScores] = []
+    var startTime: Date = Date()
+    var endTime: Date = Date()
+    var extraAppearing = false
+    
+    // MARK: - Movement
+    var moveDirection: JoyPad = .stop {
         didSet {
             if moveDirection != oldValue {
                 handleJoyPad()
             }
         }
     }
-    @ObservedObject
-    var mrDo:MrDo = MrDo()
-    @ObservedObject
-    var appleArray:AppleArray = AppleArray()
-    @ObservedObject
-    var redMonsterArray:RedMonsterArray = RedMonsterArray()
-    @ObservedObject
-    var extraMonsterArray:ExtraMonsterArray = ExtraMonsterArray()
     
-    var center:Center = Center()
-    @ObservedObject
-    var ball:Ball = Ball()
-    /// So we can turn off collisions to test
+    // MARK: - Debug
     var turnOffCollisions = false
-    var checkCounter:Int = 0 {
+    
+    // MARK: - Check Counter
+    var checkCounter: Int = 0 {
         didSet {
             if checkCounter > 4 {
                 checkCounter = 0
@@ -51,68 +73,49 @@ class GameManager: ObservableObject {
         }
     }
     
-    var levelScores:[LevelScores] = []
-    var startTime: Date = Date()
-    var endTime: Date = Date()
-    
-    /// For the EXTRA at the top of the screen.
-    var extraFrames: [UIImage] = []
-    @Published
-    var extraCollected:[Bool] = [false,false,false,false,false]
-    @Published
-    var extraCurrent = 0 {
-        didSet {
-            if extraCurrent == 5 {
-                extraCurrent = 0
-            }
-        }
-    }
-    var extraAppearing = false
-    
-    @ObservedObject
-    var progress:Progress = Progress()
-    @ObservedObject
-    var extraLife:ExtraLife = ExtraLife()
-    @Published
-    var extraLifeFlashOn = true
-    @Published
-    var points:Points?
-    var chaseMode = false
     init() {
-        moveDirection = .stop
-        /// Share these instances so they are available from the other Sprites
+        setupSharedServices()
+        setNotificationObservers()
+        setExtraFrames()
+        setupDisplayLink()
+    }
+    
+    /// Share these instances so they are available from the other Sprites
+    private func setupSharedServices() {
         ServiceLocator.shared.register(service: screenData)
         ServiceLocator.shared.register(service: appleArray)
         ServiceLocator.shared.register(service: mrDo)
         ServiceLocator.shared.register(service: redMonsterArray)
         ServiceLocator.shared.register(service: extraMonsterArray)
-        ///Here we go, lets have a nice DisplayLink to update our model with the screen refresh.
-        let displayLink:CADisplayLink = CADisplayLink(target: self, selector: #selector(refreshModel))
-        displayLink.add(to: .main, forMode:.common)
-        notificationObservers()
-        setExtraFrames()
+    }
+    
+    private func setupDisplayLink() {
+        let displayLink = CADisplayLink(target: self, selector: #selector(refreshModel))
+        displayLink.add(to: .main, forMode: .common)
     }
     
     func startGame() {
 #if os(iOS)
         screenData.assetDimension = screenData.gameSize.width / Double(screenData.screenDimensionX)
 #elseif os(tvOS)
-        gameScreen.assetDimension = gameScreen.gameSize.height / 14 //Double(gameScreen.screenDimensionX + 3)
+        screenData.assetDimension = screenData.gameSize.height / 14 //Double(screenData.screenDimensionX + 3)
 #endif
-        print("Asset dim \(screenData.assetDimension) width should be \(screenData.assetDimension * 12)")
+//        print("Asset dim \(screenData.assetDimension) width should be \(screenData.assetDimension * 12)")
         screenData.assetDimensionStep = screenData.assetDimension / GameConstants.Speed.tileSteps
-        lives = 3
+        lives = GameConstants.Game.initialLives
         score = 0
         gameTime = 0
         screenData.level = 1
         screenData.gameLevel = 1
         screenData.gameOver = false
         cherryCount = 0
+        extraCollected = Array(repeating: false, count: GameConstants.Game.extraLifeLetters)
+
         ///Testing stuff
-        
-        //        turnOffCollisions = true
-        
-        
+        turnOffCollisions = true
+
+        /// Comment out startPlaying to test these
+
         ///Testing Progess screen.
         //        progress = Progress()
         //        levelScores.append(LevelScores(level: 1, time: Int(45),levelScore: 1000,endType: .cherry))
@@ -120,6 +123,7 @@ class GameManager: ObservableObject {
         //        levelScores.append(LevelScores(level: 10, time: Int(96),levelScore: 4600,endType: .redmonster))
         //        gameState = .progress
         //        gameScreen.soundFX.progressSound()
+/// Testing Progress10
         //        gameScreen.level = 10
         //        gameScreen.gameLevel = 10
         //        gameTime = 450
@@ -135,28 +139,14 @@ class GameManager: ObservableObject {
         startPlaying()
     }
     
-    func handleJoyPad() {
-        //        guard !mrDo.willStop else {return}
+    private func handleJoyPad() {
+        guard gameState == .playing else { return }
         switch moveDirection {
-        case .down:
-            if gameState == .playing {
-                mrDo.direction = .down
-            }
-        case .left:
-            if gameState == .playing {
-                mrDo.direction = .left
-            }
-        case .right:
-            if gameState == .playing {
-                mrDo.direction = .right
-            }
-        case .up:
-            if gameState == .playing {
-                mrDo.direction = .up
-            }
-        case.stop:
-            print("handleJoyPad stop")
-            mrDo.willStop = true
+        case .down: mrDo.direction = .down
+        case .left: mrDo.direction = .left
+        case .right: mrDo.direction = .right
+        case .up: mrDo.direction = .up
+        case .stop: mrDo.willStop = true
         }
     }
     
@@ -188,7 +178,6 @@ class GameManager: ObservableObject {
         screenData.gameOver = false
         extraCurrent = 0
         extraAppearing = false
-        extraCollected = [false,false,false,false,false]
         chaseMode = false
         redMonsterArray.monsters.removeAll()
         extraMonsterArray.monsters.removeAll()
@@ -204,7 +193,6 @@ class GameManager: ObservableObject {
             screenData.soundFX.backgroundSound()
             addRedMonsters()
         }
-        
     }
     
     func restartPlaying(){
@@ -242,16 +230,19 @@ class GameManager: ObservableObject {
             try? await Task.sleep(for: .seconds(GameConstants.Delay.levelEndDelay))
             mrDo.reset()
             ball.reset()
-            
-            /// Check if we have all EXTRA for extra life.
-            if extraCollected.filter({$0 == true}).count == 5 {
-                extraLife = ExtraLife()
-                gameState = .extralife
-                screenData.soundFX.extraLifeSound()
-                extraFlash()
-            } else {
-                checkNextLevel()
-            }
+            checkEXTRA()
+        }
+    }
+    
+    private func checkEXTRA(){
+        /// Check if we have all EXTRA for extra life.
+        if extraCollected.filter({$0 == true}).count == GameConstants.Game.extraLifeLetters {
+            extraLife = ExtraLife()
+            gameState = .extralife
+            screenData.soundFX.extraLifeSound()
+            extraFlash()
+        } else {
+            checkNextLevel()
         }
     }
     
@@ -306,7 +297,7 @@ class GameManager: ObservableObject {
         mrDo.move()
         guard mrDo.doState != .dead && mrDo.doState != .falling else { return}
         /// Collect the bonus food and enter EXTRA mode
-        if mrDo.xPos == 5 && mrDo.yPos == 6 && center.collectible == true {
+            if circlesIntersect(center1: mrDo.position, diameter1: mrDo.frameSize.width / 2, center2: center.position, diameter2: center.frameSize.width / 2) && center.collectible {
             center.collectBonusFood()
             screenData.levelData.setExtraLevelData()
             screenData.soundFX.backgroundStopAll()
@@ -380,7 +371,6 @@ class GameManager: ObservableObject {
                     Task { @MainActor in
                         try? await Task.sleep(for: .seconds(GameConstants.Delay.nextLevelDelay))
                         nextLevel(endType: .extramonster)
-                        
                     }
                 }
                 return
