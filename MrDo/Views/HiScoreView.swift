@@ -64,7 +64,7 @@ struct HiScoreView: View {
                             .padding([.trailing])
                         Spacer()
                         
-                        Text("\((score.time % 3600) / 60)'\(String(format: "%02d",(score.time % 3600) % 60))")
+                        Text("\(String(format: "%02d",(score.time % 3600) / 60))'\(String(format: "%02d",(score.time % 3600) % 60))")
                             .foregroundStyle(.white)
                             .font(.custom("MrDo-Arcade", size: GameConstants.Text.scoreTextSize))
                             .padding([.trailing])

@@ -20,7 +20,6 @@ enum MonsterType {
     case letter,redmonster,bluemonster,swallowmonster,digmonster
 }
 
-
 class Monster:SwiftUISprite {
     var monsterState:MonsterState = .appearing
     var monsterDirection:MonsterDirection = .down
@@ -36,7 +35,8 @@ class Monster:SwiftUISprite {
     lazy var stripeUpFrames: [UIImage] = []
     lazy var stripeDownFrames: [UIImage] = []
     lazy var swallowFrames: [UIImage] = []
-    
+    lazy var extraSwallowFrames: [UIImage] = []
+
     lazy var deadFrame: UIImage = UIImage()
     lazy var blankFrame: UIImage = UIImage()
     
@@ -46,6 +46,7 @@ class Monster:SwiftUISprite {
     var downFrames: [UIImage] = []
     
     var monsterType:MonsterType = .bluemonster
+    lazy var prevMonsterType:MonsterType = .bluemonster
     var swallowedApple: Apple?
     
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
@@ -90,7 +91,8 @@ class Monster:SwiftUISprite {
                         gridOffsetX = 7
                         xPos -= 1
                         increaseSpeedCounter += 1
-                        if monsterType == .bluemonster {checkSwallowApple()}
+                        checkSwallowApple()
+//                        if monsterType == .bluemonster {checkSwallowApple()}
                     }
                 } else { gridOffsetX -= 1 }
                 position.x -= moveDistance
@@ -232,8 +234,7 @@ class Monster:SwiftUISprite {
     
     func canMoveUp() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard yPos > 0 else {
-                return false }
+            guard yPos > 0 else { return false }
             if checkApple(xPos: xPos, yPos: yPos-1) { return false }
             let checkAsset = screenData.levelData.tileArray[yPos-1][xPos]
             if upSet.contains(checkAsset) {
@@ -245,8 +246,7 @@ class Monster:SwiftUISprite {
     
     func canMoveDown() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard yPos < screenData.screenDimensionY-1 else {
-                return false }
+            guard yPos < screenData.screenDimensionY-1 else { return false }
             if checkApple(xPos: xPos, yPos: yPos+1) { return false }
             let checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
             if downSet.contains(checkAsset) {
@@ -258,8 +258,7 @@ class Monster:SwiftUISprite {
     
     func canMoveLeft() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard xPos > 0 else {
-                return false }
+            guard xPos > 0 else { return false }
             if checkApple(xPos: xPos-1, yPos: yPos) { return false }
             let checkAsset = screenData.levelData.tileArray[yPos][xPos-1]
             if leftSet.contains(checkAsset) {
@@ -271,8 +270,7 @@ class Monster:SwiftUISprite {
     
     func canMoveRight() -> Bool {
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard xPos < screenData.screenDimensionX - 1 else {
-                return false }
+            guard xPos < screenData.screenDimensionX - 1 else { return false }
             if checkApple(xPos: xPos+1, yPos: yPos) { return false }
             let checkAsset = screenData.levelData.tileArray[yPos][xPos+1]
             if rightSet.contains(checkAsset) {
@@ -283,7 +281,7 @@ class Monster:SwiftUISprite {
     }
     
     func checkApple(xPos:Int,yPos:Int) -> Bool {
-        guard monsterType != .bluemonster else { return false }
+        guard monsterType != .bluemonster && monsterType != .letter else { return false }
         ///Is there an apple?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {
@@ -307,13 +305,14 @@ class Monster:SwiftUISprite {
     }
     
     private func setSwallowMonster() {
-        monsterType = .swallowmonster
+        prevMonsterType = monsterType
         switch monsterDirection {
-        case .left: currentImage = swallowFrames[2]
-        case .right: currentImage = swallowFrames[0]
-        case .up: currentImage = swallowFrames[3]
-        case .down:currentImage = swallowFrames[1]
+        case .left: currentImage = monsterType == .letter ? extraSwallowFrames[2] : swallowFrames[2]
+        case .right: currentImage = monsterType == .letter ? extraSwallowFrames[0] : swallowFrames[0]
+        case .up: currentImage = monsterType == .letter ? extraSwallowFrames[3] : swallowFrames[3]
+        case .down:currentImage = monsterType == .letter ? extraSwallowFrames[1] : swallowFrames[1]
         }
+        monsterType = .swallowmonster
         actualAnimationFrame = 0
         currentAnimationFrame = 0
         currentSpeed = 6

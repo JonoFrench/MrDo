@@ -324,12 +324,22 @@ class LevelData:ObservableObject {
     func setExtraLevelData() {
         tileImages = setTilesFor(level: 11)
     }
-    
+
+    func resetExtraLevelData(level:Int) {
+        tileImages = setTilesFor(level: level)
+    }
+
     func setProgress10Data() {
         tileArray = levels.progress10
         tileImages = setTilesFor(level: 10)
     }
 
+    func setIntroScreen() {
+        tileArray = levels.introScreen
+        tileImages = setTilesFor(level: 1)
+    }
+
+    
     func setTilesFor(level:Int) -> [UIImage] {
         var tiles:[UIImage] = []
         for i in 0...17 {
@@ -564,4 +574,20 @@ struct Levels {
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu]]
+    
+    let introScreen:[[TileType]] = [
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.bk],
+        [.bk,.fu,.rl,.hz,.hz,.hz,.hz,.hz,.hz,.rr,.fu,.bk],
+        [.bk,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.bk],
+        [.bk,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.bk],
+        [.bk,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.rt,.fu,.bk],
+        [.bk,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.rb,.fu,.bk],
+        [.bk,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk],
+        [.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk,.bk]]
+
 }

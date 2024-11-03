@@ -31,7 +31,7 @@ final class GameManager: ObservableObject {
     @Published var screenData: ScreenData = ScreenData()
     // MARK: - Assets
     var extraFrames: [UIImage] = []
-
+    
     // MARK: - Sprites
     @ObservedObject private(set) var mrDo: MrDo = MrDo()
     @ObservedObject private(set) var appleArray: AppleArray = AppleArray()
@@ -51,6 +51,8 @@ final class GameManager: ObservableObject {
     var startTime: Date = Date()
     var endTime: Date = Date()
     var extraAppearing = false
+    var introBall = false
+    var introLetter = 0
     
     // MARK: - Movement
     var moveDirection: JoyPad = .stop {
@@ -94,14 +96,18 @@ final class GameManager: ObservableObject {
         displayLink.add(to: .main, forMode: .common)
     }
     
-    func startGame() {
+    func setInit() {
 #if os(iOS)
         screenData.assetDimension = screenData.gameSize.width / Double(screenData.screenDimensionX)
 #elseif os(tvOS)
         screenData.assetDimension = screenData.gameSize.height / 14 //Double(screenData.screenDimensionX + 3)
 #endif
-//        print("Asset dim \(screenData.assetDimension) width should be \(screenData.assetDimension * 12)")
+        //        print("Asset dim \(screenData.assetDimension) width should be \(screenData.assetDimension * 12)")
         screenData.assetDimensionStep = screenData.assetDimension / GameConstants.Speed.tileSteps
+        setIntroScreenData()
+    }
+    
+    func startGame() {
         lives = GameConstants.Game.initialLives
         score = 0
         gameTime = 0
@@ -110,12 +116,12 @@ final class GameManager: ObservableObject {
         screenData.gameOver = false
         cherryCount = 0
         extraCollected = Array(repeating: false, count: GameConstants.Game.extraLifeLetters)
-
+        
         ///Testing stuff
         turnOffCollisions = true
-
+        
         /// Comment out startPlaying to test these
-
+        
         ///Testing Progess screen.
         //        progress = Progress()
         //        levelScores.append(LevelScores(level: 1, time: Int(45),levelScore: 1000,endType: .cherry))
@@ -123,7 +129,7 @@ final class GameManager: ObservableObject {
         //        levelScores.append(LevelScores(level: 10, time: Int(96),levelScore: 4600,endType: .redmonster))
         //        gameState = .progress
         //        gameScreen.soundFX.progressSound()
-/// Testing Progress10
+        /// Testing Progress10
         //        gameScreen.level = 10
         //        gameScreen.gameLevel = 10
         //        gameTime = 450
@@ -161,14 +167,9 @@ final class GameManager: ObservableObject {
         } else if gameState == .ended {
             
         } else if gameState == .extralife {
-            extraLife.move()
-            extraLife.animate()
-            if extraLife.ball.exploding {
-                extraLife.ball.explode()
-            } else
-            if extraLife.ball.imploding {
-                extraLife.ball.implode()
-            }
+            extraLifeHandling()
+        } else if gameState == .intro {
+            introHandling()
         }
     }
     
@@ -283,6 +284,20 @@ final class GameManager: ObservableObject {
         }
     }
     
+    private func introBallHandling(){
+        if ball.thrown {
+            checkBallHitIntroMonster()
+            ball.move()
+        } else
+        if ball.exploding {
+            ball.explode()
+        } else
+        if ball.imploding {
+            ball.implode()
+        }
+    }
+    
+    
     private func appleHandling() {
         appleArray.checkDrop(doXpos: mrDo.xPos,doYpos: mrDo.yPos)
         appleArray.move()
@@ -297,8 +312,10 @@ final class GameManager: ObservableObject {
         mrDo.move()
         guard mrDo.doState != .dead && mrDo.doState != .falling else { return}
         /// Collect the bonus food and enter EXTRA mode
-            if circlesIntersect(center1: mrDo.position, diameter1: mrDo.frameSize.width / 2, center2: center.position, diameter2: center.frameSize.width / 2) && center.collectible {
-            center.collectBonusFood()
+        if circlesIntersect(center1: mrDo.position, diameter1: mrDo.frameSize.width / 2, center2: center.position, diameter2: center.frameSize.width / 2) && center.collectible {
+            let val = center.collectBonusFood()
+            score += val
+            levelScore += val
             screenData.levelData.setExtraLevelData()
             screenData.soundFX.backgroundStopAll()
             screenData.soundFX.backgroundAlphaSound()
@@ -312,11 +329,33 @@ final class GameManager: ObservableObject {
         }
     }
     
+    func extraLifeHandling() {
+        extraLife.move()
+        extraLife.animate()
+        if extraLife.ball.exploding {
+            extraLife.ball.explode()
+        } else
+        if extraLife.ball.imploding {
+            extraLife.ball.implode()
+        }
+    }
+    
+    func introHandling() {
+        monsterHandling()
+        if !extraMonsterArray.monsters.isEmpty {
+            if !introBall && !ball.thrown && extraMonsterArray.monsters[0].xPos == 4 {
+                throwBall()
+                introBall = true
+            }
+        }
+        introBallHandling()
+    }
+    
     private func addExtraMonsters(){
         guard extraMonsterArray.monsterCount < 6 else {
             return
         }
-        extraMonsterArray.add(xPos: 5, yPos: 0,letterPos: extraCurrent)
+        extraMonsterArray.add(xPos: 6, yPos: 0,letterPos: extraCurrent)
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(GameConstants.Delay.extraMonsterSpawnDelay))
             addExtraMonsters()
@@ -366,16 +405,34 @@ final class GameManager: ObservableObject {
                 if monster.monsterType == .bluemonster {
                     appleArray.add(xPos: monster.xPos, yPos: monster.yPos)
                 } else {
-                    extraCollected[extraCurrent] = true
-                    extrasToApples()
-                    Task { @MainActor in
-                        try? await Task.sleep(for: .seconds(GameConstants.Delay.nextLevelDelay))
-                        nextLevel(endType: .extramonster)
-                    }
+                    killLetter()
                 }
                 return
             }
         }
+    }
+    
+    private func checkBallHitIntroMonster() {
+        for monster in extraMonsterArray.monsters where monster.monsterState == .moving || monster.monsterState == .chasing || monster.monsterState == .still {
+            if circlesIntersect(center1: ball.position, diameter1: ball.frameSize.width / 2, center2: monster.position, diameter2: monster.frameSize.width / 2 ){
+                ball.setExplode(position: monster.position)
+                returnBall()
+                monster.kill()
+                appleArray.add(xPos: monster.xPos, yPos: monster.yPos)
+                return
+            }
+        }
+    }
+    
+    func killLetter() {
+        guard gameState == .playing else { return }
+        extraCollected[extraCurrent] = true
+        extrasToApples()
+        screenData.levelData.resetExtraLevelData(level: screenData.level)
+        redMonsterArray.moving()
+        screenData.soundFX.backgroundAlphaSoundStop()
+        screenData.soundFX.backgroundFastSound()
+        
     }
     
     private func doCaught() {
@@ -440,11 +497,21 @@ final class GameManager: ObservableObject {
     }
     
     private func returnBall(){
-        Task { @MainActor in
-            try? await Task.sleep(for: .seconds(GameConstants.Delay.returnBallDelay))
-            if gameState == .playing {
-                ball.setImplode(position: mrDo.position)
-                screenData.soundFX.ballResetSound()
+        if gameState == .intro {
+            ball.setImplode(position: mrDo.position)
+            return
+        }
+        if center.collected && gameState == .playing {
+            ball.setImplode(position: mrDo.position)
+            screenData.soundFX.ballResetSound()
+        } else {
+            Task { @MainActor in
+                let timeAdjust = Double(redMonsterArray.killCount) * 0.5
+                try? await Task.sleep(for: .seconds(GameConstants.Delay.returnBallDelay + timeAdjust))
+                if gameState == .playing {
+                    ball.setImplode(position: mrDo.position)
+                    screenData.soundFX.ballResetSound()
+                }
             }
         }
     }

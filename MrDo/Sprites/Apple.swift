@@ -46,6 +46,9 @@ final class AppleArray: ObservableObject {
                         monster.position = apple.position
                         monster.position.y -= apple.frameSize.height
                         monsterInstance.squashCount += 1
+                        if monster.monsterType == .letter {
+                            NotificationCenter.default.post(name: .notificationKillLetter, object: nil, userInfo: nil)
+                        }
                     }
                 }
             }

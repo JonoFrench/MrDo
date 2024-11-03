@@ -35,7 +35,6 @@
 		34099A252C99CB4800F4FE3A /* NewHighScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A242C99CB4800F4FE3A /* NewHighScoreView.swift */; };
 		34099A282C99E52500F4FE3A /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A272C99E52500F4FE3A /* IntroView.swift */; };
 		34099A2A2C99E67100F4FE3A /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A292C99E67100F4FE3A /* StartView.swift */; };
-		34099A2C2C99E68A00F4FE3A /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A2B2C99E68A00F4FE3A /* InfoView.swift */; };
 		34099A2E2C99E6F100F4FE3A /* ScreenData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A2D2C99E6F100F4FE3A /* ScreenData.swift */; };
 		34099A302C9A070600F4FE3A /* LevelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A2F2C9A070600F4FE3A /* LevelData.swift */; };
 		34099A322C9AC5F500F4FE3A /* Apple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34099A312C9AC5F500F4FE3A /* Apple.swift */; };
@@ -117,7 +116,6 @@
 		34099A262C99E48900F4FE3A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		34099A272C99E52500F4FE3A /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		34099A292C99E67100F4FE3A /* StartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartView.swift; sourceTree = "<group>"; };
-		34099A2B2C99E68A00F4FE3A /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		34099A2D2C99E6F100F4FE3A /* ScreenData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenData.swift; sourceTree = "<group>"; };
 		34099A2F2C9A070600F4FE3A /* LevelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelData.swift; sourceTree = "<group>"; };
 		34099A312C9AC5F500F4FE3A /* Apple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apple.swift; sourceTree = "<group>"; };
@@ -338,7 +336,6 @@
 				34099A242C99CB4800F4FE3A /* NewHighScoreView.swift */,
 				34099A272C99E52500F4FE3A /* IntroView.swift */,
 				34099A292C99E67100F4FE3A /* StartView.swift */,
-				34099A2B2C99E68A00F4FE3A /* InfoView.swift */,
 				340A7B4B2CBD5C8700433318 /* ProgressView.swift */,
 				340A7B592CC0FDE000433318 /* Progress10View.swift */,
 				34B9D1A52CCA6D7D001BF478 /* ExtraLifeView.swift */,
@@ -493,7 +490,6 @@
 				34099A1D2C99CAD900F4FE3A /* HiScoreView.swift in Sources */,
 				34099A342C9AC60A00F4FE3A /* AppleView.swift in Sources */,
 				34099A252C99CB4800F4FE3A /* NewHighScoreView.swift in Sources */,
-				34099A2C2C99E68A00F4FE3A /* InfoView.swift in Sources */,
 				340A7B562CBFED6D00433318 /* GameOverView.swift in Sources */,
 				340A7B302CBBE14100433318 /* GameManager+Levels.swift in Sources */,
 				34099A0B2C99C50E00F4FE3A /* CoreDataStack.swift in Sources */,

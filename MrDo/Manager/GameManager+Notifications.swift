@@ -20,6 +20,7 @@ extension Notification.Name {
     static let notificationExtraLife = Notification.Name("NotificationExtraLife")
     static let notificationRemovePoints = Notification.Name("NotificationRemovePoints")
     static let notificationChaseMode = Notification.Name("NotificationChaseMode")
+    static let notificationKillLetter = Notification.Name("NotificationKillLetter")
 }
 
 extension GameManager {
@@ -34,7 +35,8 @@ extension GameManager {
         NotificationCenter.default.addObserver(self, selector: #selector(self.addExtraLife(notification:)), name: .notificationExtraLife, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.removePoints(notification:)), name: .notificationRemovePoints, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.startChaseMode(notification:)), name: .notificationChaseMode, object: nil)
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.removeLetter(notification:)), name: .notificationKillLetter, object: nil)
+
         
         
 #if os(tvOS)
@@ -81,7 +83,7 @@ extension GameManager {
                 screenData.soundFX.gameOverSound()
                 screenData.gameOver = true
                 try? await Task.sleep(for: .seconds(GameConstants.Delay.gameOverDelay2))
-                if hiScores.isNewHiScore(score: score,level: screenData.level, time: gameTime) {
+                if hiScores.isNewHiScore(score: score,level: screenData.gameLevel, time: gameTime) {
                     hiScores.resetInput()
                     gameState = .highscore
                     screenData.soundFX.nameEntrySound()
@@ -142,7 +144,14 @@ extension GameManager {
             extraMonsterArray.remove(id: id)
         }
     }
-    
+
+    @objc func removeLetter(notification: Notification) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(GameConstants.Delay.extraLetterDelay))
+            killLetter()
+        }
+    }
+
     @objc func removePoints(notification: Notification) {
         if points != nil {
             self.points = nil

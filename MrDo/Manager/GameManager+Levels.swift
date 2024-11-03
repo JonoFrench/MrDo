@@ -9,6 +9,25 @@ import Foundation
 
 extension GameManager {
     
+    func setIntroScreenData() {
+        screenData.levelData.setIntroScreen()
+        mrDo.setup(xPos: 2, yPos: 5)
+        appleArray.apples.removeAll()
+        appleArray.add(xPos: 5, yPos: 5)
+        appleArray.add(xPos: 7, yPos: 6)
+        appleArray.add(xPos: 9, yPos: 6)
+        resetIntroScreen()
+    }
+    
+    func resetIntroScreen() {
+        mrDo.hasBall = true
+        introBall = false
+        extraMonsterArray.monsters.removeAll()
+        extraMonsterArray.addIntro(xPos: 9, yPos: 5, letterPos: introLetter)
+        introLetter += 1
+        if introLetter == 5 { introLetter = 0 }
+    }
+    
     func setDataForLevel(level: Int) {
         resetLevelState()
         configureLevel(level)

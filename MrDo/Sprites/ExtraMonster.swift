@@ -44,7 +44,11 @@ final class ExtraMonsterArray: ObservableObject {
             killCount += 1
         }
     }
-    
+ 
+    func addIntro(xPos:Int,yPos:Int,letterPos:Int) {
+        let monster = ExtraMonster(xPos: xPos, yPos:yPos,letter: letterPos)
+        monsters.append(monster)
+    }
     func add(xPos:Int,yPos:Int,letterPos:Int) {
         let monster = ExtraMonster(xPos: xPos, yPos:yPos,type: letterAdded ? .bluemonster : .letter,letter: letterPos)
         monsters.append(monster)
@@ -72,6 +76,20 @@ final class ExtraMonster:Monster,Moveable,Animatable {
     private var appearCount = 0
     private var increaseSpeedCounter = 0
     private var letter = 0
+   
+    init(xPos: Int, yPos: Int,letter: Int) {
+        super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.extraMonsterSize)
+        monsterType = .letter
+        self.letter = letter
+        setImages()
+        currentImage = extraFrames[0]
+        monsterDirection = .left
+        monsterState = .moving
+        setOffsets(direction: .left)
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            moveDistance = screenData.assetDimensionStep
+        }
+    }
     
     init(xPos: Int, yPos: Int, type:MonsterType, letter: Int) {
         super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.extraMonsterSize)
@@ -150,17 +168,19 @@ final class ExtraMonster:Monster,Moveable,Animatable {
             currentAnimationFrame = 0
             if monsterType == .swallowmonster {
                 actualAnimationFrame += 1
-                if actualAnimationFrame == 1 {
+//                if actualAnimationFrame == 2 {
+//                    if let appleArray: AppleArray = ServiceLocator.shared.resolve(), let swallowedApple {
+//                        appleArray.remove(id: swallowedApple.id)
+//                    }
+//                }
+                currentImage = prevMonsterType == .letter ? extraSwallowFrames[3 + actualAnimationFrame] : swallowFrames[3 + actualAnimationFrame]
+                if actualAnimationFrame == 4 {
                     if let appleArray: AppleArray = ServiceLocator.shared.resolve(), let swallowedApple {
                         appleArray.remove(id: swallowedApple.id)
                     }
-                }
-                currentImage = swallowFrames[3 + actualAnimationFrame]
-                if actualAnimationFrame == 4 {
                     actualAnimationFrame = 0
-                    monsterType = .bluemonster
+                    monsterType = prevMonsterType
                     currentSpeed = GameConstants.Speed.monsterSpeed
-                    
                 }
             }
             else if monsterState == .moving || monsterState == .chasing || monsterState == .still || monsterState == .appearing {
@@ -183,7 +203,8 @@ final class ExtraMonster:Monster,Moveable,Animatable {
         for i in 6..<8 { walkUpFrames.append(getTile(name: "BlueMonsters", pos: i)!) }
         for i in 0..<16 { extraFrames.append(getTile(name: "ExtraMonsters", pos: i)!) }
         for i in 0..<8 { swallowFrames.append(getTile(name: "BlueSwallowMonster", pos: i)!)}
-        
+        for i in 0..<8 { extraSwallowFrames.append(getTile(name: "WhiteSwallowMonster", pos: i)!)}
+
         if monsterType == .letter {
             leftFrames = [extraFrames[letter * 3 + 1],extraFrames[letter * 3 + 2]]
             rightFrames = leftFrames

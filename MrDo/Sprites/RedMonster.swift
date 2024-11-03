@@ -218,7 +218,7 @@ final class RedMonster:Monster,Moveable,Animatable {
                     
                 case .up:
                     if gridOffsetY == 0 {
-                        if canMoveUp() || checkApple(xPos: xPos, yPos: yPos-1) {
+                        if canMoveUp() || checkApple(xPos: xPos, yPos: yPos-1) || yPos == 0 {
                             monsterType = .redmonster
                             chaseMode()
                             monsterDirection = nextDirection()
@@ -227,7 +227,7 @@ final class RedMonster:Monster,Moveable,Animatable {
                         gridOffsetY = 7
                         yPos -= 1
                         checkGridUp()
-                    } else { gridOffsetY -= 1}
+                    } else { gridOffsetY -= 1 }
                     position.y -= moveDistance
                     
                 case .down:
@@ -252,7 +252,7 @@ final class RedMonster:Monster,Moveable,Animatable {
         let prevTiles = [TileType.ro,.vt,.rb,.bl,.br,.vt,.lb,.ll,.lr,.br,.bl,.bk,.ll,.lb,.lr,.fu,.ch,.bk]
         let swapTiles = [TileType.ro,.rt,.vt,.tl,.tr,.vt,.lt,.tl,.tr,.lr,.ll,.lt,.ll,.bk,.lr,.rt,.rt,.bk]
         let upSet:Set = [TileType.ll,.lr,.vt,.tl,.tr]
-        guard yPos > 0 else {return}
+        guard yPos >= 0 else {return}
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos+1][xPos]
@@ -415,7 +415,7 @@ final class RedMonster:Monster,Moveable,Animatable {
         let prevTiles = [TileType.ro,.tr,.br,.hz,.tr,.lr,.lt,.lt,.lr,.lr,.lb,.bk,.bk,.bk,.bk,.fu,.ch,.bk]
         let leftSet:Set = [TileType.lt,.lb,.hz,.tl,.bl]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard yPos < screenData.screenDimensionY - 1 else {return}
+            guard xPos >= 0 else {return}
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos][xPos+1]
             if leftSet.contains(gridAsset) { return }
@@ -500,7 +500,7 @@ final class RedMonster:Monster,Moveable,Animatable {
         let prevTiles = [TileType.ro,.tl,.bl,.hz,.hz,.ll,.lt,.lt,.lt,.lb,.lb,.bk,.bk,.bk,.bk,.fu,.ch,.bk]
         let rightSet:Set = [TileType.lt,.lb,.hz,.tr,.br,.rr]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard yPos < screenData.screenDimensionY - 1 else {return}
+            guard xPos < screenData.screenDimensionX else {return}
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos][xPos-1]
             if rightSet.contains(gridAsset) { return }
