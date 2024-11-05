@@ -61,6 +61,12 @@ final class ExtraMonsterArray: ObservableObject {
             }
         }
     }
+    func reset(){
+        monsterCount = 0
+        killCount = 0
+        monsters.removeAll()
+        letterAdded = false
+    }
 }
 
 final class ExtraMonster:Monster,Moveable,Animatable {
@@ -76,7 +82,7 @@ final class ExtraMonster:Monster,Moveable,Animatable {
     private var appearCount = 0
     private var increaseSpeedCounter = 0
     private var letter = 0
-   
+       
     init(xPos: Int, yPos: Int,letter: Int) {
         super.init(xPos: xPos, yPos: yPos, frameSize: GameConstants.Size.extraMonsterSize)
         monsterType = .letter
@@ -168,11 +174,6 @@ final class ExtraMonster:Monster,Moveable,Animatable {
             currentAnimationFrame = 0
             if monsterType == .swallowmonster {
                 actualAnimationFrame += 1
-//                if actualAnimationFrame == 2 {
-//                    if let appleArray: AppleArray = ServiceLocator.shared.resolve(), let swallowedApple {
-//                        appleArray.remove(id: swallowedApple.id)
-//                    }
-//                }
                 currentImage = prevMonsterType == .letter ? extraSwallowFrames[3 + actualAnimationFrame] : swallowFrames[3 + actualAnimationFrame]
                 if actualAnimationFrame == 4 {
                     if let appleArray: AppleArray = ServiceLocator.shared.resolve(), let swallowedApple {
@@ -181,6 +182,7 @@ final class ExtraMonster:Monster,Moveable,Animatable {
                     actualAnimationFrame = 0
                     monsterType = prevMonsterType
                     currentSpeed = GameConstants.Speed.monsterSpeed
+                    animationSpeed = GameConstants.Speed.normalAnimation
                 }
             }
             else if monsterState == .moving || monsterState == .chasing || monsterState == .still || monsterState == .appearing {

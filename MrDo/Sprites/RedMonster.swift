@@ -45,6 +45,12 @@ final class RedMonsterArray: ObservableObject {
         monsters.append(monster)
         monsterCount += 1
     }
+    
+    func reset(){
+        monsterCount = 0
+        killCount = 0
+        monsters.removeAll()
+    }
 }
 
 final class RedMonster:Monster,Moveable,Animatable {
@@ -191,9 +197,11 @@ final class RedMonster:Monster,Moveable,Animatable {
                 case .left:
                     if gridOffsetX == 0 {
                         if canMoveLeft() || checkApple(xPos: xPos-1, yPos: yPos) || xPos == 0 {
-                            monsterType = .redmonster
-                            chaseMode()
                             monsterDirection = nextDirection()
+                            if !stayDigging {
+                                monsterType = .redmonster
+                                chaseMode()
+                            } else { stayDigging = false }
                             return
                         }
                         gridOffsetX = 7
@@ -205,9 +213,13 @@ final class RedMonster:Monster,Moveable,Animatable {
                 case .right:
                     if gridOffsetX == 7 {
                         if canMoveRight() || checkApple(xPos: xPos+1, yPos: yPos) || xPos == screenData.screenDimensionX-1  {
-                            monsterType = .redmonster
-                            chaseMode()
                             monsterDirection = nextDirection()
+                            if !stayDigging {
+                                monsterType = .redmonster
+                                chaseMode()
+                            } else {
+                                stayDigging = false
+                            }
                             return
                         }
                         gridOffsetX = 0
@@ -332,11 +344,12 @@ final class RedMonster:Monster,Moveable,Animatable {
 //    }
 
     private func checkGridDown(){
+        let fullTiles = [TileType.ro,.rt,.rb,.rl,.rr,.vt,.hz,.tl,.tr,.br,.bl,.lt,.ll,.lb,.lr,.fu,.ch,.bk]
         let swapTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lb,.ll,.lr,.lr,.ll,.lt,.ll,.bk,.lr,.rb,.rb,.bk]
         let prevTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lt,.ll,.lr,.lr,.ll,.bk,.ll,.bk,.lr,.fu,.ch,.bk]
         let downSet:Set = [TileType.ll,.lr,.vt,.bl,.br]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard yPos < screenData.screenDimensionY - 1 else {return}
+            guard yPos < screenData.screenDimensionY else {return}
             let gridAsset = screenData.levelData.tileArray[yPos][xPos]
             let previousAsset = screenData.levelData.tileArray[yPos-1][xPos]
             if downSet.contains(gridAsset) { return }
@@ -411,7 +424,8 @@ final class RedMonster:Monster,Moveable,Animatable {
 //    }
     
     private func checkGridLeft(){
-        let swapTiles = [TileType.ro,.tl,.br,.tl,.hz,.ll,.lb,.ll,.lt,.lb,.lb,.lt,.ll,.bk,.lr,.rl,.rl,.bk]
+        let fullTiles = [TileType.ro,.rt,.rb,.rl,.rr,.vt,.hz,.tl,.tr,.br,.bl,.lt,.ll,.lb,.lr,.fu,.ch,.bk]
+        let swapTiles = [TileType.ro,.tl,.br,.hz,.hz,.ll,.lb,.ll,.lt,.lb,.lb,.lt,.ll,.bk,.bk,.rl,.rl,.bk]
         let prevTiles = [TileType.ro,.tr,.br,.hz,.tr,.lr,.lt,.lt,.lr,.lr,.lb,.bk,.bk,.bk,.bk,.fu,.ch,.bk]
         let leftSet:Set = [TileType.lt,.lb,.hz,.tl,.bl]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {
@@ -496,7 +510,8 @@ final class RedMonster:Monster,Moveable,Animatable {
 //    }
     
     private func checkGridRight(){
-        let swapTiles = [TileType.ro,.tr,.bl,.hz,.hz,.lr,.lb,.lt,.lt,.lb,.lb,.lt,.ll,.bk,.lr,.rr,.rr,.bk]
+        let fullTiles = [TileType.ro,.rt,.rb,.rl,.rr,.vt,.hz,.tl,.tr,.br,.bl,.lt,.ll,.lb,.lr,.fu,.ch,.bk]
+        let swapTiles = [TileType.ro,.tr,.bl,.hz,.hz,.lr,.lb,.lt,.lt,.lb,.lb,.lt,.bk,.bk,.bk,.rr,.rr,.bk]
         let prevTiles = [TileType.ro,.tl,.bl,.hz,.hz,.ll,.lt,.lt,.lt,.lb,.lb,.bk,.bk,.bk,.bk,.fu,.ch,.bk]
         let rightSet:Set = [TileType.lt,.lb,.hz,.tr,.br,.rr]
         if let screenData: ScreenData = ServiceLocator.shared.resolve() {

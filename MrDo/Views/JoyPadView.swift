@@ -75,13 +75,13 @@ struct JoyPadView: View {
                         .fill(Color.black)
                         .frame(width: 30, height: 30)
                         .overlay(alignment: .center, content: {
-                            Text("\(manager.screenData.level)")
+                            Text("\(manager.screenData.gameLevel)")
                                 .foregroundStyle(.white)
                                 .font(.custom("DonkeyKongClassicsNESExtended", size: 8))
                         })
                         .onTapGesture(count: 2) {
                             print("Double tapped!")
-                            manager.screenData.level += 1
+                            manager.increaseLevel()
                             manager.objectWillChange.send()
                         }
                 } else {

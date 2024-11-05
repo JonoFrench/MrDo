@@ -48,6 +48,10 @@ class Monster:SwiftUISprite {
     var monsterType:MonsterType = .bluemonster
     lazy var prevMonsterType:MonsterType = .bluemonster
     var swallowedApple: Apple?
+    var animationSpeed = 8
+    var stayDigging = false
+    var upDownCount = 0
+    var leftRightCount = 0
     
     override init(xPos: Int, yPos: Int, frameSize: CGSize) {
         super.init(xPos: xPos, yPos: yPos, frameSize: frameSize)
@@ -88,11 +92,12 @@ class Monster:SwiftUISprite {
                         monsterDirection = rndDirection
                         return
                     } else {
+                        leftRightCount += 1
+                        upDownCount = 0
                         gridOffsetX = 7
                         xPos -= 1
                         increaseSpeedCounter += 1
                         checkSwallowApple()
-//                        if monsterType == .bluemonster {checkSwallowApple()}
                     }
                 } else { gridOffsetX -= 1 }
                 position.x -= moveDistance
@@ -108,10 +113,12 @@ class Monster:SwiftUISprite {
                         monsterDirection = rndDirection
                         return
                     } else {
+                        leftRightCount += 1
+                        upDownCount = 0
                         gridOffsetX = 0
                         xPos += 1
                         increaseSpeedCounter += 1
-                        if monsterType == .bluemonster {checkSwallowApple()}
+                        checkSwallowApple()
                     }
                 } else { gridOffsetX += 1 }
                 position.x += moveDistance
@@ -127,10 +134,12 @@ class Monster:SwiftUISprite {
                         monsterDirection = rndDirection
                         return
                     } else {
+                        leftRightCount = 0
+                        upDownCount += 1
                         gridOffsetY = 7
                         yPos -= 1
                         increaseSpeedCounter += 1
-                        if monsterType == .bluemonster {checkSwallowApple()}
+                        checkSwallowApple()
                     }
                 } else { gridOffsetY -= 1 }
                 position.y -= moveDistance
@@ -146,10 +155,12 @@ class Monster:SwiftUISprite {
                         monsterDirection = rndDirection
                         return
                     } else {
+                        leftRightCount = 0
+                        upDownCount += 1
                         gridOffsetY = 0
                         yPos += 1
                         increaseSpeedCounter += 1
-                        if monsterType == .bluemonster {checkSwallowApple()}
+                        checkSwallowApple()
                     }
                 } else { gridOffsetY += 1 }
                 position.y += moveDistance
@@ -226,6 +237,40 @@ class Monster:SwiftUISprite {
                 directionArray.append(.right)
                 directionArray.append(.right)
             }
+            
+            if directionArray.contains(.right) && upDownCount > 6 {
+                directionArray.append(.right)
+                directionArray.append(.right)
+                directionArray.append(.right)
+                directionArray.append(.right)
+            }
+            if directionArray.contains(.left) && upDownCount > 6 {
+                directionArray.append(.left)
+                directionArray.append(.left)
+                directionArray.append(.left)
+                directionArray.append(.left)
+            }
+
+            if directionArray.contains(.up) && leftRightCount > 6 {
+                directionArray.append(.up)
+                directionArray.append(.up)
+                directionArray.append(.up)
+                directionArray.append(.up)
+            }
+            if directionArray.contains(.down) && leftRightCount > 6 {
+                directionArray.append(.down)
+                directionArray.append(.down)
+                directionArray.append(.down)
+                directionArray.append(.down)
+            }
+        }
+        /// If Digger gets stuck, usually between 2 apples then we can escape by going up or down.
+        if directionArray.isEmpty {
+            if monsterDirection == .left || monsterDirection == .right {
+                directionArray.append(.up)
+                directionArray.append(.down)
+                stayDigging = true
+            }
         }
         let newDir = directionArray[Int.random(in: 0..<directionArray.count)]
         setOffsets(direction: newDir)
@@ -298,6 +343,7 @@ class Monster:SwiftUISprite {
             for apple in appleArray.apples {
                 if apple.xPos == xPos && apple.yPos == yPos {
                     swallowedApple = apple
+                    swallowedApple?.frameSize = GameConstants.Size.appleSwallowSize
                     setSwallowMonster()
                 }
             }
@@ -315,6 +361,7 @@ class Monster:SwiftUISprite {
         monsterType = .swallowmonster
         actualAnimationFrame = 0
         currentAnimationFrame = 0
-        currentSpeed = 6
+        currentSpeed = GameConstants.Speed.swallowSpeed
+        animationSpeed = GameConstants.Speed.swallowAnimation
     }
 }

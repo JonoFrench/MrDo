@@ -18,15 +18,27 @@ final class ScreenData:ObservableObject {
     var assetDimensionStep = 0.0
     var gameSize = CGSize()
     var screenSize = CGSize()
+    /// W have 3 level variables.
+    /// screenLevel for the screens 1 to 10
+    /// gameLevel for the 30 different screens
+    /// actualLevel for the player's game
     @Published
-    var level:Int = 1 {
+    var screenLevel:Int = 1 {
         didSet {
-            if level > 10 {
-                level = 1
+            if screenLevel > 10 {
+                screenLevel = 1
             }
         }
     }
-    var gameLevel:Int = 1
+    var gameLevel:Int = 1 {
+        didSet {
+            if gameLevel > 30 {
+                gameLevel = 1
+            }
+        }
+    }
+    @Published
+    var actualLevel:Int = 1
     var levelEnd = false
     var gameOver = false
 }

@@ -18,10 +18,13 @@ final class Center:SwiftUISprite {
     
     init(){
         super.init(xPos: 5, yPos: 6, frameSize: GameConstants.Size.centerSize)
+        resetCenter()
+    }
+    
+    func resetCenter() {
         currentFrame = ImageResource(name: "CenterMonster", bundle: .main)
         collectible = false
         collected = false
-
     }
 
     func setBonusFood(level:Int) {

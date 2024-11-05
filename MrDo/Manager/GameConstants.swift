@@ -14,7 +14,7 @@ public enum GameState {
 public enum JoyPad {
     case left,right,up,down,stop
 }
-
+///How we complete each level.
 public enum LevelEndType {
     case cherry,redmonster,extramonster
 }
@@ -27,20 +27,24 @@ public enum GameConstants {
         public static let screenWidth = 12
         public static let screenHeight = 13
     }
-    
+    ///Higher speed = slower
     public enum Speed {
         public static let tileSteps = 8.0
         public static let doSpeed = 2
         public static let ballSpeed = 2
         public static let monsterSpeed = 4
+        public static let swallowSpeed = 4
         public static let digSpeed = 6
         public static let appleSpeed = 1
+        public static let swallowAnimation = 24
+        public static let normalAnimation = 8
     }
     
     public enum Size {
 #if os(iOS)
         public static let doSize = CGSize(width: 30, height: 30)
         public static let appleSize = CGSize(width: 28, height: 28)
+        public static let appleSwallowSize = CGSize(width: 12, height: 12)
         public static let ballSize = CGSize(width: 12, height: 12)
         public static let redMonsterSize = CGSize(width: 28, height: 28)
         public static let extraMonsterSize = CGSize(width: 28, height: 28)
@@ -54,6 +58,7 @@ public enum GameConstants {
 #elseif os(tvOS)
         public static let doSize = CGSize(width: 64, height: 64)
         public static let appleSize = CGSize(width: 64, height: 64)
+        public static let appleSwallowSize = CGSize(width: 28, height: 28)
         public static let ballSize = CGSize(width: 24, height: 24)
         public static let redMonsterSize = CGSize(width: 52, height: 52)
         public static let extraMonsterSize = CGSize(width: 52, height: 52)
@@ -81,12 +86,12 @@ public enum GameConstants {
 #elseif os(tvOS)
         public static let startText = "PRESS A TO START"
         public static let starttextSize:CGFloat = 24
-        public static let copyTextSize:CGFloat = 28
+        public static let copyTextSize:CGFloat = 22
         public static let titleTextSize:CGFloat = 28
         public static let extraTextSize:CGFloat = 36
-        public static let highScoreTextSize:CGFloat = 28
-        public static let subTitleTextSize:CGFloat = 12
-        public static let scoreTextSize:CGFloat = 16
+        public static let highScoreTextSize:CGFloat = 36
+        public static let subTitleTextSize:CGFloat = 18
+        public static let scoreTextSize:CGFloat = 22
         public static let letterTextSize:CGFloat = 60
 #endif
     }
@@ -114,12 +119,6 @@ public enum GameConstants {
         public static let cherryPoints = 100
         public static let allCherryPoints = 500
         public static let monsterPoints = 500
-        public static let extraLifePoints = 10000
-    }
-    
-    public enum Timing {
-        public static let frameRate = 1.0 / 60.0
-        public static let animationFrameRate = 0.1
     }
     
     public enum Animation {

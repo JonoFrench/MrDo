@@ -13,8 +13,8 @@ struct Progress10View: View {
     var body: some View {
         ZStack(alignment: .center) {
             let score = manager.levelScores.last
-            let averageTime = manager.gameTime / manager.screenData.level
-            let averageScore = manager.score / manager.screenData.level
+            let averageTime = manager.gameTime / manager.screenData.actualLevel
+            let averageScore = manager.score / manager.screenData.actualLevel
             ScreenView(gameScreen: manager.screenData)
                 .zIndex(0.5)
                 .overlay(alignment: .top, content: {

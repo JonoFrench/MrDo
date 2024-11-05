@@ -65,6 +65,7 @@
 		340A7B5A2CC0FDE000433318 /* Progress10View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B592CC0FDE000433318 /* Progress10View.swift */; };
 		340A7B5C2CC140FA00433318 /* RedMonster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B5B2CC140FA00433318 /* RedMonster.swift */; };
 		340A7B5E2CC1410D00433318 /* RedMonsterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A7B5D2CC1410D00433318 /* RedMonsterView.swift */; };
+		34B02A392CD93E6700FCDD04 /* GameManager+Testing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B02A382CD93E6700FCDD04 /* GameManager+Testing.swift */; };
 		34B951642C9C392D00FE770B /* MrDoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951632C9C392D00FE770B /* MrDoView.swift */; };
 		34B951662C9C394200FE770B /* MrDo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951652C9C394200FE770B /* MrDo.swift */; };
 		34B951682C9E0A5700FE770B /* BallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B951672C9E0A5700FE770B /* BallView.swift */; };
@@ -146,6 +147,7 @@
 		340A7B592CC0FDE000433318 /* Progress10View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress10View.swift; sourceTree = "<group>"; };
 		340A7B5B2CC140FA00433318 /* RedMonster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedMonster.swift; sourceTree = "<group>"; };
 		340A7B5D2CC1410D00433318 /* RedMonsterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedMonsterView.swift; sourceTree = "<group>"; };
+		34B02A382CD93E6700FCDD04 /* GameManager+Testing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameManager+Testing.swift"; sourceTree = "<group>"; };
 		34B951632C9C392D00FE770B /* MrDoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDoView.swift; sourceTree = "<group>"; };
 		34B951652C9C394200FE770B /* MrDo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrDo.swift; sourceTree = "<group>"; };
 		34B951672C9E0A5700FE770B /* BallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallView.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				34099A012C99C45C00F4FE3A /* GameManager+TV.swift */,
 				340A7B2F2CBBE14100433318 /* GameManager+Levels.swift */,
 				34B9D1B02CD1251F001BF478 /* GameConstants.swift */,
+				34B02A382CD93E6700FCDD04 /* GameManager+Testing.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -472,6 +475,7 @@
 				34B9D1A82CCA8233001BF478 /* ExtraLife.swift in Sources */,
 				34099A192C99CA8300F4FE3A /* BottomView.swift in Sources */,
 				34099A232C99CB2800F4FE3A /* GameView.swift in Sources */,
+				34B02A392CD93E6700FCDD04 /* GameManager+Testing.swift in Sources */,
 				34099A322C9AC5F500F4FE3A /* Apple.swift in Sources */,
 				34B9D1A42CC94DD9001BF478 /* Monster.swift in Sources */,
 				340A7B5C2CC140FA00433318 /* RedMonster.swift in Sources */,

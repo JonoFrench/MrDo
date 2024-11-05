@@ -14,7 +14,7 @@ struct StartView: View {
     @ObservedObject var extraMonsterArray:ExtraMonsterArray
     @ObservedObject var ball:Ball
     var body: some View {
-        VStack {
+        VStack(alignment: .center) {
             Image("Title")
                 .resizable()
                 .aspectRatio(contentMode: .fit)

@@ -38,10 +38,33 @@ class LevelData:ObservableObject {
     var tileArray:[[TileType]] = [[]]
     private let tileImage = "Tiles"
     var tileImages:[UIImage] = []
-    private let tileBackground:[Int] = [0,1,2,3,4,2,5,6,7,8,12]
+    private let tileBackground:[Int] = [0,1,2,3,4,2,5,6,7,8,3,4,2,5,6,7,9,1,10,0,5,6,7,9,1,10,3,4,2,11,12]
     private var fallSet:Set = [TileType.rb,.lb,.br,.bl,.ch,.fu,.hz,.rl,.rr]
 
     init() {
+    }
+    
+    func setLevelData(screenLevel:Int,gameLevel:Int) {
+        tileArray = levels.getLevel(level:screenLevel)
+        tileImages = setTilesFor(level: gameLevel)
+    }
+    
+    func setExtraLevelData() {
+        tileImages = setTilesFor(level: 31)
+    }
+
+    func resetExtraLevelData(gameLevel:Int) {
+        tileImages = setTilesFor(level: gameLevel)
+    }
+
+    func setProgress10Data() {
+        tileArray = levels.progress10
+        tileImages = setTilesFor(level: 10)
+    }
+
+    func setIntroScreen() {
+        tileArray = levels.introScreen
+        tileImages = setTilesFor(level: 1)
     }
     
     func checkFalling(xPos:Int,yPos:Int) -> Bool {
@@ -51,7 +74,7 @@ class LevelData:ObservableObject {
         return false
     }
     
-    let fullWalls:[[Int]] = [
+    private let fullWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
@@ -62,7 +85,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1]
     ]
     
-    let blankWalls:[[Int]] = [
+    private let blankWalls:[[Int]] = [
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -73,7 +96,7 @@ class LevelData:ObservableObject {
         [0,0,0,0,0,0,0,0]
     ]
 
-    let rtWalls:[[Int]] = [
+    private let rtWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
@@ -84,7 +107,7 @@ class LevelData:ObservableObject {
         [1,1,0,0,0,0,1,1]
     ]
 
-    let rbWalls:[[Int]] = [
+    private let rbWalls:[[Int]] = [
         [1,1,0,0,0,0,1,1],
         [1,1,0,0,0,0,1,1],
         [1,1,0,0,0,0,1,1],
@@ -94,7 +117,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1]
     ]
-    let rlWalls:[[Int]] = [
+    private let rlWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [1,1,1,0,0,0,0,0],
@@ -105,7 +128,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1]
     ]
 
-    let rrWalls:[[Int]] = [
+    private let rrWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [0,0,0,0,0,1,1,1],
@@ -116,7 +139,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1]
     ]
     
-    let tlWalls:[[Int]] = [
+    private let tlWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [1,1,1,0,0,0,0,0],
@@ -126,7 +149,7 @@ class LevelData:ObservableObject {
         [1,1,0,0,0,0,0,0],
         [1,1,0,0,0,0,0,0]
     ]
-    let trWalls:[[Int]] = [
+    private let trWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [0,0,0,0,0,1,1,1],
@@ -137,7 +160,7 @@ class LevelData:ObservableObject {
         [0,0,0,0,0,0,1,1]
     ]
 
-    let brWalls:[[Int]] = [
+    private let brWalls:[[Int]] = [
         [0,0,0,0,0,0,1,1],
         [0,0,0,0,0,0,1,1],
         [0,0,0,0,0,0,1,1],
@@ -147,7 +170,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1]
     ]
-    let blWalls:[[Int]] = [
+    private let blWalls:[[Int]] = [
         [1,1,0,0,0,0,0,0],
         [1,1,0,0,0,0,0,0],
         [1,1,0,0,0,0,0,0],
@@ -158,7 +181,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1]
     ]
 
-    let hzWalls:[[Int]] = [
+    private let hzWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [0,0,0,0,0,0,0,0],
@@ -168,7 +191,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1]
     ]
-    let vtWalls:[[Int]] = [
+    private let vtWalls:[[Int]] = [
         [1,1,0,0,0,0,1,1],
         [1,1,0,0,0,0,1,1],
         [1,1,0,0,0,0,1,1],
@@ -178,7 +201,7 @@ class LevelData:ObservableObject {
         [1,1,0,0,0,0,1,1],
         [1,1,0,0,0,0,1,1]
     ]
-    let ltWalls:[[Int]] = [
+    private let ltWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [0,0,0,0,0,0,0,0],
@@ -188,7 +211,7 @@ class LevelData:ObservableObject {
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0]
     ]
-    let lbWalls:[[Int]] = [
+    private let lbWalls:[[Int]] = [
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -198,7 +221,7 @@ class LevelData:ObservableObject {
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1]
     ]
-    let llWalls:[[Int]] = [
+    private let llWalls:[[Int]] = [
         [1,1,0,0,0,0,0,0],
         [1,1,0,0,0,0,0,0],
         [1,1,0,0,0,0,0,0],
@@ -208,7 +231,7 @@ class LevelData:ObservableObject {
         [1,1,0,0,0,0,0,0],
         [1,1,0,0,0,0,0,0]
     ]
-    let lrWalls:[[Int]] = [
+    private let lrWalls:[[Int]] = [
         [0,0,0,0,0,0,1,1],
         [0,0,0,0,0,0,1,1],
         [0,0,0,0,0,0,1,1],
@@ -219,7 +242,7 @@ class LevelData:ObservableObject {
         [0,0,0,0,0,0,1,1]
     ]
     
-    let tbWalls:[[Int]] = [
+    private let tbWalls:[[Int]] = [
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [0,0,0,0,0,0,0,0],
@@ -316,30 +339,6 @@ class LevelData:ObservableObject {
         }
     }
     
-    func setLevelData(level:Int) {
-        tileArray = levels.getLevel(level:level)
-        tileImages = setTilesFor(level: level)
-    }
-    
-    func setExtraLevelData() {
-        tileImages = setTilesFor(level: 11)
-    }
-
-    func resetExtraLevelData(level:Int) {
-        tileImages = setTilesFor(level: level)
-    }
-
-    func setProgress10Data() {
-        tileArray = levels.progress10
-        tileImages = setTilesFor(level: 10)
-    }
-
-    func setIntroScreen() {
-        tileArray = levels.introScreen
-        tileImages = setTilesFor(level: 1)
-    }
-
-    
     func setTilesFor(level:Int) -> [UIImage] {
         var tiles:[UIImage] = []
         for i in 0...17 {
@@ -397,8 +396,8 @@ struct Levels {
         }
     }
     
-    let level1:[[TileType]] = [
-        [.fu,.fu,.fu,.fu,.rl,.lt,.hz,.hz,.hz,.tr,.fu,.fu],
+    private let level1:[[TileType]] = [
+        [.fu,.fu,.fu,.fu,.bl,.bk,.lb,.lb,.hz,.tr,.fu,.fu],
         [.ch,.ch,.fu,.fu,.fu,.vt,.fu,.fu,.fu,.bl,.tr,.fu],
         [.ch,.ch,.fu,.fu,.fu,.vt,.ch,.ch,.ch,.ch,.bl,.tr],
         [.ch,.ch,.fu,.ch,.ch,.vt,.ch,.ch,.ch,.ch,.fu,.vt],
@@ -411,7 +410,7 @@ struct Levels {
         [.tl,.hz,.tr,.fu,.fu,.vt,.fu,.fu,.fu,.fu,.tl,.br],
         [.vt,.fu,.vt,.fu,.fu,.vt,.fu,.fu,.fu,.tl,.br,.fu],
         [.bl,.hz,.lb,.hz,.hz,.lb,.hz,.hz,.hz,.br,.fu,.fu]]
-    let level2:[[TileType]] = [
+    private let level2:[[TileType]] = [
         [.fu,.fu,.tl,.hz,.lb,.lb,.lb,.lb,.hz,.tr,.fu,.fu],
         [.fu,.tl,.br,.fu,.fu,.fu,.fu,.fu,.fu,.bl,.tr,.fu],
         [.tl,.br,.ch,.ch,.ch,.ch,.fu,.fu,.fu,.fu,.bl,.tr],
@@ -425,7 +424,7 @@ struct Levels {
         [.tl,.br,.fu,.fu,.ch,.ch,.ch,.ch,.fu,.fu,.ch,.ch],
         [.vt,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.ch,.ch],
         [.bl,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.rr]]
-    let level3:[[TileType]] = [
+    private let level3:[[TileType]] = [
         [.fu,.fu,.tl,.hz,.lb,.lb,.lb,.lb,.hz,.tr,.fu,.fu],
         [.fu,.tl,.br,.fu,.fu,.fu,.fu,.fu,.fu,.bl,.tr,.fu],
         [.tl,.br,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.bl,.tr],
@@ -440,7 +439,7 @@ struct Levels {
         [.bl,.tr,.fu,.ch,.ch,.fu,.fu,.fu,.fu,.fu,.tl,.br],
         [.fu,.bl,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.br,.fu]]
     
-    let level4:[[TileType]] = [
+    private let level4:[[TileType]] = [
         [.fu,.fu,.fu,.fu,.ll,.lb,.lb,.lb,.hz,.tr,.fu,.fu],
         [.ch,.ch,.ch,.ch,.vt,.fu,.fu,.fu,.fu,.vt,.fu,.fu],
         [.ch,.ch,.ch,.ch,.vt,.fu,.fu,.fu,.fu,.vt,.ch,.ch],
@@ -455,7 +454,7 @@ struct Levels {
         [.fu,.ch,.ch,.ch,.ch,.fu,.fu,.fu,.fu,.vt,.fu,.fu],
         [.fu,.ch,.ch,.ch,.ch,.rl,.hz,.hz,.hz,.br,.fu,.fu]]
     
-    let level5:[[TileType]] = [
+    private let level5:[[TileType]] = [
         [.tl,.hz,.hz,.hz,.lb,.lb,.lb,.lb,.hz,.hz,.hz,.rr],
         [.vt,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.vt,.fu,.ch,.ch,.ch,.ch,.fu,.fu,.fu,.fu,.fu,.fu],
@@ -470,7 +469,7 @@ struct Levels {
         [.bl,.tr,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.tl,.br],
         [.fu,.bl,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.br,.fu]]
     
-    let level6:[[TileType]] = [
+    private let level6:[[TileType]] = [
         [.fu,.fu,.tl,.hz,.lb,.lb,.lb,.lb,.hz,.hz,.hz,.rr],
         [.fu,.tl,.br,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.tl,.br,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
@@ -485,7 +484,7 @@ struct Levels {
         [.bl,.tr,.fu,.fu,.fu,.fu,.ch,.ch,.ch,.ch,.tl,.br],
         [.fu,.bl,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.br,.fu]]
     
-    let level7:[[TileType]] = [
+    private let level7:[[TileType]] = [
         [.tl,.hz,.hz,.hz,.lb,.lb,.lb,.lb,.hz,.hz,.hz,.tr],
         [.rb,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.vt],
         [.fu,.ch,.ch,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.tl,.br],
@@ -500,7 +499,7 @@ struct Levels {
         [.fu,.fu,.fu,.fu,.fu,.vt,.fu,.ch,.ch,.fu,.fu,.fu],
         [.fu,.fu,.fu,.rl,.hz,.br,.fu,.fu,.fu,.fu,.fu,.fu]]
     
-    let level8:[[TileType]] = [
+    private let level8:[[TileType]] = [
         [.fu,.fu,.tl,.hz,.lb,.lb,.lb,.lb,.hz,.tr,.fu,.fu],
         [.fu,.tl,.br,.fu,.fu,.fu,.fu,.fu,.fu,.bl,.tr,.fu],
         [.tl,.br,.ch,.ch,.fu,.ch,.ch,.fu,.ch,.ch,.bl,.tr],
@@ -515,7 +514,7 @@ struct Levels {
         [.bl,.tr,.fu,.fu,.fu,.fu,.ch,.ch,.ch,.ch,.tl,.br],
         [.fu,.bl,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.br,.fu]]
     
-    let level9:[[TileType]] = [
+    private let level9:[[TileType]] = [
         [.fu,.fu,.tl,.hz,.lb,.lb,.lb,.lb,.hz,.tr,.fu,.fu],
         [.fu,.tl,.br,.fu,.fu,.fu,.fu,.fu,.fu,.bl,.tr,.fu],
         [.tl,.br,.fu,.fu,.fu,.ch,.ch,.ch,.ch,.fu,.bl,.tr],
@@ -530,7 +529,7 @@ struct Levels {
         [.ch,.ch,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.tl,.br,.fu],
         [.rl,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.hz,.br,.fu,.fu]]
     
-    let level10:[[TileType]] = [
+    private let level10:[[TileType]] = [
         [.fu,.fu,.tl,.hz,.lb,.lb,.lb,.lb,.hz,.tr,.fu,.fu],
         [.fu,.tl,.lr,.fu,.fu,.fu,.fu,.fu,.fu,.bl,.tr,.fu],
         [.tl,.br,.bl,.tr,.fu,.fu,.fu,.fu,.fu,.fu,.bl,.tr],
@@ -545,7 +544,7 @@ struct Levels {
         [.fu,.bl,.tr,.fu,.ch,.ch,.ch,.ch,.fu,.ll,.br,.fu],
         [.fu,.fu,.bl,.hz,.hz,.hz,.hz,.hz,.hz,.br,.fu,.fu]]
     
-    let levelX:[[TileType]] = [
+    private let levelX:[[TileType]] = [
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],
         [.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu,.fu],

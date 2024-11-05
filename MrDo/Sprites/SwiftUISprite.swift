@@ -75,4 +75,16 @@ class SwiftUISprite:ObservableObject {
         guard let cgImage = image.cgImage?.cropping(to: rect) else { return nil }
         return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
     }
+    
+    func circlesIntersect(center: CGPoint, diameter: CGFloat) -> Bool {
+        let radius1 = diameter / 2
+        let radius2 = self.frameSize.width / 2 / 2
+        let distanceX = self.position.x - center.x
+        let distanceY = self.position.y - center.y
+        let distanceSquared = distanceX * distanceX + distanceY * distanceY
+        let radiusSum = radius1 + radius2
+        let radiusSumSquared = radiusSum * radiusSum
+        return distanceSquared <= radiusSumSquared
+    }
+
 }

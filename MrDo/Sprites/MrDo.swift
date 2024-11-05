@@ -293,34 +293,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             } else { wasCherry = false }
             let i = fullTiles.firstIndex(of: gridAsset)
             let p = fullTiles.firstIndex(of: previousAsset)
-            Task { @MainActor in
-                //try? await Task.sleep(for: .seconds(0.5))
                 screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
                 screenData.levelData.tileArray[yPos+1][xPos] = prevTiles[p!]
                 screenData.objectWillChange.send()
-            }
-        }
-    }
-    
-    private func checkGridDown(){
-        let swapTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lb,.ll,.lr,.lr,.ll,.lt,.ll,.bk,.lr,.rb,.rb,.bk]
-        let prevTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lt,.ll,.lr,.lr,.ll,.bk,.ll,.bk,.lr,.fu,.ch,.bk]
-        let downSet:Set = [TileType.ll,.lr,.vt,.bl,.br,.rb]
-        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
-            guard yPos < screenData.screenDimensionY - 1 else {return}
-            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
-            let previousAsset = screenData.levelData.tileArray[yPos-1][xPos]
-            if downSet.contains(gridAsset) { return }
-            if gridAsset == .ch { addCherry()
-            } else { wasCherry = false }
-            let i = fullTiles.firstIndex(of: gridAsset)
-            let p = fullTiles.firstIndex(of: previousAsset)
-            Task { @MainActor in
-                //try? await Task.sleep(for: .seconds(0.5))
-                screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
-                screenData.levelData.tileArray[yPos-1][xPos] = prevTiles[p!]
-                screenData.objectWillChange.send()
-            }
         }
     }
     
@@ -337,12 +312,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             } else { wasCherry = false }
             let i = fullTiles.firstIndex(of: gridAsset)
             let p = fullTiles.firstIndex(of: previousAsset)
-            Task { @MainActor in
-                //try? await Task.sleep(for: .seconds(0.5))
                 screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
                 screenData.levelData.tileArray[yPos][xPos+1] = prevTiles[p!]
                 screenData.objectWillChange.send()
-            }
         }
     }
     
@@ -359,12 +331,9 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
             } else { wasCherry = false }
             let i = fullTiles.firstIndex(of: gridAsset)
             let p = fullTiles.firstIndex(of: previousAsset)
-            Task { @MainActor in
-                //try? await Task.sleep(for: .seconds(0.5))
                 screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
                 screenData.levelData.tileArray[yPos][xPos-1] = prevTiles[p!]
                 screenData.objectWillChange.send()
-            }
         }
     }
     
@@ -430,6 +399,28 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
 //            screenData.objectWillChange.send()
 //        }
 //    }
+    
+    private func checkGridDown(){
+        let fullTiles = [TileType.ro,.rt,.rb,.rl,.rr,.vt,.hz,.tl,.tr,.br,.bl,.lt,.ll,.lb,.lr,.fu,.ch,.bk]
+        let swapTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lb,.ll,.lr,.lr,.ll,.lt,.ll,.lb,.lr,.rb,.rb,.bk]
+        let prevTiles = [TileType.ro,.vt,.vt,.tl,.tr,.vt,.lt,.ll,.lr,.lr,.ll,.bk,.ll,.lb,.lr,.fu,.ch,.bk]
+        let downSet:Set = [TileType.ll,.lr,.vt,.bl,.br,.rb]
+        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
+            guard yPos < screenData.screenDimensionY else {return}
+            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
+            let previousAsset = screenData.levelData.tileArray[yPos-1][xPos]
+            if downSet.contains(gridAsset) { return }
+            if gridAsset == .ch { addCherry()
+            } else { wasCherry = false }
+            let i = fullTiles.firstIndex(of: gridAsset)
+            let p = fullTiles.firstIndex(of: previousAsset)
+                screenData.levelData.tileArray[yPos][xPos] = swapTiles[i!]
+                screenData.levelData.tileArray[yPos-1][xPos] = prevTiles[p!]
+                screenData.objectWillChange.send()
+        }
+    }
+    
+    
 //    private func checkGridDown() {
 //        if let screenData: ScreenData = ServiceLocator.shared.resolve() {
 //            let gridAsset = screenData.levelData.tileArray[yPos][xPos]
@@ -795,7 +786,7 @@ final class MrDo:SwiftUISprite,Moveable,Animatable {
         ///Is there an apple below?
         if let appleArray: AppleArray = ServiceLocator.shared.resolve() {
             for apple in appleArray.apples {
-                if apple.yPos-1 == yPos && apple.xPos == xPos {
+                if apple.yPos == yPos && apple.xPos == xPos {
                     pushedApple = apple
                     return true
                 }

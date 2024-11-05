@@ -120,8 +120,11 @@ final class Apple:SwiftUISprite,Moveable {
                 if moveCounter == 8 {
                     moveCounter = 0
                     dropLevel += 1
-                    let checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
-                    if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr || yPos == screenData.screenDimensionY {
+                    var checkAsset:TileType = .lb
+                    if yPos < screenData.screenDimensionY-1 {
+                        checkAsset = screenData.levelData.tileArray[yPos+1][xPos]
+                    }
+                    if checkAsset == .rb || checkAsset == .lb || checkAsset == .br || checkAsset == .bl || checkAsset == .ch || checkAsset == .fu || checkAsset == .hz || checkAsset == .rl || checkAsset == .rr {
                         if dropLevel > 1 {
                             breakApple()
                         } else {
