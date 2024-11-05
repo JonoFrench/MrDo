@@ -120,7 +120,7 @@ final class GameManager: ObservableObject {
         let testProgressSwitch = false
         let testProgress10Switch = false
         let testExtraLifeSwitch = false
-        let testShowLevelsSwitch = true
+        let testShowLevelsSwitch = false
 //        let testLevel = false
 //        let levelToTest = 0
         if testProgressSwitch {
